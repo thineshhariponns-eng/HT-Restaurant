@@ -1,0 +1,91 @@
+@model DemoClient
+@{
+    ViewData["Title"] = $"{Model.Name} details";
+    var stepsDone = DemoClientStore.StepsDone(Model.Stage);
+    var configured = stepsDone >= 2;
+    var activity = DemoClientStore.ActivityFor(Model.Name);
+}
+<div class="container admin-pad">
+    <p style="font-size:0.875rem">
+        <a asp-area="Platform" asp-controller="Clients" asp-action="Index" class="text-muted">&larr; Clients</a>
+    </p>
+
+    <header class="page-heading" style="margin-top:12px">
+        <h1>@Model.Name @Model.City</h1>
+        <span class="status-pill">
+            <span class="dot stage-dot-@Model.Stage.ToString().ToLowerInvariant()"></span>
+            @DemoClientStore.Label(Model.Stage)
+        </span>
+    </header>
+
+    <div class="grid grid-2" style="align-items:start">
+        <section class="summary-panel">
+            <h2 class="title" style="font-size:1rem">Client information</h2>
+            <dl style="margin:16px 0 0">
+                <div class="summary-row"><dt>Client ID</dt><dd class="tabular text-primary" style="margin:0">@Model.Code</dd></div>
+                <div class="summary-row"><dt>Name</dt><dd class="text-primary" style="margin:0">@Model.Name</dd></div>
+                <div class="summary-row"><dt>Contact</dt><dd class="text-primary" style="margin:0">@Model.Contact</dd></div>
+                <div class="summary-row"><dt>Created</dt><dd class="tabular text-primary" style="margin:0">@Model.CreatedUtc.ToString("d MMM yyyy")</dd></div>
+                <div class="summary-row"><dt>Updated</dt><dd class="tabular text-primary" style="margin:0">@Model.UpdatedUtc.ToString("d MMM yyyy")</dd></div>
+            </dl>
+        </section>
+
+        <section class="summary-panel">
+            <h2 class="title" style="font-size:1rem">Onboarding status</h2>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:16px">
+                <span class="meter" style="flex:1;height:12px" role="img" aria-label="@Model.Progress percent complete"><span style="width:@(Model.Progress)%"></span></span>
+                <span class="tabular text-body">@Model.Progress%</span>
+            </div>
+            <ul style="list-style:none;margin:16px 0 0;padding:0">
+                @for (var i = 0; i < DemoClientStore.Steps.Length; i++)
+                {
+                    var done = i < stepsDone;
+                    <li style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--color-border-subtle)">
+                        <span style="width:16px;text-align:center;color:@(done ? "var(--color-primary-600)" : "var(--color-border-strong)")">@(done ? "✓" : "·")</span>
+                        <span style="font-size:0.875rem;color:@(done ? "var(--color-text-primary)" : "var(--color-text-muted)")">@DemoClientStore.Steps[i]</span>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
+
+    <section class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Domains</h2>
+        <table class="ruled" style="margin-top:16px;border:0;background:transparent">
+            <thead><tr><th>Domain</th><th>Type</th><th>Status</th></tr></thead>
+            <tbody>
+            <tr>
+                <td class="text-primary">@Model.Domain</td>
+                <td class="text-body">Customer</td>
+                <td class="text-body">@(configured ? "Configured" : "Pending")</td>
+            </tr>
+            <tr>
+                <td class="text-primary">@Model.ResolvedAdminDomain</td>
+                <td class="text-body">Admin</td>
+                <td class="text-body">@(configured ? "Configured" : "Pending")</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    @if (activity.Count > 0)
+    {
+        <section class="summary-panel" style="margin-top:24px">
+            <h2 class="title" style="font-size:1rem">Recent activity</h2>
+            <ul style="list-style:none;margin:16px 0 0;padding:0">
+                @foreach (var entry in activity)
+                {
+                    <li style="display:flex;gap:16px;padding:10px 0;border-bottom:1px solid var(--color-border-subtle)">
+                        <time class="tabular text-muted" style="width:48px;font-size:0.875rem">@entry.Time</time>
+                        <span class="text-body" style="font-size:0.875rem">@entry.Event</span>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
+    <div class="actions-row">
+        <a class="btn btn-secondary" asp-area="Platform" asp-controller="Domains" asp-action="Index">Manage domains</a>
+        <a class="btn btn-secondary" asp-area="Platform" asp-controller="Deployments" asp-action="Index">View board</a>
+    </div>
+</div>

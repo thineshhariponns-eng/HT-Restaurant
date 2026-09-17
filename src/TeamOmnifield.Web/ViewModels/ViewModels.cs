@@ -73,3 +73,25 @@ public class OrderListItemViewModel
     public OrderStatus Status { get; set; }
     public DateTime CreatedUtc { get; set; }
 }
+
+public class OrderHistoryViewModel
+{
+    public string Phone { get; set; } = string.Empty;
+    /// <summary>True once a lookup has run, so the page can tell "no results" from "not asked yet".</summary>
+    public bool Searched { get; set; }
+    public List<OrderListItemViewModel> Orders { get; set; } = [];
+}
+
+public class NewClientViewModel
+{
+    [Required, StringLength(120)] public string Name { get; set; } = string.Empty;
+    [StringLength(80)] public string? City { get; set; }
+    [Required, StringLength(120)] public string Contact { get; set; } = string.Empty;
+    [Required, EmailAddress, StringLength(160)] public string ContactEmail { get; set; } = string.Empty;
+    [Required, StringLength(160)]
+    [RegularExpression(@"^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$", ErrorMessage = "Use a hostname such as spicegarden.com — lowercase, no protocol.")]
+    public string Domain { get; set; } = string.Empty;
+    [Required, StringLength(160)]
+    [RegularExpression(@"^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$", ErrorMessage = "Use a hostname such as admin.spicegarden.local — lowercase, no protocol.")]
+    public string AdminDomain { get; set; } = string.Empty;
+}

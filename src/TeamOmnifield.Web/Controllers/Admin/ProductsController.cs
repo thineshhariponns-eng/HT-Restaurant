@@ -7,7 +7,7 @@ using TeamOmnifield.Web.ViewModels;
 
 namespace TeamOmnifield.Web.Controllers.Admin;
 
-[Area("Admin"), Authorize]
+[Area("Admin"), Authorize(Roles = "Admin")]
 public class ProductsController(AppDbContext db) : Controller
 {
     public async Task<IActionResult> Index() => View(await db.Products.Include(x => x.Category).OrderBy(x => x.Category!.DisplayOrder).ThenBy(x => x.Name).ToListAsync());

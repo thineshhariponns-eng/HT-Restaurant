@@ -1,0 +1,110 @@
+@{
+    ViewData["Title"] = "Deployments";
+    var clients = DemoClientStore.All();
+    var pipeline = DemoClientStore.Pipeline;
+}
+<div class="container admin-pad">
+    <header class="page-heading">
+        <h1>Client management</h1>
+        <p class="text-muted" style="font-size:0.875rem">Kanban. Drag a card between columns, or use its arrows.</p>
+    </header>
+
+    <div class="kanban">
+        @foreach (var stage in pipeline)
+        {
+            var column = clients.Where(x => x.Stage == stage).ToList();
+            <section class="kanban-col" data-stage="@stage" aria-label="@DemoClientStore.Label(stage)">
+                <header>
+                    <p class="label-caps" style="display:flex;align-items:center;gap:8px">
+                        <span class="dot stage-dot-@stage.ToString().ToLowerInvariant()"></span>
+                        @DemoClientStore.Label(stage)
+                    </p>
+                    <p class="count tabular">@column.Count.ToString("00")</p>
+                </header>
+                <ul class="kanban-list" data-stage="@stage">
+                    @foreach (var client in column)
+                    {
+                        var index = Array.IndexOf(pipeline, client.Stage);
+                        <li class="kanban-card" draggable="true" data-client="@client.Id">
+                            <div class="row">
+                                <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
+                                <span class="nudge">
+                                    @if (index > 0)
+                                    {
+                                        <form method="post" asp-area="Platform" asp-controller="Deployments" asp-action="Move">
+                                            <input type="hidden" name="id" value="@client.Id" />
+                                            <input type="hidden" name="stage" value="@pipeline[index - 1]" />
+                                            <button type="submit" aria-label="Move @client.Name left">&lsaquo;</button>
+                                        </form>
+                                    }
+                                    @if (index < pipeline.Length - 1)
+                                    {
+                                        <form method="post" asp-area="Platform" asp-controller="Deployments" asp-action="Move">
+                                            <input type="hidden" name="id" value="@client.Id" />
+                                            <input type="hidden" name="stage" value="@pipeline[index + 1]" />
+                                            <button type="submit" aria-label="Move @client.Name right">&rsaquo;</button>
+                                        </form>
+                                    }
+                                </span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+                                <span class="tabular text-body" style="font-size:0.75rem">@client.Progress%</span>
+                                <span class="meter" style="flex:1" aria-hidden="true"><span style="width:@(client.Progress)%"></span></span>
+                            </div>
+                            <p class="host text-body">@client.Domain</p>
+                            <p class="host text-muted">@client.ResolvedAdminDomain</p>
+                            <p class="text-muted tabular" style="font-size:0.75rem;margin:8px 0 0">Updated: @client.UpdatedUtc.ToString("d MMM")</p>
+                        </li>
+                    }
+                    @if (column.Count == 0)
+                    {
+                        <li class="kanban-empty text-muted">Nothing in @DemoClientStore.Label(stage).</li>
+                    }
+                </ul>
+            </section>
+        }
+    </div>
+
+    <form id="moveForm" method="post" asp-area="Platform" asp-controller="Deployments" asp-action="Move" style="display:none">
+        <input type="hidden" name="id" id="moveId" />
+        <input type="hidden" name="stage" id="moveStage" />
+    </form>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+  var dragged = null;
+  var form = document.getElementById('moveForm');
+
+  document.querySelectorAll('.kanban-card').forEach(function (card) {
+    card.addEventListener('dragstart', function (e) {
+      dragged = card;
+      card.classList.add('dragging');
+      if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', card.dataset.client); }
+    });
+    card.addEventListener('dragend', function () {
+      card.classList.remove('dragging');
+      dragged = null;
+    });
+  });
+
+  document.querySelectorAll('.kanban-list').forEach(function (list) {
+    list.addEventListener('dragover', function (e) { e.preventDefault(); list.classList.add('over'); });
+    list.addEventListener('dragleave', function () { list.classList.remove('over'); });
+    list.addEventListener('drop', function (e) {
+      e.preventDefault();
+      list.classList.remove('over');
+      var id = (e.dataTransfer && e.dataTransfer.getData('text/plain')) || (dragged && dragged.dataset.client);
+      if (!id) return;
+      var target = list.dataset.stage;
+      var from = dragged ? dragged.closest('.kanban-list').dataset.stage : null;
+      if (from === target) return;
+      document.getElementById('moveId').value = id;
+      document.getElementById('moveStage').value = target;
+      form.submit();
+    });
+  });
+})();
+</script>
+}

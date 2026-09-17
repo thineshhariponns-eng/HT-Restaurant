@@ -1,0 +1,87 @@
+@model NewClientViewModel
+@{ ViewData["Title"] = "Onboarding"; }
+<div class="container admin-pad" style="max-width:760px">
+    <header class="page-heading">
+        <h1>Client onboarding</h1>
+        <p class="text-muted" style="font-size:0.875rem">Create a new restaurant client.</p>
+    </header>
+
+    <form method="post" asp-area="Platform" asp-controller="Onboarding" asp-action="Index" novalidate>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="ModelOnly" class="alert-error"></div>
+        }
+
+        <section class="form-card">
+            <h2 class="title" style="font-size:1rem">Client information</h2>
+
+            <div class="field" style="margin-top:20px">
+                <label asp-for="Name">Client name</label>
+                <input asp-for="Name" autocomplete="organization" />
+                <span asp-validation-for="Name" class="field-error-text"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="City">Branch or town <span class="text-muted">(optional)</span></label>
+                <input asp-for="City" autocomplete="address-level2" />
+            </div>
+
+            <div class="field">
+                <label asp-for="Contact">Contact name</label>
+                <input asp-for="Contact" autocomplete="name" />
+                <span asp-validation-for="Contact" class="field-error-text"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="ContactEmail">Contact email</label>
+                <input asp-for="ContactEmail" type="email" autocomplete="email" />
+                <span asp-validation-for="ContactEmail" class="field-error-text"></span>
+            </div>
+        </section>
+
+        <section class="form-card" style="margin-top:20px">
+            <h2 class="title" style="font-size:1rem">Domain configuration</h2>
+
+            <div class="field" style="margin-top:20px">
+                <label asp-for="Domain">Customer hostname</label>
+                <input asp-for="Domain" id="customerDomain" placeholder="spicegarden.com" />
+                <span asp-validation-for="Domain" class="field-error-text"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="AdminDomain">Admin hostname</label>
+                <input asp-for="AdminDomain" id="adminDomain" placeholder="admin.spicegarden.local" />
+                <span asp-validation-for="AdminDomain" class="field-error-text"></span>
+                <p class="hint text-muted">Filled from the customer hostname until you change it.</p>
+            </div>
+        </section>
+
+        <section class="form-card" style="margin-top:20px">
+            <h2 class="title" style="font-size:1rem">Initial status</h2>
+            <p class="text-body" style="display:flex;align-items:center;gap:8px;margin-top:16px;font-size:0.875rem">
+                <span class="dot stage-dot-new"></span> New client
+            </p>
+            <div class="actions-row" style="margin-bottom:0;justify-content:space-between">
+                <a class="btn btn-secondary" asp-area="Platform" asp-controller="Clients" asp-action="Index">Cancel</a>
+                <button type="submit" class="btn btn-primary">Create client</button>
+            </div>
+        </section>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+  var customer = document.getElementById('customerDomain');
+  var admin = document.getElementById('adminDomain');
+  if (!customer || !admin) return;
+  var touched = admin.value.length > 0;
+  admin.addEventListener('input', function () { touched = true; });
+  customer.addEventListener('input', function () {
+    if (touched) return;
+    var label = customer.value.trim().toLowerCase().split('.')[0];
+    admin.value = label ? 'admin.' + label + '.local' : '';
+  });
+})();
+</script>
+}

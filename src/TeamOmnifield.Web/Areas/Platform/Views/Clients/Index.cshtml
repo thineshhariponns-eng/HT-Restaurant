@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Clients";
+    var query = ((string)ViewBag.Query ?? string.Empty).Trim();
+    var clients = DemoClientStore.All();
+    if (query.Length > 0)
+    {
+        clients = clients.Where(x =>
+            x.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+            x.Domain.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+            x.ResolvedAdminDomain.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+    string Code(ClientStage stage) => stage switch {
+        ClientStage.New => "New", ClientStage.Onboarding => "Onboard", ClientStage.Development => "Dev",
+        ClientStage.Review => "Review", _ => "Live",
+    };
+}
+<div class="container admin-pad">
+    <header class="page-heading">
+        <h1>Clients</h1>
+    </header>
+
+    <div class="toolbar">
+        <a class="btn btn-primary" asp-area="Platform" asp-controller="Onboarding" asp-action="Index">+ Add client</a>
+        <form method="get" asp-area="Platform" asp-controller="Clients" asp-action="Index" class="search-wrap" style="margin-left:auto;max-width:280px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+            <input type="search" name="q" value="@query" placeholder="Name or domain" aria-label="Search clients" />
+        </form>
+    </div>
+
+    @if (clients.Count == 0)
+    {
+        <div class="empty-state">
+            <p class="title">No client matches “@query”</p>
+            <p class="hint text-muted">Try a different name or domain.</p>
+        </div>
+    }
+    else
+    {
+        <table class="ruled">
+            <thead>
+            <tr>
+                <th>Client</th>
+                <th>Customer domain</th>
+                <th>Admin domain</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var client in clients)
+            {
+                <tr>
+                    <td class="text-primary">
+                        <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
+                    </td>
+                    <td class="text-body">@client.Domain</td>
+                    <td class="text-body">@client.ResolvedAdminDomain</td>
+                    <td><span class="label-caps stage-@client.Stage.ToString().ToLowerInvariant()">@Code(client.Stage)</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <p class="text-muted" style="font-size:0.875rem;margin-top:16px">Showing @clients.Count client@(clients.Count == 1 ? "" : "s")</p>
+    }
+</div>

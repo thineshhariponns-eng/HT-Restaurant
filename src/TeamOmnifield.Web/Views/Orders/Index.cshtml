@@ -1,0 +1,82 @@
+@model OrderHistoryViewModel
+@{
+    ViewData["Title"] = "My orders";
+    var statusLabel = new Dictionary<OrderStatus, string> {
+        [OrderStatus.Pending] = "Placed", [OrderStatus.Confirmed] = "Confirmed", [OrderStatus.Preparing] = "Preparing",
+        [OrderStatus.Ready] = "Ready", [OrderStatus.OutForDelivery] = "Out for delivery", [OrderStatus.Delivered] = "Delivered",
+        [OrderStatus.Cancelled] = "Cancelled",
+    };
+    string Tone(OrderStatus s) => s switch {
+        OrderStatus.Pending => "attention",
+        OrderStatus.Confirmed or OrderStatus.Preparing or OrderStatus.Ready => "kitchen",
+        OrderStatus.OutForDelivery => "delivery",
+        OrderStatus.Delivered => "done",
+        _ => "stopped",
+    };
+}
+<section class="band band-strong">
+    <div class="container">
+        <h1 class="display" style="font-size:clamp(1.875rem,3vw,2.25rem)">My orders</h1>
+        <p class="text-body" style="margin-top:8px">Enter the phone number you ordered with to see your past orders.</p>
+    </div>
+</section>
+
+<section class="band-surface" style="border-bottom:1px solid var(--color-border-subtle)">
+    <div class="container band-tight">
+        <form method="get" asp-controller="Orders" asp-action="Index" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+            <div class="field" style="flex:1;min-width:220px;max-width:360px">
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" name="phone" value="@Model.Phone" placeholder="+91 98765 43210" autocomplete="tel" />
+            </div>
+            <button type="submit" class="btn btn-primary">Find my orders</button>
+        </form>
+    </div>
+</section>
+
+<section class="container band" style="border-bottom:0">
+    @if (!Model.Searched)
+    {
+        <div class="empty-state">
+            <p class="title">Look up an order</p>
+            <p class="hint text-muted">We keep orders against the phone number given at checkout.</p>
+        </div>
+    }
+    else if (Model.Orders.Count == 0)
+    {
+        <div class="empty-state">
+            <p class="title">No orders for that number</p>
+            <p class="hint text-muted">Check the number, or <a href="/Menu" style="color:var(--color-primary-600)">start a new order</a>.</p>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted tabular" style="font-size:0.875rem;margin:0 0 16px">
+            @Model.Orders.Count order@(Model.Orders.Count == 1 ? "" : "s") for @Model.Phone
+        </p>
+        <table class="ruled">
+            <thead>
+            <tr>
+                <th>Order</th>
+                <th>Placed</th>
+                <th>Status</th>
+                <th style="text-align:right">Total</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td class="tabular text-primary">#@order.OrderNumber</td>
+                    <td class="tabular text-muted">@order.CreatedUtc.ToLocalTime().ToString("d MMM, h:mm tt")</td>
+                    <td><span class="badge"><span class="dot dot-@Tone(order.Status)"></span>@statusLabel[order.Status]</span></td>
+                    <td class="tabular text-primary" style="text-align:right">₹@order.Total.ToString("0.00")</td>
+                    <td style="text-align:right">
+                        <a class="btn btn-secondary btn-sm" asp-controller="Orders" asp-action="Details" asp-route-orderNumber="@order.OrderNumber">View</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</section>
