@@ -6,7 +6,7 @@
 
     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle px-4 py-3 sm:px-6">
       <a
-        routerLink="/onboarding"
+        routerLink="/developer/onboarding"
         class="flex h-9 items-center bg-primary-600 px-3 text-sm font-semibold text-text-inverse hover:bg-primary-700"
       >
         + Add client
@@ -42,7 +42,7 @@
             <tr class="border-b border-border-subtle last:border-b-0">
               <th scope="row" class="px-4 py-3 text-left font-medium sm:px-6">
                 <a
-                  [routerLink]="['/clients', row.id]"
+                  [routerLink]="['/developer/clients', row.id]"
                   class="text-text-primary hover:text-primary-600 hover:underline"
                 >
                   {{ row.name }}

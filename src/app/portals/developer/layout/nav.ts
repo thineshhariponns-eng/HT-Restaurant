@@ -12,16 +12,16 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Delivery',
     links: [
-      { path: '/dashboard', label: 'Dashboard' },
-      { path: '/clients', label: 'Clients' },
-      { path: '/onboarding', label: 'Onboarding' },
+      { path: '/developer/dashboard', label: 'Dashboard' },
+      { path: '/developer/clients', label: 'Clients' },
+      { path: '/developer/onboarding', label: 'Onboarding' },
     ],
   },
   {
     label: 'Infrastructure',
     links: [
-      { path: '/domains', label: 'Domains' },
-      { path: '/deployments', label: 'Deployments' },
+      { path: '/developer/domains', label: 'Domains' },
+      { path: '/developer/deployments', label: 'Deployments' },
     ],
   },
 ];

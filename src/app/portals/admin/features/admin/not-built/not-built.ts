@@ -21,7 +21,7 @@ import { HlmButton } from '@spartan-ng/helm/button';
       } @else {
         <p class="text-text-body">There's no admin page at this address.</p>
       }
-      <a hlmBtn variant="outline" class="mt-6" routerLink="/orders">Go to Orders</a>
+      <a hlmBtn variant="outline" class="mt-6" routerLink="/admin/orders">Go to Orders</a>
     </div>
   `,
 })

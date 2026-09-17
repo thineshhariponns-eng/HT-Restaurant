@@ -48,6 +48,6 @@ export class Onboarding {
       return;
     }
     const client = this.store.add(this.form.getRawValue());
-    this.router.navigate(['/clients', client.id]);
+    this.router.navigate(['/developer/clients', client.id]);
   }
 }

@@ -15,19 +15,19 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Operations',
     links: [
-      { path: '/dashboard', label: 'Dashboard', icon: 'lucideLayoutDashboard' },
-      { path: '/orders', label: 'Orders', icon: 'lucideClipboardList', showPendingCount: true },
+      { path: '/admin/dashboard', label: 'Dashboard', icon: 'lucideLayoutDashboard' },
+      { path: '/admin/orders', label: 'Orders', icon: 'lucideClipboardList', showPendingCount: true },
     ],
   },
-  { label: 'Catalog', links: [{ path: '/menu', label: 'Menu', icon: 'lucideUtensilsCrossed' }] },
+  { label: 'Catalog', links: [{ path: '/admin/menu', label: 'Menu', icon: 'lucideUtensilsCrossed' }] },
   {
     label: 'People',
     links: [
-      { path: '/staff', label: 'Staff', icon: 'lucideUsers' },
-      { path: '/customers', label: 'Customers', icon: 'lucideContact' },
+      { path: '/admin/staff', label: 'Staff', icon: 'lucideUsers' },
+      { path: '/admin/customers', label: 'Customers', icon: 'lucideContact' },
     ],
   },
-  { label: 'Insights', links: [{ path: '/reports', label: 'Reports', icon: 'lucideChartColumn' }] },
+  { label: 'Insights', links: [{ path: '/admin/reports', label: 'Reports', icon: 'lucideChartColumn' }] },
 ];
 
-export const SETTINGS_LINK: NavLink = { path: '/settings', label: 'Settings', icon: 'lucideSettings' };
+export const SETTINGS_LINK: NavLink = { path: '/admin/settings', label: 'Settings', icon: 'lucideSettings' };
