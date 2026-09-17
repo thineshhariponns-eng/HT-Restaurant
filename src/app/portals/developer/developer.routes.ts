@@ -12,7 +12,7 @@ function clientTitle(route: ActivatedRouteSnapshot): string {
   return (client ? `${client.name} details` : 'Client not found') + SUFFIX;
 }
 
-export const routes: Routes = [
+export const DEVELOPER_ROUTES: Routes = [
   {
     path: '',
     component: PlatformShell,

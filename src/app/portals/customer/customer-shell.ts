@@ -4,9 +4,9 @@ import { Header } from './layout/header/header';
 import { Footer } from './layout/footer/footer';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-customer-shell',
   imports: [RouterOutlet, Header, Footer],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './customer-shell.html',
+  styleUrl: './customer-shell.css'
 })
-export class App {}
+export class CustomerShell {}

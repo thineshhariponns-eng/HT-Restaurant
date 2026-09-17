@@ -4,7 +4,7 @@ import { AdminShell } from './layout/admin-shell/admin-shell';
 const SUFFIX = ' · HT Restaurant Admin';
 const notBuilt = () => import('./features/admin/not-built/not-built').then((m) => m.NotBuilt);
 
-export const routes: Routes = [
+export const ADMIN_ROUTES: Routes = [
   {
     path: '',
     component: AdminShell,
