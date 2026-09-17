@@ -1,0 +1,23 @@
+<a
+  [routerLink]="['/menu']"
+  [queryParams]="{ category: categorySlug() }"
+  class="group flex items-center justify-between gap-4 border-b border-border-subtle py-5 transition-colors duration-150 hover:border-primary-600"
+>
+  <span class="font-display text-xl font-semibold text-text-primary sm:text-2xl">{{ label() }}</span>
+
+  <span class="flex items-center gap-3 text-sm text-text-muted">
+    <span class="tabular-nums text-primary-600">{{ dishCount() }} {{ dishCount() === 1 ? 'dish' : 'dishes' }}</span>
+    <svg
+      class="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 5l7 7-7 7" />
+    </svg>
+  </span>
+</a>

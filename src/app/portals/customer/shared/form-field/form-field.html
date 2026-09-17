@@ -1,0 +1,34 @@
+<div>
+  <label [for]="fieldId()" class="text-sm font-medium text-text-primary">
+    {{ label() }}
+    @if (required()) {
+      <span class="text-primary-600" aria-hidden="true"> *</span>
+    }
+  </label>
+
+  <input
+    [id]="fieldId()"
+    [type]="type()"
+    [formControl]="control()"
+    [placeholder]="placeholder()"
+    [attr.aria-required]="required()"
+    [attr.aria-invalid]="hasError()"
+    class="mt-1.5 block w-full border bg-bg-surface px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+    [class.border-border-strong]="!hasError()"
+    [class.focus:border-primary-600]="!hasError()"
+    [class.focus:ring-1]="!hasError()"
+    [class.focus:ring-primary-600]="!hasError()"
+    [class.border-error]="hasError()"
+    [class.focus:ring-error]="hasError()"
+  />
+
+  @if (hasError()) {
+    <p class="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-error">
+      <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8v4M12 16h.01" />
+      </svg>
+      {{ errorMessage() }}
+    </p>
+  }
+</div>

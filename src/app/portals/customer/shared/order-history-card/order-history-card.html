@@ -1,0 +1,145 @@
+<article
+  [attr.aria-labelledby]="titleId()"
+  data-testid="order-card"
+  class="grid gap-x-8 gap-y-4 border-b border-border-subtle py-6 sm:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[16rem_minmax(0,1fr)_auto]"
+>
+  <!-- Identity: number, when, how many, how it's fulfilled -->
+  <div class="min-w-0 sm:col-start-1 sm:row-start-1">
+    <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+      <h3 [id]="titleId()" class="font-display text-lg font-semibold tabular-nums text-text-primary">
+        <a
+          [routerLink]="orderLink()"
+          class="transition-colors duration-150 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+        >
+          #{{ order().orderNumber }}
+        </a>
+      </h3>
+      <div class="shrink-0 sm:hidden">
+        <app-order-status-badge [type]="order().type" [status]="order().status" />
+      </div>
+    </div>
+
+    <p class="mt-1 text-sm tabular-nums text-text-muted">
+      <time [attr.datetime]="order().placedAt">
+        {{ relativeDay() ?? (order().placedAt | date: 'MMM d, y' : '+0530') }} &middot;
+        {{ order().placedAt | date: 'h:mm a' : '+0530' }}
+      </time>
+    </p>
+
+    <p class="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-text-muted">
+      <span class="tabular-nums">{{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }}</span>
+      <span aria-hidden="true">&middot;</span>
+      <span class="inline-flex items-center gap-1.5">
+        @if (order().type === 'delivery') {
+          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="6" cy="18" r="2" />
+            <circle cx="17" cy="18" r="2" />
+            <path d="M4 18h1V9h6l4 5h4v4h-1M11 9V6h3l3 3" />
+          </svg>
+          Delivery
+        } @else {
+          <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 9l1.5-5h13L20 9M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9z M9 13a3 3 0 0 0 6 0" />
+          </svg>
+          Pickup
+        }
+      </span>
+    </p>
+  </div>
+
+  <!-- What was ordered -->
+  <ul class="min-w-0 space-y-1 text-sm sm:col-start-1 sm:row-start-2 lg:col-start-2 lg:row-start-1 lg:pt-1.5">
+    @for (line of visibleLines(); track line.slug) {
+      <li class="truncate text-text-body">
+        {{ line.name }} <span class="tabular-nums text-text-muted">&times; {{ line.quantity }}</span>
+      </li>
+    }
+    @if (hiddenLineCount() > 0) {
+      <li class="text-text-muted">+ {{ hiddenLineCount() }} more</li>
+    }
+  </ul>
+
+  <!-- Status, total, next step -->
+  <div class="flex flex-col gap-3 sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:items-end lg:col-start-3 lg:row-span-1">
+    <div class="hidden sm:block">
+      <app-order-status-badge [type]="order().type" [status]="order().status" />
+    </div>
+
+    <p class="flex items-baseline gap-2 sm:justify-end">
+      <span class="text-xs uppercase tracking-widest text-text-muted">Total</span>
+      <span
+        class="font-display text-xl font-semibold tabular-nums"
+        [class.text-primary-600]="group() !== 'cancelled'"
+        [class.text-text-muted]="group() === 'cancelled'"
+      >
+        ₹{{ order().total }}
+      </span>
+    </p>
+
+    <div class="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 sm:justify-end">
+      @switch (group()) {
+        @case ('active') {
+          <a
+            [routerLink]="orderLink()"
+            [attr.aria-label]="'Track order ' + order().orderNumber"
+            class="inline-flex w-full items-center justify-center gap-2 bg-primary-600 px-4 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 sm:w-auto"
+          >
+            Track Order
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        }
+        @case ('completed') {
+          <a
+            [routerLink]="orderLink()"
+            [attr.aria-label]="'View order ' + order().orderNumber"
+            class="inline-flex items-center py-2.5 text-sm font-medium text-text-body transition-colors duration-150 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+          >
+            View Order
+          </a>
+          <button
+            type="button"
+            data-testid="order-again"
+            [disabled]="allUnavailable()"
+            (click)="onOrderAgain()"
+            [attr.aria-label]="allUnavailable() ? null : 'Order again: add items from order ' + order().orderNumber + ' to your cart'"
+            class="inline-flex items-center justify-center gap-2 border px-4 py-2.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            [class.border-border-strong]="!allUnavailable()"
+            [class.text-text-primary]="!allUnavailable()"
+            [class.hover:border-primary-600]="!allUnavailable()"
+            [class.hover:text-primary-600]="!allUnavailable()"
+            [class.border-transparent]="allUnavailable()"
+            [class.bg-bg-sunken]="allUnavailable()"
+            [class.text-text-muted]="allUnavailable()"
+            [class.cursor-not-allowed]="allUnavailable()"
+          >
+            @if (allUnavailable()) {
+              Unavailable today
+            } @else {
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7M20 4v4.7h-4.7M20 12a8 8 0 0 1-13.7 5.6L4 15.3M4 20v-4.7h4.7" />
+              </svg>
+              Order Again
+            }
+          </button>
+        }
+        @default {
+          <a
+            [routerLink]="orderLink()"
+            [attr.aria-label]="'View order ' + order().orderNumber"
+            class="inline-flex items-center py-2.5 text-sm font-medium text-text-body transition-colors duration-150 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+          >
+            View Order
+          </a>
+        }
+      }
+    </div>
+
+    @if (group() === 'completed' && unavailableCount() > 0 && !allUnavailable()) {
+      <p class="text-xs text-text-muted" data-testid="unavailable-note">
+        {{ unavailableCount() }} {{ unavailableCount() === 1 ? 'item' : 'items' }} unavailable today
+      </p>
+    }
+  </div>
+</article>

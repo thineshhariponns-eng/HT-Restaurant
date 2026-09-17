@@ -1,0 +1,76 @@
+<section class="border-b border-border-strong">
+  <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <h1 class="font-display text-3xl font-semibold text-text-primary sm:text-4xl">Menu</h1>
+    <p class="mt-2 text-text-body">Explore our menu</p>
+  </div>
+</section>
+
+<section class="border-b border-border-subtle bg-bg-surface">
+  <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+    <div class="relative max-w-md">
+      <svg
+        class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="M21 21l-4.3-4.3" />
+      </svg>
+
+      <input
+        type="search"
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+        placeholder="Search menu items..."
+        aria-label="Search menu items"
+        class="w-full border border-border-subtle bg-bg-base py-2.5 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-primary-600 focus:outline-none"
+      />
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-1" role="tablist" aria-label="Menu categories">
+      @for (filter of filters; track filter) {
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="selectedCategory() === filter"
+          (click)="selectCategory(filter)"
+          class="border-b-2 px-3 py-2 text-sm font-medium transition-colors duration-150 hover:border-primary-600 hover:text-primary-600"
+          [class.border-primary-600]="selectedCategory() === filter"
+          [class.text-primary-600]="selectedCategory() === filter"
+          [class.border-transparent]="selectedCategory() !== filter"
+          [class.text-text-body]="selectedCategory() !== filter"
+        >
+          {{ filter }}
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+  @if (filteredDishes().length > 0) {
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      @for (dish of filteredDishes(); track dish.name) {
+        <app-menu-item-card
+          [slug]="dish.slug"
+          [name]="dish.name"
+          [description]="dish.description"
+          [price]="dish.price"
+          [isVeg]="dish.isVeg"
+          [isAvailable]="dish.isAvailable"
+          (addToCart)="onAddToCart(dish)"
+        />
+      }
+    </div>
+  } @else {
+    <div class="flex flex-col items-center gap-2 py-20 text-center">
+      <p class="font-display text-xl font-semibold text-text-primary">No dishes found</p>
+      <p class="text-sm text-text-muted">Try another search or category.</p>
+    </div>
+  }
+</section>

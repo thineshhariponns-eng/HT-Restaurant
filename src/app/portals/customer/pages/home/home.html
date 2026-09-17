@@ -1,0 +1,194 @@
+<section class="border-b border-border-strong">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-8 lg:py-20">
+    <div>
+      <p class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-primary-600">
+        <span class="relative flex h-2 w-2">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+            [class.bg-status-delivered]="isOpen()"
+            [class.bg-text-muted]="!isOpen()"
+          ></span>
+          <span
+            class="relative inline-flex h-2 w-2 rounded-full"
+            [class.bg-status-delivered]="isOpen()"
+            [class.bg-text-muted]="!isOpen()"
+          ></span>
+        </span>
+        {{ isOpen() ? 'Open Now' : 'Closed' }} &middot; {{ statusLabel() }}
+      </p>
+
+      <h1 class="mt-4 font-display text-4xl font-semibold leading-tight text-text-primary sm:text-5xl">
+        HT Restaurant<br /><span class="text-primary-600">Erode</span>
+      </h1>
+
+      <p class="mt-4 max-w-sm text-text-body">
+        Today's kitchen card, straight from Perundurai Road — order for pickup, delivery or dine-in.
+      </p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          routerLink="/menu"
+          class="bg-primary-600 px-5 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+        >
+          Order Now
+        </a>
+        <a
+          routerLink="/menu"
+          class="border border-border-strong px-5 py-3 text-sm font-semibold text-text-primary transition-colors duration-150 hover:border-primary-600 hover:text-primary-600"
+        >
+          Explore Menu
+        </a>
+      </div>
+
+      <dl class="mt-10 grid max-w-sm grid-cols-2 gap-x-6 gap-y-4 border-t border-border-subtle pt-6 text-sm">
+        <div>
+          <dt class="text-xs uppercase tracking-widest text-text-muted">Location</dt>
+          <dd class="mt-1 text-text-body">Perundurai Road, Erode</dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase tracking-widest text-text-muted">Today's Hours</dt>
+          <dd class="mt-1 tabular-nums text-text-body">{{ todayHoursLabel() }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div>
+      <div class="flex items-baseline justify-between border-b border-border-strong pb-3">
+        <h2 class="font-display text-sm font-semibold uppercase tracking-widest text-text-muted">Today's Kitchen</h2>
+        <span class="text-xs tabular-nums text-text-muted">{{ dishes.length }} dishes today</span>
+      </div>
+
+      @for (group of menuByCategory; track group.label) {
+        <div class="mt-6">
+          <p class="text-xs font-semibold uppercase tracking-widest text-primary-600">{{ group.label }}</p>
+          <div class="mt-1">
+            @for (dish of group.dishes; track dish.name) {
+              <app-dish-card
+                [slug]="dish.slug"
+                [name]="dish.name"
+                [price]="dish.price"
+                [isVeg]="dish.isVeg"
+                [isAvailable]="dish.isAvailable"
+                (addToCart)="onAddToCart(dish)"
+              />
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+  <div class="flex flex-wrap items-end justify-between gap-4 border-b border-border-strong pb-4">
+    <h2 class="font-display text-2xl font-semibold text-text-primary sm:text-3xl">Customer Favorites</h2>
+    <a routerLink="/menu" class="text-sm font-medium text-primary-600 transition-colors duration-150 hover:text-primary-700">
+      View full menu &rarr;
+    </a>
+  </div>
+
+  <div class="mt-10">
+    <app-dish-card
+      size="hero"
+      [slug]="flagshipDish.slug"
+      [name]="flagshipDish.name"
+      [description]="flagshipDish.description"
+      [price]="flagshipDish.price"
+      [isVeg]="flagshipDish.isVeg"
+      [isAvailable]="flagshipDish.isAvailable"
+      (addToCart)="onAddToCart(flagshipDish)"
+    />
+  </div>
+
+  <div class="mt-2">
+    @for (dish of favoriteRows; track dish.name) {
+      <app-dish-card
+        [slug]="dish.slug"
+        [name]="dish.name"
+        [price]="dish.price"
+        [isVeg]="dish.isVeg"
+        [isAvailable]="dish.isAvailable"
+        (addToCart)="onAddToCart(dish)"
+      />
+    }
+  </div>
+</section>
+
+<section class="border-y border-border-subtle bg-bg-surface">
+  <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+    <h2 class="font-display text-2xl font-semibold text-text-primary sm:text-3xl">Browse the Full Card</h2>
+
+    <div class="mt-8">
+      @for (category of categories; track category.slug) {
+        <app-category-tile [label]="category.label" [categorySlug]="category.slug" [dishCount]="category.count" />
+      }
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+  <h2 class="font-display text-2xl font-semibold text-text-primary sm:text-3xl">About HT Restaurant Erode</h2>
+
+  <div class="mt-4 border-l-2 border-primary-600 pl-6">
+    <p class="text-text-body">
+      HT Restaurant has been serving Erode with a menu built around the region's own turmeric and local produce. Our
+      kitchen blends traditional Tamil Nadu cooking with a modern, considered plate — for dine-in, pickup and
+      delivery alike.
+    </p>
+    <p class="mt-4 text-text-body">
+      Every dish is prepared fresh to order, using recipes developed by our kitchen team and ingredients sourced
+      close to home.
+    </p>
+  </div>
+</section>
+
+<section class="border-y border-border-subtle">
+  <div
+    class="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-border-subtle lg:px-8"
+  >
+    <div class="lg:px-6 lg:first:pl-0">
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-primary-600">Location</h3>
+      <p class="mt-3 text-sm text-text-body">142, Perundurai Road,<br />Erode, Tamil Nadu 638011</p>
+    </div>
+
+    <div class="lg:px-6">
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-primary-600">Hours</h3>
+      <p class="mt-3 text-sm text-text-body">
+        Mon&ndash;Fri: 11:00 AM &ndash; 10:30 PM<br />Sat&ndash;Sun: 10:30 AM &ndash; 11:00 PM
+      </p>
+      <p class="mt-2 text-xs text-text-muted">{{ statusLabel() }}</p>
+    </div>
+
+    <div class="lg:px-6">
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-primary-600">Contact</h3>
+      <p class="mt-3 text-sm text-text-body">
+        <a href="tel:+919876543210" class="transition-colors duration-150 hover:text-primary-600">+91 98765 43210</a><br />
+        <a href="mailto:hello@htrestauranterode.in" class="transition-colors duration-150 hover:text-primary-600"
+          >hello&#64;htrestauranterode.in</a
+        >
+      </p>
+    </div>
+
+    <div class="lg:px-6 lg:last:pr-0">
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-primary-600">Delivery &amp; Pickup</h3>
+      <p class="mt-3 text-sm text-text-body">
+        Pickup ready in 20 minutes, or delivery within 5 km of Perundurai Road.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="bg-bg-base">
+  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+    <p class="text-xs font-semibold uppercase tracking-widest text-text-muted">{{ statusLabel() }}</p>
+    <h2 class="mt-3 max-w-2xl font-display text-4xl font-semibold leading-tight text-text-primary sm:text-5xl">
+      The full card is ready<br /><span class="text-primary-600">whenever you are.</span>
+    </h2>
+    <a
+      routerLink="/menu"
+      class="mt-8 inline-block bg-primary-600 px-6 py-4 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+    >
+      View Full Menu
+    </a>
+  </div>
+</section>

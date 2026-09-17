@@ -1,0 +1,312 @@
+<header class="border-b border-border-subtle px-4 pt-8 pb-6 sm:px-6 lg:px-8">
+  <h1 class="font-display text-2xl font-semibold text-text-primary sm:text-3xl">Orders</h1>
+  <p class="mt-2 text-sm text-text-muted tabular-nums">{{ summary() }}</p>
+</header>
+
+<!-- Tool band: status views, search, order type -->
+<div class="border-b border-border-subtle bg-bg-surface px-4 sm:px-6 lg:px-8">
+  <nav aria-label="Filter by status" class="-mb-px flex gap-6 overflow-x-auto">
+    @for (v of views; track v.id) {
+      <button
+        type="button"
+        class="flex shrink-0 items-center gap-2 border-b-2 pt-4 pb-3 text-sm font-semibold transition-colors"
+        [class]="
+          view() === v.id
+            ? 'border-primary-600 text-text-primary'
+            : 'border-transparent text-text-muted hover:border-border-strong hover:text-text-primary'
+        "
+        [attr.aria-pressed]="view() === v.id"
+        (click)="view.set(v.id)"
+      >
+        {{ v.label }}
+        <span
+          class="tabular-nums"
+          [class]="v.id === 'new' && counts().new > 0 ? 'text-primary-600' : 'text-text-muted'"
+          >{{ counts()[v.id] }}</span
+        >
+      </button>
+    }
+  </nav>
+</div>
+
+<div
+  class="flex flex-col gap-3 border-b border-border-subtle px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8"
+>
+  <label class="relative block sm:w-80">
+    <span class="sr-only">Search orders</span>
+    <ng-icon
+      name="lucideSearch"
+      size="16"
+      class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-text-muted"
+      aria-hidden="true"
+    />
+    <input
+      #search
+      hlmInput
+      type="search"
+      class="h-9 w-full pr-10 pl-9"
+      placeholder="Order #, customer or phone"
+      [value]="query()"
+      (input)="query.set($any($event.target).value)"
+      (keydown.escape)="query.set('')"
+    />
+    <kbd
+      class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 border border-border-strong px-1.5 text-xs text-text-muted sm:block"
+      aria-hidden="true"
+      >/</kbd
+    >
+  </label>
+
+  <div role="group" aria-label="Order type" class="flex border border-border-strong sm:ml-auto">
+    @for (t of ['all', 'delivery', 'pickup']; track t) {
+      <button
+        type="button"
+        class="h-9 flex-1 px-4 text-sm font-medium capitalize transition-colors not-last:border-r not-last:border-border-strong sm:flex-none"
+        [class]="typeFilter() === t ? 'bg-primary-100 text-primary-600' : 'text-text-body hover:text-text-primary'"
+        [attr.aria-pressed]="typeFilter() === t"
+        (click)="typeFilter.set($any(t))"
+      >
+        {{ t === 'all' ? 'All types' : t }}
+      </button>
+    }
+  </div>
+</div>
+
+<section class="px-4 pb-10 sm:px-6 lg:px-8" aria-label="Order list" aria-live="polite">
+  @if (demo() === 'loading') {
+    <div class="pt-2" aria-busy="true">
+      <span class="sr-only">Loading orders</span>
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div class="flex items-center gap-6 border-b border-border-subtle py-4">
+          <div hlmSkeleton class="h-4 w-16 bg-border-subtle"></div>
+          <div hlmSkeleton class="h-4 w-40 bg-border-subtle"></div>
+          <div hlmSkeleton class="hidden h-4 flex-1 bg-border-subtle md:block"></div>
+          <div hlmSkeleton class="h-4 w-16 bg-border-subtle"></div>
+          <div hlmSkeleton class="h-7 w-24 bg-border-subtle"></div>
+        </div>
+      }
+    </div>
+  } @else if (demo() === 'error') {
+    <div class="mx-auto max-w-md py-16 text-center" role="alert">
+      <ng-icon name="lucideTriangleAlert" size="28" class="text-error-text" aria-hidden="true" />
+      <h2 class="mt-4 font-display text-lg font-semibold text-text-primary">Orders didn't load</h2>
+      <p class="mt-2 text-sm text-text-body">
+        The order list couldn't be fetched. Nothing you did was lost; try again in a moment.
+      </p>
+      <button hlmBtn variant="outline" class="mt-6" type="button" (click)="retry()">
+        <ng-icon name="lucideRotateCcw" size="16" aria-hidden="true" />
+        Try again
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="mx-auto max-w-md py-16 text-center">
+      <ng-icon name="lucideInbox" size="28" class="text-text-muted" aria-hidden="true" />
+      @if (query()) {
+        <h2 class="mt-4 font-display text-lg font-semibold text-text-primary">
+          No orders match “{{ query() }}”
+        </h2>
+        <p class="mt-2 text-sm text-text-body">Check the order number or phone, or search all statuses.</p>
+        <button hlmBtn variant="outline" class="mt-6" type="button" (click)="clearFilters()">
+          Clear search and filters
+        </button>
+      } @else if (view() === 'new') {
+        <h2 class="mt-4 font-display text-lg font-semibold text-text-primary">No new orders</h2>
+        <p class="mt-2 text-sm text-text-body">
+          You're caught up. New orders will wait here for you to accept or reject.
+        </p>
+        <button hlmBtn variant="outline" class="mt-6" type="button" (click)="view.set('in-progress')">
+          See orders in progress
+        </button>
+      } @else {
+        <h2 class="mt-4 font-display text-lg font-semibold text-text-primary">Nothing here yet</h2>
+        <p class="mt-2 text-sm text-text-body">No orders in this view for tonight's service.</p>
+        <button hlmBtn variant="outline" class="mt-6" type="button" (click)="clearFilters()">
+          Show all orders
+        </button>
+      }
+    </div>
+  } @else {
+    <!-- Desktop / tablet: ruled table -->
+    <div hlmTableContainer class="hidden md:block">
+      <table hlmTable class="text-sm">
+        <caption class="sr-only">Orders, {{ rangeLabel() }}</caption>
+        <thead hlmTHead>
+          <tr hlmTr class="border-border-strong hover:bg-transparent">
+            <th hlmTh class="label-caps h-11 ps-0 text-text-muted" [attr.aria-sort]="ariaSort('placed')">
+              <button type="button" class="inline-flex items-center gap-1.5 hover:text-text-primary" (click)="toggleSort('placed')">
+                Order
+                <ng-icon
+                  [name]="ariaSort('placed') === 'none' ? 'lucideArrowUpDown' : ariaSort('placed') === 'ascending' ? 'lucideArrowUp' : 'lucideArrowDown'"
+                  size="13"
+                  aria-hidden="true"
+                />
+              </button>
+            </th>
+            <th hlmTh class="label-caps text-text-muted">Customer</th>
+            <th hlmTh class="label-caps hidden text-text-muted xl:table-cell">Items</th>
+            <th hlmTh class="label-caps text-end text-text-muted" [attr.aria-sort]="ariaSort('total')">
+              <button type="button" class="inline-flex items-center gap-1.5 hover:text-text-primary" (click)="toggleSort('total')">
+                Total
+                <ng-icon
+                  [name]="ariaSort('total') === 'none' ? 'lucideArrowUpDown' : ariaSort('total') === 'ascending' ? 'lucideArrowUp' : 'lucideArrowDown'"
+                  size="13"
+                  aria-hidden="true"
+                />
+              </button>
+            </th>
+            <th hlmTh class="label-caps text-text-muted">Status</th>
+            <th hlmTh class="label-caps pe-0 text-end text-text-muted"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody hlmTBody>
+          @for (o of pageRows(); track o.number) {
+            <tr
+              hlmTr
+              class="cursor-pointer border-border-subtle hover:bg-bg-surface"
+              [class.bg-primary-100]="openNumber() === o.number"
+              (click)="openNumber.set(o.number)"
+            >
+              <td hlmTd class="py-3 ps-0">
+                <button
+                  type="button"
+                  class="font-display font-semibold text-text-primary tabular-nums hover:text-primary-600"
+                  [attr.aria-label]="'Open order ' + o.number"
+                  (click)="$event.stopPropagation(); openNumber.set(o.number)"
+                >
+                  #{{ o.number }}
+                </button>
+                <span class="mt-0.5 flex items-center gap-2 text-xs text-text-muted tabular-nums">
+                  {{ clockTime(o.placedAt) }}
+                  <span aria-hidden="true">·</span>
+                  <span [class]="isLate(o) ? 'font-semibold text-primary-600' : ''">
+                    {{ age(o) }}{{ isLate(o) ? ' waiting' : ' ago' }}
+                  </span>
+                </span>
+              </td>
+              <td hlmTd class="py-3">
+                <span class="block text-text-primary">{{ o.customerName }}</span>
+                <app-order-type [type]="o.type" class="mt-0.5 text-xs" />
+              </td>
+              <td hlmTd class="hidden max-w-72 truncate py-3 text-text-body xl:table-cell">
+                {{ itemsSummary(o) }}
+              </td>
+              <td hlmTd class="py-3 text-end text-text-primary tabular-nums">{{ rupees(o.total) }}</td>
+              <td hlmTd class="py-3"><app-status-badge [status]="o.status" /></td>
+              <td hlmTd class="py-3 pe-0" (click)="$event.stopPropagation()">
+                <div class="flex items-center justify-end gap-1">
+                  @if (nextLabel(o); as label) {
+                    <button
+                      hlmBtn
+                      size="sm"
+                      [variant]="o.status === 'pending' ? 'default' : 'outline'"
+                      class="min-w-28"
+                      type="button"
+                      (click)="advance(o.number)"
+                    >
+                      {{ label }}
+                    </button>
+                  }
+                  <button
+                    hlmBtn
+                    variant="ghost"
+                    size="icon-sm"
+                    type="button"
+                    [hlmDropdownMenuTrigger]="menu"
+                    align="end"
+                    [attr.aria-label]="'More actions for order ' + o.number"
+                  >
+                    <ng-icon name="lucideEllipsis" size="16" />
+                  </button>
+                  <ng-template #menu>
+                    <hlm-dropdown-menu class="w-44">
+                      <button hlmDropdownMenuItem (triggered)="openNumber.set(o.number)">View details</button>
+                      @if (canStop(o); as stopLabel) {
+                        <button hlmDropdownMenuItem variant="destructive" (triggered)="stopping.set(o)">
+                          {{ stopLabel }}
+                        </button>
+                      }
+                    </hlm-dropdown-menu>
+                  </ng-template>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phone: stacked ruled rows -->
+    <ul role="list" class="md:hidden">
+      @for (o of pageRows(); track o.number) {
+        <li class="border-b border-border-subtle py-4">
+          <button type="button" class="block w-full text-start" (click)="openNumber.set(o.number)">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="font-display font-semibold text-text-primary tabular-nums">#{{ o.number }}</span>
+              <span class="text-text-primary tabular-nums">{{ rupees(o.total) }}</span>
+            </span>
+            <span class="mt-1 flex items-center justify-between gap-3 text-sm">
+              <span class="truncate text-text-body">{{ o.customerName }}</span>
+              <span class="shrink-0 text-xs tabular-nums" [class]="isLate(o) ? 'font-semibold text-primary-600' : 'text-text-muted'">
+                {{ age(o) }}{{ isLate(o) ? ' waiting' : ' ago' }}
+              </span>
+            </span>
+          </button>
+          <div class="mt-3 flex items-center gap-3">
+            <app-status-badge [status]="o.status" />
+            <app-order-type [type]="o.type" class="text-xs" />
+            @if (nextLabel(o); as label) {
+              <button
+                hlmBtn
+                size="sm"
+                [variant]="o.status === 'pending' ? 'default' : 'outline'"
+                class="ml-auto h-10 min-w-28"
+                type="button"
+                (click)="advance(o.number)"
+              >
+                {{ label }}
+              </button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+
+    @if (pageCount() > 1) {
+      <nav aria-label="Pages" class="flex items-center justify-between gap-4 pt-4 text-sm">
+        <p class="text-text-muted tabular-nums">{{ rangeLabel() }}</p>
+        <div class="flex gap-2">
+          <button hlmBtn variant="outline" size="sm" type="button" [disabled]="page() === 0" (click)="page.set(page() - 1)">
+            Previous
+          </button>
+          <button
+            hlmBtn
+            variant="outline"
+            size="sm"
+            type="button"
+            [disabled]="page() >= pageCount() - 1"
+            (click)="page.set(page() + 1)"
+          >
+            Next
+          </button>
+        </div>
+      </nav>
+    }
+  }
+</section>
+
+<hlm-sheet side="right" [state]="sheetState()" (closed)="openNumber.set(null)">
+  <hlm-sheet-content
+    *hlmSheetPortal="let ctx"
+    class="w-full gap-0 border-border-subtle p-0 sm:max-w-[480px]"
+  >
+    @if (openOrder(); as o) {
+      <app-order-detail [order]="o" (advance)="advance($event)" (stop)="stopping.set($event)" />
+    }
+  </hlm-sheet-content>
+</hlm-sheet>
+
+<app-stop-order-dialog
+  [order]="stopping()"
+  (confirmed)="confirmStop($event)"
+  (dismissed)="stopping.set(null)"
+/>

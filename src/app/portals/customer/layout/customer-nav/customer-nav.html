@@ -1,0 +1,21 @@
+<ul
+  class="flex gap-1 text-sm font-medium"
+  [class.flex-row]="variant() === 'horizontal'"
+  [class.items-center]="variant() === 'horizontal'"
+  [class.flex-col]="variant() === 'stacked'"
+  [class.gap-2]="variant() === 'stacked'"
+>
+  @for (link of links; track link.path) {
+    <li>
+      <a
+        [routerLink]="link.path"
+        routerLinkActive="border-primary-600 text-primary-600"
+        [routerLinkActiveOptions]="{ exact: link.exact }"
+        (click)="onLinkClick()"
+        class="block border-b-2 border-transparent px-3 py-2 text-text-body transition-colors duration-150 hover:border-primary-600 hover:text-text-primary"
+      >
+        {{ link.label }}
+      </a>
+    </li>
+  }
+</ul>

@@ -1,0 +1,45 @@
+<div class="border border-border-subtle bg-bg-surface p-6">
+  <h2 class="font-display text-lg font-semibold text-text-primary">Order Summary</h2>
+
+  <div class="mt-5">
+    <ng-content />
+  </div>
+
+  <dl class="mt-5 space-y-3 text-sm">
+    <div class="flex items-center justify-between">
+      <dt class="text-text-body">Subtotal</dt>
+      <dd class="tabular-nums text-text-primary">₹{{ subtotal() }}</dd>
+    </div>
+    <div class="flex items-center justify-between">
+      <dt class="text-text-body">Tax</dt>
+      <dd class="tabular-nums text-text-primary">₹{{ tax() }}</dd>
+    </div>
+    @if (delivery(); as deliveryFee) {
+      <div class="flex items-center justify-between">
+        <dt class="text-text-body">Delivery</dt>
+        <dd class="tabular-nums text-text-primary">₹{{ deliveryFee }}</dd>
+      </div>
+    }
+  </dl>
+
+  <div class="mt-4 flex items-center justify-between border-t border-border-strong pt-4">
+    <span class="font-display text-base font-semibold text-text-primary">Total</span>
+    <span
+      class="font-display text-xl font-semibold tabular-nums"
+      [class.text-primary-600]="!totalMuted()"
+      [class.text-text-muted]="totalMuted()"
+    >
+      ₹{{ total() }}
+    </span>
+  </div>
+
+  @if (showCheckout()) {
+    <button
+      type="button"
+      (click)="onCheckout()"
+      class="mt-6 w-full bg-primary-600 px-5 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+    >
+      Proceed to Checkout
+    </button>
+  }
+</div>

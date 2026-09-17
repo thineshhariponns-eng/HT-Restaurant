@@ -1,0 +1,72 @@
+<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+  <section class="border border-border-subtle bg-bg-surface">
+    <h1 class="font-display border-b border-border-subtle px-4 py-4 text-lg leading-tight font-semibold text-text-primary sm:px-6">
+      Clients
+    </h1>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle px-4 py-3 sm:px-6">
+      <a
+        routerLink="/onboarding"
+        class="flex h-9 items-center bg-primary-600 px-3 text-sm font-semibold text-text-inverse hover:bg-primary-700"
+      >
+        + Add client
+      </a>
+
+      <div class="flex items-center gap-2">
+        <label for="client-search" class="label-caps text-text-muted">Search</label>
+        <input
+          id="client-search"
+          type="search"
+          autocomplete="off"
+          placeholder="Name or domain"
+          class="h-9 w-48 border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted sm:w-56"
+          [value]="search()"
+          (input)="onSearch($event)"
+        />
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-[40rem] border-collapse text-sm">
+        <caption class="sr-only">Every client, with its customer and admin domains</caption>
+        <thead>
+          <tr class="border-b border-border-subtle">
+            <th scope="col" class="label-caps px-4 py-3 text-left text-text-muted sm:px-6">Client</th>
+            <th scope="col" class="label-caps px-4 py-3 text-left text-text-muted">Customer domain</th>
+            <th scope="col" class="label-caps px-4 py-3 text-left text-text-muted">Admin domain</th>
+            <th scope="col" class="label-caps px-4 py-3 text-left text-text-muted">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.id) {
+            <tr class="border-b border-border-subtle last:border-b-0">
+              <th scope="row" class="px-4 py-3 text-left font-medium sm:px-6">
+                <a
+                  [routerLink]="['/clients', row.id]"
+                  class="text-text-primary hover:text-primary-600 hover:underline"
+                >
+                  {{ row.name }}
+                </a>
+              </th>
+              <td class="px-4 py-3 text-text-body">{{ row.domain }}</td>
+              <td class="px-4 py-3 text-text-body">{{ row.adminDomain }}</td>
+              <td class="px-4 py-3">
+                <span class="label-caps" [class]="stageText(row.stage)">{{ stageCode(row.stage) }}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="px-4 py-8 text-center text-sm text-text-muted sm:px-6">
+                No client matches “{{ search() }}”.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p aria-live="polite" class="border-t border-border-subtle px-4 py-3 text-sm text-text-muted sm:px-6">
+      Showing {{ rows().length }} {{ rows().length === 1 ? 'client' : 'clients' }}
+    </p>
+  </section>
+</div>

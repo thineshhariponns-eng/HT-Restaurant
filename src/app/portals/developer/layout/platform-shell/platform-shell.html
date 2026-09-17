@@ -1,0 +1,64 @@
+<a
+  href="#main"
+  class="sr-only z-50 bg-primary-600 px-4 py-2 text-sm font-semibold text-text-inverse focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+>
+  Skip to content
+</a>
+
+<div class="min-h-dvh lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+  <aside
+    class="sticky top-0 hidden h-dvh border-r border-border-subtle bg-bg-sunken lg:block"
+    aria-label="Sidebar"
+  >
+    <app-sidebar-nav />
+  </aside>
+
+  <div class="flex min-w-0 flex-col">
+    <header
+      class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border-subtle bg-bg-base px-4 sm:px-6 lg:px-8"
+    >
+      <button
+        type="button"
+        class="-ml-2 flex h-9 w-9 items-center justify-center text-text-body hover:bg-primary-100 hover:text-text-primary lg:hidden"
+        aria-label="Open navigation"
+        (click)="drawerOpen.set(true)"
+      >
+        <span aria-hidden="true" class="text-lg leading-none">☰</span>
+      </button>
+
+      <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+        <ol class="flex items-center gap-2 text-sm">
+          <li class="hidden text-text-muted sm:block">Platform</li>
+          <li class="hidden text-border-strong sm:block" aria-hidden="true">/</li>
+          <li class="truncate font-medium text-text-primary" aria-current="page">{{ pageLabel() }}</li>
+        </ol>
+      </nav>
+
+      <p class="label-caps hidden whitespace-nowrap text-text-muted sm:block">Consultant</p>
+      <button
+        type="button"
+        class="flex h-9 items-center border border-border-strong px-3 text-sm font-medium text-text-body hover:border-primary-600 hover:text-text-primary"
+      >
+        Profile
+      </button>
+    </header>
+
+    <main id="main" tabindex="-1" class="flex-1 outline-none">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+@if (drawerOpen()) {
+  <div class="fixed inset-0 z-40 lg:hidden">
+    <button
+      type="button"
+      class="absolute inset-0 bg-bg-sunken/80"
+      aria-label="Close navigation"
+      (click)="drawerOpen.set(false)"
+    ></button>
+    <div class="absolute inset-y-0 left-0 w-[280px] border-r border-border-subtle bg-bg-sunken">
+      <app-sidebar-nav (navigated)="drawerOpen.set(false)" />
+    </div>
+  </div>
+}
