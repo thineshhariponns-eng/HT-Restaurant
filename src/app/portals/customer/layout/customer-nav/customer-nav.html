@@ -6,9 +6,10 @@
   [class.gap-2]="variant() === 'stacked'"
 >
   @for (link of links; track link.path) {
-    <li>
+    <li [class.lg:ml-2]="link.staff" [class.lg:border-l]="link.staff" [class.border-border-subtle]="link.staff">
       <a
         [routerLink]="link.path"
+        [class.text-text-muted]="link.staff"
         routerLinkActive="border-primary-600 text-primary-600"
         [routerLinkActiveOptions]="{ exact: link.exact }"
         (click)="onLinkClick()"

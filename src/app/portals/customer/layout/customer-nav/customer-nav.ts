@@ -5,6 +5,8 @@ interface NavLink {
   label: string;
   path: string;
   exact: boolean;
+  /** Staff doors: the other two portals, set apart from the diner's links. */
+  staff?: boolean;
 }
 
 @Component({
@@ -23,7 +25,9 @@ export class CustomerNav {
     { label: 'Menu', path: '/menu', exact: false },
     { label: 'My Orders', path: '/orders', exact: false },
     { label: 'About', path: '/about', exact: false },
-    { label: 'Contact', path: '/contact', exact: false }
+    { label: 'Contact', path: '/contact', exact: false },
+    { label: 'Admin', path: '/admin', exact: false, staff: true },
+    { label: 'Developer', path: '/developer', exact: false, staff: true }
   ];
 
   protected onLinkClick(): void {
