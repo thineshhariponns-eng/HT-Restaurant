@@ -1,0 +1,22 @@
+@model LoginViewModel
+@{ ViewData["Title"] = "Admin Login"; }
+<div class="center-page">
+    <div class="form-card narrow">
+        <p class="label-caps text-primary">Owner console</p>
+        <h1 class="headline" style="margin-top:8px">Admin login</h1>
+        <div asp-validation-summary="ModelOnly" class="alert-error" style="margin-top:20px"></div>
+        <form asp-action="Login" method="post" style="margin-top:20px">
+            <input type="hidden" name="returnUrl" value="@Context.Request.Query["returnUrl"]" />
+            <div class="field">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" autocomplete="username" />
+            </div>
+            <div class="field">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" autocomplete="current-password" />
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+        </form>
+        <p class="hint" style="margin-top:16px">Local evaluation account: admin@htrestaurant.com / Admin@12345</p>
+    </div>
+</div>

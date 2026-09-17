@@ -1,0 +1,136 @@
+@model Order
+@{
+    ViewData["Title"] = "Order " + Model.OrderNumber;
+    var lifecycle = new[] { OrderStatus.Pending, OrderStatus.Confirmed, OrderStatus.Preparing, OrderStatus.Ready, OrderStatus.OutForDelivery, OrderStatus.Delivered };
+    var statusLabel = new Dictionary<OrderStatus, string> {
+        [OrderStatus.Pending] = "New", [OrderStatus.Confirmed] = "Confirmed", [OrderStatus.Preparing] = "Preparing",
+        [OrderStatus.Ready] = "Ready", [OrderStatus.OutForDelivery] = "Out for delivery", [OrderStatus.Delivered] = "Delivered",
+        [OrderStatus.Cancelled] = "Cancelled",
+    };
+    string Tone(OrderStatus s) => s switch {
+        OrderStatus.Pending => "attention",
+        OrderStatus.Confirmed or OrderStatus.Preparing or OrderStatus.Ready => "kitchen",
+        OrderStatus.OutForDelivery => "delivery",
+        OrderStatus.Delivered => "done",
+        _ => "stopped",
+    };
+    string? NextLabel(OrderStatus s) => s switch {
+        OrderStatus.Pending => "Accept", OrderStatus.Confirmed => "Start preparing", OrderStatus.Preparing => "Mark ready",
+        OrderStatus.Ready => "Send out", OrderStatus.OutForDelivery => "Mark delivered", _ => null,
+    };
+    OrderStatus? NextStatus(OrderStatus s) => s switch {
+        OrderStatus.Pending => OrderStatus.Confirmed, OrderStatus.Confirmed => OrderStatus.Preparing,
+        OrderStatus.Preparing => OrderStatus.Ready, OrderStatus.Ready => OrderStatus.OutForDelivery,
+        OrderStatus.OutForDelivery => OrderStatus.Delivered, _ => (OrderStatus?)null,
+    };
+    bool CanStop(OrderStatus s) => s is OrderStatus.Pending or OrderStatus.Confirmed or OrderStatus.Preparing or OrderStatus.Ready;
+    string StopLabel(OrderStatus s) => s == OrderStatus.Pending ? "Reject order" : "Cancel order";
+    var currentIndex = Array.IndexOf(lifecycle, Model.Status);
+}
+<header class="page-heading">
+    <div class="section-heading" style="margin-bottom:0">
+        <div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <h1 class="tabular">Order #@Model.OrderNumber</h1>
+                <span class="badge"><span class="dot dot-@Tone(Model.Status)"></span>@statusLabel[Model.Status]</span>
+            </div>
+            <p class="text-muted tabular" style="margin-top:8px;font-size:0.875rem">Placed @Model.CreatedUtc.ToLocalTime().ToString("d MMM, h:mm tt")</p>
+        </div>
+        <a href="/Admin/Orders" class="btn btn-secondary">Back</a>
+    </div>
+</header>
+
+<div class="admin-pad order-detail-grid" style="display:grid;gap:24px">
+    <div>
+        <section class="card" style="padding:20px;margin-bottom:20px">
+            <h3 class="label-caps" style="margin-bottom:16px">Progress</h3>
+            @if (Model.Status == OrderStatus.Cancelled)
+            {
+                <p class="text-body" style="display:flex;align-items:center;gap:8px"><span class="dot dot-stopped"></span>This order was cancelled on @Model.UpdatedUtc.ToLocalTime().ToString("d MMM, h:mm tt").</p>
+            }
+            else
+            {
+                <ol class="lifecycle">
+                    @for (var i = 0; i < lifecycle.Length; i++)
+                    {
+                        var state = i < currentIndex ? "done" : i == currentIndex ? "current" : "upcoming";
+                        <li class="@state">
+                            <span class="rail"></span>
+                            <span class="marker">
+                                @if (state == "done")
+                                {
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                                }
+                                else if (state == "current")
+                                {
+                                    <span></span>
+                                }
+                            </span>
+                            <span class="label">
+                                @statusLabel[lifecycle[i]]
+                            </span>
+                            <span class="time tabular">@(i == currentIndex ? Model.UpdatedUtc.ToLocalTime().ToString("h:mm tt") : "")</span>
+                        </li>
+                    }
+                </ol>
+            }
+        </section>
+
+        <section class="card" style="padding:20px;margin-bottom:20px">
+            <h3 class="label-caps" style="margin-bottom:12px">Customer</h3>
+            <p class="title" style="font-size:1rem;margin:0">@Model.CustomerName</p>
+            <p class="text-body tabular" style="margin-top:8px;font-size:0.875rem">
+                <a href="tel:@Model.Phone" style="color:inherit">@Model.Phone</a>
+            </p>
+            <p class="text-body" style="margin-top:4px;font-size:0.875rem">@Model.DeliveryAddress</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+            {
+                <p style="margin-top:16px;border:1px solid var(--color-border-strong);background:var(--color-bg-sunken);padding:10px 12px;font-size:0.875rem;color:var(--color-text-primary)">@Model.Notes</p>
+            }
+        </section>
+
+        <section class="card" style="padding:20px">
+            <h3 class="label-caps" style="margin-bottom:8px">Items</h3>
+            @foreach (var item in Model.Items)
+            {
+                <div class="ruled-row" style="font-size:0.875rem">
+                    <span><span class="text-muted tabular">@item.Quantity&times;</span> <span style="color:var(--color-text-primary)">@item.ProductNameSnapshot</span></span>
+                    <span class="tabular text-body">₹@item.LineTotal.ToString("0.00")</span>
+                </div>
+            }
+            <div style="margin-top:12px">
+                <div class="summary-row"><span>Subtotal</span><span class="tabular" style="color:var(--color-text-primary)">₹@Model.Subtotal.ToString("0.00")</span></div>
+                <div class="summary-row"><span>Delivery</span><span class="tabular" style="color:var(--color-text-primary)">₹@Model.DeliveryFee.ToString("0.00")</span></div>
+                <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@Model.Total.ToString("0.00")</span></div>
+            </div>
+        </section>
+    </div>
+
+    <div>
+        @if (Model.Status != OrderStatus.Delivered && Model.Status != OrderStatus.Cancelled)
+        {
+            <div class="card" style="padding:20px;position:sticky;top:80px;display:flex;flex-direction:column;gap:12px">
+                @{ var next = NextStatus(Model.Status); }
+                @if (next.HasValue)
+                {
+                    <form asp-action="ChangeStatus" method="post">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="@next" />
+                        <button type="submit" class="btn btn-primary btn-block">@NextLabel(Model.Status)</button>
+                    </form>
+                }
+                @if (CanStop(Model.Status))
+                {
+                    <form asp-action="ChangeStatus" method="post" onsubmit="return confirm('Are you sure you want to @(StopLabel(Model.Status).ToLowerInvariant()) #@Model.OrderNumber?');">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
+                        <button type="submit" class="btn btn-danger btn-block">@StopLabel(Model.Status)</button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+</div>
+<style>
+  @@media (min-width: 900px) { .order-detail-grid { grid-template-columns: 1fr 300px; align-items: start; } }
+</style>

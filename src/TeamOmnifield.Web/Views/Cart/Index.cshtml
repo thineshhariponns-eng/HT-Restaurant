@@ -1,0 +1,63 @@
+@model CartViewModel
+@{ ViewData["Title"] = "Cart"; }
+@if (!Model.Items.Any())
+{
+    <section class="empty-state" style="padding-top:96px;padding-bottom:96px">
+        <p class="title">Your cart is empty.</p>
+        <p class="hint text-muted">Browse our menu and add something delicious.</p>
+        <a href="/Menu" class="btn btn-primary">Explore Menu</a>
+    </section>
+}
+else
+{
+    <section class="band band-strong">
+        <div class="container">
+            <h1 class="display" style="font-size:clamp(1.875rem,3vw,2.25rem)">Your Cart</h1>
+            <a href="/Menu" class="text-muted" style="margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-size:0.875rem;font-weight:500">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+                Continue Shopping
+            </a>
+        </div>
+    </section>
+
+    <section class="container band" style="border-bottom:0">
+        <div style="display:grid;gap:40px" class="cart-layout">
+            <div>
+                @foreach (var item in Model.Items)
+                {
+                    <article class="ruled-row" style="align-items:center;flex-wrap:wrap;gap:16px;padding:20px 0">
+                        <div style="min-width:0;flex:1 1 200px">
+                            <p class="title" style="font-size:1rem">@item.Name</p>
+                            <p class="text-muted tabular" style="margin-top:4px;font-size:0.875rem">₹@item.UnitPrice.ToString("0") each</p>
+                        </div>
+                        <form asp-action="Update" method="post" class="qty-stepper">
+                            <button type="button" data-qty-step="-1" aria-label="Decrease quantity">&minus;</button>
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <input type="number" name="quantity" min="0" max="20" value="@item.Quantity" data-qty-input />
+                            <button type="button" data-qty-step="1" aria-label="Increase quantity">+</button>
+                        </form>
+                        <p class="price tabular" style="width:80px;text-align:right;margin:0">₹@item.LineTotal.ToString("0")</p>
+                        <form asp-action="Remove" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="btn btn-ghost" style="color:var(--color-text-muted)">Remove</button>
+                        </form>
+                    </article>
+                }
+            </div>
+            <div>
+                <div class="summary-panel">
+                    <h2>Order Summary</h2>
+                    <div style="margin-top:20px">
+                        <div class="summary-row"><span>Subtotal</span><span class="tabular text-primary" style="color:var(--color-text-primary)">₹@Model.Subtotal.ToString("0.00")</span></div>
+                        <div class="summary-row"><span>Delivery</span><span class="tabular" style="color:var(--color-text-primary)">₹@Model.DeliveryFee.ToString("0.00")</span></div>
+                    </div>
+                    <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@Model.Total.ToString("0.00")</span></div>
+                    <a href="/Checkout" class="btn btn-primary btn-block" style="margin-top:24px">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+<style>
+  @@media (min-width: 1024px) { .cart-layout { grid-template-columns: 1fr 360px; align-items: start; } .cart-layout > div:last-child { position: sticky; top: 96px; } }
+</style>

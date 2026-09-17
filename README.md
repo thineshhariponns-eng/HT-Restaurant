@@ -1,59 +1,106 @@
-# HTRestaurent
+# TeamOmnifield — HTRestaurantErode Full-Stack Evaluation
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
+A containerized ASP.NET Core MVC (.NET 10) application with PostgreSQL for managing orders placed on **htrestaurant.com**, fulfilled by the owners through **admin.htrestaurant.com**. The solution is intentionally designed as a practical full-stack evaluation project for Harsha and Thinesh.
 
-## Development server
+## Local architecture
 
-To start a local development server, run:
-
-```bash
-ng serve
+```text
+Browser
+  |
+  +-- htrestaurant.com --------> Nginx :8080 --+
+  |                                             |
+  +-- admin.htrestaurant.com --> Nginx :8080 --> ASP.NET Core MVC :8080 --> PostgreSQL :5432
+  |                                             |
+  +-- teamomnifield.ai --------> Nginx :8080 --+
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+All application/runtime services are containerized. No local .NET or PostgreSQL installation is required.
 
-## Code scaffolding
+## Prerequisites
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Docker Desktop with Docker Compose
+- Git
+- A browser
 
-```bash
-ng generate component component-name
-```
+## Start
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+From the repository root:
 
 ```bash
-ng build
+docker compose up --build -d
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Then add these lines to the machine's hosts file:
 
-## Running unit tests
+```text
+127.0.0.1 htrestaurant.com
+127.0.0.1 admin.htrestaurant.com
+127.0.0.1 teamomnifield.ai
+```
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Windows hosts file:
+`C:\Windows\System32\drivers\etc\hosts`
+
+Open:
+
+- http://htrestaurant.com:8080 — customer restaurant storefront
+- http://admin.htrestaurant.com:8080 — owner/admin fulfillment console
+- http://teamomnifield.ai:8080 — TeamOmnifield system dashboard
+- http://localhost:8080 — health/diagnostic fallback
+
+The root path on each named host automatically routes to the appropriate experience: restaurant storefront, admin login/dashboard, or TeamOmnifield operations.
+
+### Seed admin login
+
+- Email: `admin@htrestaurant.com`
+- Password: `Admin@12345`
+
+Change this immediately if this is ever used outside local evaluation.
+
+## Useful commands
 
 ```bash
-ng test
+docker compose ps
+docker compose logs -f web
+docker compose logs -f postgres
+docker compose down
+# Delete database volume and reseed from scratch:
+docker compose down -v
 ```
 
-## Running end-to-end tests
+## Evaluation flow
 
-For end-to-end (e2e) testing, run:
+1. Open the restaurant site.
+2. Browse seeded menu categories and products.
+3. Add products to cart.
+4. Submit an order with customer name, phone and delivery address.
+5. Open the admin console and sign in.
+6. View new orders and change status: Pending → Confirmed → Preparing → Ready → OutForDelivery → Delivered.
+7. Test cancellation.
+8. Open TeamOmnifield dashboard and inspect operational metrics.
+9. Verify PostgreSQL persistence by restarting the web container.
 
-```bash
-ng e2e
-```
+## Project structure
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+- `src/TeamOmnifield.Web` — ASP.NET Core MVC application
+- `tests/TeamOmnifield.Web.Tests` — unit tests
+- `nginx` — local reverse proxy and host routing
+- `db` — PostgreSQL initialization
+- `SPECIFICATION.md` — evaluation specification and acceptance criteria
+- `CHECKLIST.md` — implementation/evaluation checklist
+- `docker-compose.yml` — complete local stack
 
-## Additional Resources
+## Design principles
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- MVC separation of concerns
+- Controllers delegate to services
+- EF Core + PostgreSQL
+- Strong model validation
+- Cookie authentication for the local admin area
+- Anti-forgery protection on state-changing MVC forms
+- Host-aware UI separation
+- Container-first local setup
+- Health endpoint for operational verification
+- No external email dependency
+- No payment gateway dependency for the evaluation MVP
+

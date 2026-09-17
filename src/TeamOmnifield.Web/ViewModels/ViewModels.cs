@@ -1,0 +1,75 @@
+using System.ComponentModel.DataAnnotations;
+using TeamOmnifield.Web.Models;
+
+namespace TeamOmnifield.Web.ViewModels;
+
+public class CartLineViewModel
+{
+    public int ProductId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal UnitPrice { get; set; }
+    public int Quantity { get; set; }
+    public decimal LineTotal => UnitPrice * Quantity;
+}
+
+public class CartViewModel
+{
+    public List<CartLineViewModel> Items { get; set; } = [];
+    public decimal Subtotal => Items.Sum(x => x.LineTotal);
+    public decimal DeliveryFee { get; set; }
+    public decimal Total => Subtotal + DeliveryFee;
+}
+
+public class CheckoutViewModel
+{
+    [Required, StringLength(100)] public string CustomerName { get; set; } = string.Empty;
+    [Required, Phone, StringLength(20)] public string Phone { get; set; } = string.Empty;
+    [Required, StringLength(500)] public string DeliveryAddress { get; set; } = string.Empty;
+    [StringLength(500)] public string? Notes { get; set; }
+}
+
+public class LoginViewModel
+{
+    [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+    [Required, DataType(DataType.Password)] public string Password { get; set; } = string.Empty;
+}
+
+public class ProductEditViewModel
+{
+    public int Id { get; set; }
+    [Required, StringLength(120)] public string Name { get; set; } = string.Empty;
+    [StringLength(500)] public string Description { get; set; } = string.Empty;
+    [Range(0.01, 100000)] public decimal Price { get; set; }
+    [StringLength(500)] public string ImageUrl { get; set; } = string.Empty;
+    [Required] public int CategoryId { get; set; }
+    public bool IsAvailable { get; set; } = true;
+}
+
+public class DashboardViewModel
+{
+    public int TotalOrdersToday { get; set; }
+    public decimal SalesToday { get; set; }
+    public int PendingOrders { get; set; }
+    public int PreparingOrders { get; set; }
+    public int ReadyOrders { get; set; }
+    public int DeliveredOrders { get; set; }
+    public int CancelledOrders { get; set; }
+    public List<MenuHighlightViewModel> MenuHighlights { get; set; } = [];
+}
+
+public class MenuHighlightViewModel
+{
+    public string Name { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
+}
+
+public class OrderListItemViewModel
+{
+    public int Id { get; set; }
+    public string OrderNumber { get; set; } = string.Empty;
+    public string CustomerName { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public decimal Total { get; set; }
+    public OrderStatus Status { get; set; }
+    public DateTime CreatedUtc { get; set; }
+}

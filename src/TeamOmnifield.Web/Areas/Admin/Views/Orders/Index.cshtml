@@ -1,0 +1,236 @@
+@model IEnumerable<OrderListItemViewModel>
+@{
+    ViewData["Title"] = "Orders";
+    var statusLabel = new Dictionary<OrderStatus, string> {
+        [OrderStatus.Pending] = "New", [OrderStatus.Confirmed] = "Confirmed", [OrderStatus.Preparing] = "Preparing",
+        [OrderStatus.Ready] = "Ready", [OrderStatus.OutForDelivery] = "Out for delivery", [OrderStatus.Delivered] = "Delivered",
+        [OrderStatus.Cancelled] = "Cancelled",
+    };
+    string Tone(OrderStatus s) => s switch {
+        OrderStatus.Pending => "attention",
+        OrderStatus.Confirmed or OrderStatus.Preparing or OrderStatus.Ready => "kitchen",
+        OrderStatus.OutForDelivery => "delivery",
+        OrderStatus.Delivered => "done",
+        _ => "stopped",
+    };
+    string? NextLabel(OrderStatus s) => s switch {
+        OrderStatus.Pending => "Accept", OrderStatus.Confirmed => "Start preparing", OrderStatus.Preparing => "Mark ready",
+        OrderStatus.Ready => "Send out", OrderStatus.OutForDelivery => "Mark delivered", _ => null,
+    };
+    OrderStatus? NextStatus(OrderStatus s) => s switch {
+        OrderStatus.Pending => OrderStatus.Confirmed, OrderStatus.Confirmed => OrderStatus.Preparing,
+        OrderStatus.Preparing => OrderStatus.Ready, OrderStatus.Ready => OrderStatus.OutForDelivery,
+        OrderStatus.OutForDelivery => OrderStatus.Delivered, _ => (OrderStatus?)null,
+    };
+    bool CanStop(OrderStatus s) => s is OrderStatus.Pending or OrderStatus.Confirmed or OrderStatus.Preparing or OrderStatus.Ready;
+    string StopLabel(OrderStatus s) => s == OrderStatus.Pending ? "Reject order" : "Cancel order";
+
+    var all = Model.ToList();
+    int CountFor(string view) => view switch {
+        "new" => all.Count(o => o.Status == OrderStatus.Pending),
+        "in-progress" => all.Count(o => o.Status is OrderStatus.Confirmed or OrderStatus.Preparing or OrderStatus.Ready),
+        "on-the-way" => all.Count(o => o.Status == OrderStatus.OutForDelivery),
+        "closed" => all.Count(o => o.Status is OrderStatus.Delivered or OrderStatus.Cancelled),
+        _ => all.Count,
+    };
+}
+<header class="page-heading">
+    <h1>Orders</h1>
+    <p class="text-muted tabular" style="font-size:0.875rem">@CountFor("new") new &middot; @(CountFor("in-progress") + CountFor("on-the-way")) in progress &middot; @all.Count tonight</p>
+</header>
+
+<div class="tabbar" id="orderTabs" role="tablist" aria-label="Filter by status">
+    <button type="button" class="active" data-view="all">All <span class="count">@CountFor("all")</span></button>
+    <button type="button" data-view="new">New <span class="count attn">@CountFor("new")</span></button>
+    <button type="button" data-view="in-progress">In progress <span class="count">@CountFor("in-progress")</span></button>
+    <button type="button" data-view="on-the-way">On the way <span class="count">@CountFor("on-the-way")</span></button>
+    <button type="button" data-view="closed">Closed <span class="count">@CountFor("closed")</span></button>
+</div>
+
+<div class="toolbar">
+    <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+        <input type="search" id="orderSearch" placeholder="Order #, customer or phone" aria-label="Search orders" />
+    </div>
+</div>
+
+<div class="admin-pad" style="padding-top:16px">
+    @if (!all.Any())
+    {
+        <div class="empty-state">
+            <p class="title">No orders yet</p>
+            <p class="hint text-muted">New orders will appear here as they come in.</p>
+        </div>
+    }
+    else
+    {
+        <div style="overflow-x:auto">
+            <table class="ruled" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th><button type="button" class="sort-btn" data-sort="created">Order</button></th>
+                        <th>Customer</th>
+                        <th><button type="button" class="sort-btn" data-sort="total">Total</button></th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in all.OrderByDescending(o => o.CreatedUtc))
+                    {
+                        <tr data-status="@o.Status" data-created="@o.CreatedUtc.ToString("o")" data-total="@o.Total" data-search="@($"{o.OrderNumber} {o.CustomerName} {o.Phone}".ToLowerInvariant())">
+                            <td>
+                                <a href="/Admin/Orders/Details/@o.Id" class="tabular" style="font-weight:600;color:var(--color-text-primary)">#@o.OrderNumber</a>
+                                <div class="text-muted tabular" style="font-size:0.75rem;margin-top:2px" data-age></div>
+                            </td>
+                            <td style="color:var(--color-text-primary)">@o.CustomerName<div class="text-muted" style="font-size:0.8125rem">@o.Phone</div></td>
+                            <td class="tabular price">₹@o.Total.ToString("0.00")</td>
+                            <td><span class="badge"><span class="dot dot-@Tone(o.Status)"></span>@statusLabel[o.Status]</span></td>
+                            <td style="text-align:right;white-space:nowrap">
+                                @{ var next = NextStatus(o.Status); }
+                                @if (next.HasValue)
+                                {
+                                    <form asp-action="ChangeStatus" method="post" style="display:inline-block">
+                                        <input type="hidden" name="id" value="@o.Id" />
+                                        <input type="hidden" name="status" value="@next" />
+                                        <button type="submit" class="btn @(o.Status == OrderStatus.Pending ? "btn-primary" : "btn-secondary") btn-sm">@NextLabel(o.Status)</button>
+                                    </form>
+                                }
+                                @if (CanStop(o.Status))
+                                {
+                                    <form asp-action="ChangeStatus" method="post" style="display:inline-block;margin-left:6px" data-confirm="Are you sure you want to @(StopLabel(o.Status).ToLowerInvariant()) #@o.OrderNumber?">
+                                        <input type="hidden" name="id" value="@o.Id" />
+                                        <input type="hidden" name="status" value="@OrderStatus.Cancelled" />
+                                        <button type="submit" class="btn btn-danger btn-sm">@StopLabel(o.Status)</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="empty-state" id="ordersEmpty" style="display:none">
+            <p class="title">No orders in this view</p>
+            <p class="hint text-muted">Try another tab or clear your search.</p>
+        </div>
+        <nav class="pager" id="ordersPager" aria-label="Pages">
+            <p class="text-muted tabular" id="ordersRange"></p>
+            <div class="btns">
+                <button type="button" class="btn btn-secondary btn-sm" id="ordersPrev">Previous</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="ordersNext">Next</button>
+            </div>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+<script>
+(function () {
+  var PAGE_SIZE = 10;
+  var LATE_MINUTES = 5;
+  var table = document.getElementById('ordersTable');
+  if (!table) return;
+  var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr'));
+  var tabs = document.getElementById('orderTabs');
+  var search = document.getElementById('orderSearch');
+  var empty = document.getElementById('ordersEmpty');
+  var pager = document.getElementById('ordersPager');
+  var range = document.getElementById('ordersRange');
+  var prevBtn = document.getElementById('ordersPrev');
+  var nextBtn = document.getElementById('ordersNext');
+  var sortKey = 'created', sortDir = 'desc', view = 'all', page = 0;
+
+  var VIEW_STATUSES = {
+    'new': ['Pending'],
+    'in-progress': ['Confirmed', 'Preparing', 'Ready'],
+    'on-the-way': ['OutForDelivery'],
+    'closed': ['Delivered', 'Cancelled'],
+  };
+
+  function age(iso) {
+    var mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    var hrs = Math.floor(mins / 60);
+    return hrs + 'h ' + (mins % 60) + 'm ago';
+  }
+
+  function renderAges() {
+    rows.forEach(function (row) {
+      var el = row.querySelector('[data-age]');
+      if (!el) return;
+      var created = row.getAttribute('data-created');
+      var mins = (Date.now() - new Date(created).getTime()) / 60000;
+      var text = age(created);
+      if (row.getAttribute('data-status') === 'Pending' && mins >= LATE_MINUTES) {
+        el.innerHTML = '<strong style="color:var(--color-primary-600)">' + text.replace(' ago', ' waiting') + '</strong>';
+      } else {
+        el.textContent = text;
+      }
+    });
+  }
+
+  function apply() {
+    var q = search.value.trim().toLowerCase();
+    var visible = rows.filter(function (row) {
+      var status = row.getAttribute('data-status');
+      var inView = view === 'all' || (VIEW_STATUSES[view] || []).indexOf(status) !== -1;
+      var matches = !q || row.getAttribute('data-search').indexOf(q) !== -1;
+      return inView && matches;
+    });
+
+    visible.sort(function (a, b) {
+      var sign = sortDir === 'asc' ? 1 : -1;
+      if (sortKey === 'total') return (parseFloat(a.getAttribute('data-total')) - parseFloat(b.getAttribute('data-total'))) * sign;
+      return a.getAttribute('data-created').localeCompare(b.getAttribute('data-created')) * sign;
+    });
+
+    rows.forEach(function (row) { row.style.display = 'none'; });
+    var total = visible.length;
+    var start = page * PAGE_SIZE;
+    var pageRows = visible.slice(start, start + PAGE_SIZE);
+    pageRows.forEach(function (row) { row.style.display = ''; });
+    pageRows.forEach(function (row) { table.querySelector('tbody').appendChild(row); });
+
+    table.style.display = total ? '' : 'none';
+    empty.style.display = total ? 'none' : '';
+    pager.style.display = total > PAGE_SIZE ? '' : 'none';
+    range.textContent = total ? (start + 1) + '–' + Math.min(start + PAGE_SIZE, total) + ' of ' + total : '';
+    prevBtn.disabled = page === 0;
+    nextBtn.disabled = start + PAGE_SIZE >= total;
+    renderAges();
+  }
+
+  tabs.querySelectorAll('button[data-view]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      tabs.querySelectorAll('button').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      view = btn.getAttribute('data-view');
+      page = 0;
+      apply();
+    });
+  });
+  search.addEventListener('input', function () { page = 0; apply(); });
+  table.querySelectorAll('[data-sort]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-sort');
+      sortDir = (sortKey === key && sortDir === 'desc') ? 'asc' : 'desc';
+      sortKey = key;
+      apply();
+    });
+  });
+  prevBtn.addEventListener('click', function () { page = Math.max(0, page - 1); apply(); });
+  nextBtn.addEventListener('click', function () { page += 1; apply(); });
+
+  table.querySelectorAll('form[data-confirm]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      if (!window.confirm(form.getAttribute('data-confirm'))) e.preventDefault();
+    });
+  });
+
+  apply();
+  setInterval(renderAges, 30000);
+})();
+</script>
+}

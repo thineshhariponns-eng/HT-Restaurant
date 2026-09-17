@@ -1,0 +1,39 @@
+@model IEnumerable<Product>
+@{ ViewData["Title"] = "Products"; }
+<header class="page-heading">
+    <div class="section-heading" style="margin-bottom:0">
+        <div><span class="label-caps text-primary">Menu management</span><h1>Products</h1></div>
+        <a class="btn btn-primary" href="/Admin/Products/Create">Add product</a>
+    </div>
+</header>
+<div class="admin-pad">
+    <div style="overflow-x:auto">
+        <table class="ruled">
+            <thead><tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Available</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(p.ImageUrl))
+                            {
+                                <img src="@p.ImageUrl" alt="@p.Name" class="product-thumb" />
+                            }
+                            else
+                            {
+                                <div class="product-thumb placeholder">@p.Name.Substring(0, 1)</div>
+                            }
+                        </td>
+                        <td style="color:var(--color-text-primary)">@p.Name</td>
+                        <td>@p.Category?.Name</td>
+                        <td class="tabular price">₹@p.Price.ToString("0.00")</td>
+                        <td>
+                            <span class="badge" style="padding:4px 10px"><span class="dot @(p.IsAvailable ? "dot-done" : "dot-stopped")"></span>@(p.IsAvailable ? "Yes" : "No")</span>
+                        </td>
+                        <td><a href="/Admin/Products/Edit/@p.Id" class="btn btn-ghost" style="color:var(--color-primary-600)">Edit</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

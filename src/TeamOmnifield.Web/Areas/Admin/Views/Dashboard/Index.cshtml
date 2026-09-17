@@ -1,0 +1,43 @@
+@model DashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+<header class="page-heading">
+    <span class="label-caps text-primary">admin.htrestaurant.com</span>
+    <h1>Owner dashboard</h1>
+</header>
+<div class="admin-pad">
+    <div class="metric-grid">
+        <div class="metric-card"><span>Orders today</span><strong>@Model.TotalOrdersToday</strong></div>
+        <div class="metric-card"><span>Sales today</span><strong>₹@Model.SalesToday.ToString("0.00")</strong></div>
+        <div class="metric-card"><span>Pending</span><strong>@Model.PendingOrders</strong></div>
+        <div class="metric-card"><span>Preparing</span><strong>@Model.PreparingOrders</strong></div>
+        <div class="metric-card"><span>Ready</span><strong>@Model.ReadyOrders</strong></div>
+        <div class="metric-card"><span>Delivered</span><strong>@Model.DeliveredOrders</strong></div>
+    </div>
+    <div class="actions-row">
+        <a class="btn btn-primary" href="/Admin/Orders">Order queue</a>
+        <a class="btn btn-secondary" href="/Admin/Products">Products</a>
+        <a class="btn btn-secondary" href="http://teamomnifield.ai:8080">TeamOmnifield</a>
+    </div>
+    @if (Model.MenuHighlights.Count > 0)
+    {
+        <h2 class="headline" style="margin-top:40px;font-size:1.25rem">Menu highlights</h2>
+        <div class="grid grid-3" style="margin-top:16px">
+            @foreach (var item in Model.MenuHighlights)
+            {
+                <article class="card">
+                    <div class="card-photo">
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.Name" />
+                        }
+                        else
+                        {
+                            <span>Photo coming soon</span>
+                        }
+                    </div>
+                    <h3 class="title" style="margin-top:12px;font-size:0.9375rem">@item.Name</h3>
+                </article>
+            }
+        </div>
+    }
+</div>
