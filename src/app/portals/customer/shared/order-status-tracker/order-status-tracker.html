@@ -1,0 +1,12 @@
+<ol class="flex flex-col md:flex-row" [class.md:max-w-md]="steps().length <= 2" aria-label="Order progress">
+  @for (step of steps(); track step.status) {
+    <li
+      app-order-status-step
+      [label]="step.label"
+      [state]="step.state"
+      [time]="step.time"
+      [terminalIsSuccess]="step.terminalIsSuccess"
+      [isLast]="$last"
+    ></li>
+  }
+</ol>

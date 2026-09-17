@@ -13,7 +13,60 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "paths": {
+      "@spartan-ng/helm/alert-dialog": [
+        "./src/app/portals/admin/shared/ui/alert-dialog/src/index.ts"
+      ],
+      "@spartan-ng/helm/button": [
+        "./src/app/portals/admin/shared/ui/button/src/index.ts"
+      ],
+      "@spartan-ng/helm/checkbox": [
+        "./src/app/portals/admin/shared/ui/checkbox/src/index.ts"
+      ],
+      "@spartan-ng/helm/dialog": [
+        "./src/app/portals/admin/shared/ui/dialog/src/index.ts"
+      ],
+      "@spartan-ng/helm/dropdown-menu": [
+        "./src/app/portals/admin/shared/ui/dropdown-menu/src/index.ts"
+      ],
+      "@spartan-ng/helm/field": [
+        "./src/app/portals/admin/shared/ui/field/src/index.ts"
+      ],
+      "@spartan-ng/helm/input": [
+        "./src/app/portals/admin/shared/ui/input/src/index.ts"
+      ],
+      "@spartan-ng/helm/label": [
+        "./src/app/portals/admin/shared/ui/label/src/index.ts"
+      ],
+      "@spartan-ng/helm/separator": [
+        "./src/app/portals/admin/shared/ui/separator/src/index.ts"
+      ],
+      "@spartan-ng/helm/sheet": [
+        "./src/app/portals/admin/shared/ui/sheet/src/index.ts"
+      ],
+      "@spartan-ng/helm/skeleton": [
+        "./src/app/portals/admin/shared/ui/skeleton/src/index.ts"
+      ],
+      "@spartan-ng/helm/sonner": [
+        "./src/app/portals/admin/shared/ui/sonner/src/index.ts"
+      ],
+      "@spartan-ng/helm/switch": [
+        "./src/app/portals/admin/shared/ui/switch/src/index.ts"
+      ],
+      "@spartan-ng/helm/table": [
+        "./src/app/portals/admin/shared/ui/table/src/index.ts"
+      ],
+      "@spartan-ng/helm/tabs": [
+        "./src/app/portals/admin/shared/ui/tabs/src/index.ts"
+      ],
+      "@spartan-ng/helm/textarea": [
+        "./src/app/portals/admin/shared/ui/textarea/src/index.ts"
+      ],
+      "@spartan-ng/helm/utils": [
+        "./src/app/portals/admin/shared/ui/utils/src/index.ts"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

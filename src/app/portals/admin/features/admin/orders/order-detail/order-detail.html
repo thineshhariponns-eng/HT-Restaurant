@@ -1,0 +1,154 @@
+@let o = order();
+
+<header class="border-b border-border-subtle px-6 pt-6 pb-5 pr-14">
+  <div class="flex flex-wrap items-center gap-3">
+    <h2 hlmSheetTitle class="font-display text-xl font-semibold text-text-primary tabular-nums">
+      Order #{{ o.number }}
+    </h2>
+    <app-status-badge [status]="o.status" />
+  </div>
+  <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-muted">
+    <app-order-type [type]="o.type" />
+    <span aria-hidden="true">·</span>
+    <span class="tabular-nums">Placed {{ clockTime(o.placedAt) }}, {{ placedAgo() }} ago</span>
+  </p>
+</header>
+
+<div class="min-h-0 flex-1 overflow-y-auto">
+  <!-- Lifecycle rail -->
+  <section class="border-b border-border-subtle px-6 py-5" aria-labelledby="progress-heading">
+    <h3 id="progress-heading" class="label-caps mb-4 text-text-muted">Progress</h3>
+    <ol class="grid gap-0">
+      @for (step of steps(); track step.status; let last = $last) {
+        <li class="relative grid grid-cols-[20px_1fr_auto] gap-x-3 pb-4 last:pb-0">
+          @if (!last) {
+            <span
+              class="absolute top-5 bottom-0 left-[9px] w-px"
+              [class]="step.state === 'upcoming' ? 'bg-border-subtle' : 'bg-border-strong'"
+              aria-hidden="true"
+            ></span>
+          }
+          <span
+            class="relative flex size-5 items-center justify-center border-2"
+            [class]="
+              step.state === 'done'
+                ? 'border-primary-600 bg-primary-600 text-text-inverse'
+                : step.state === 'current'
+                  ? 'border-primary-600 bg-bg-surface'
+                  : step.state === 'stopped'
+                    ? 'border-status-cancelled bg-bg-surface text-error-text'
+                    : 'border-border-strong bg-bg-surface'
+            "
+            aria-hidden="true"
+          >
+            @if (step.state === 'done') {
+              <ng-icon name="lucideCheck" size="12" strokeWidth="3" />
+            } @else if (step.state === 'current') {
+              <span class="size-2 rounded-full bg-primary-600 motion-safe:animate-pulse"></span>
+            } @else if (step.state === 'stopped') {
+              <ng-icon name="lucideX" size="12" strokeWidth="3" />
+            }
+          </span>
+          <span
+            class="text-sm leading-5"
+            [class]="step.state === 'upcoming' ? 'text-text-muted' : 'font-medium text-text-primary'"
+          >
+            {{ step.label }}
+            <span class="sr-only">
+              {{ step.state === 'upcoming' ? '(not yet)' : step.state === 'current' ? '(current)' : '' }}
+            </span>
+            @if (step.note) {
+              <span class="mt-0.5 block font-normal text-text-body">{{ step.note }}</span>
+            }
+          </span>
+          <span class="text-sm leading-5 text-text-muted tabular-nums">{{ step.time ?? '' }}</span>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <!-- Customer -->
+  <section class="border-b border-border-subtle px-6 py-5" aria-labelledby="customer-heading">
+    <h3 id="customer-heading" class="label-caps mb-3 text-text-muted">Customer</h3>
+    <p class="text-base font-medium text-text-primary">{{ o.customerName }}</p>
+    <dl class="mt-2 grid gap-2 text-sm">
+      <div class="flex items-center gap-2">
+        <dt class="sr-only">Phone</dt>
+        <ng-icon name="lucidePhone" size="15" class="text-text-muted" aria-hidden="true" />
+        <dd>
+          <a [href]="'tel:' + o.customerPhone.replaceAll(' ', '')" class="text-text-body tabular-nums hover:text-primary-600 hover:underline">
+            {{ o.customerPhone }}
+          </a>
+        </dd>
+      </div>
+      @if (o.address) {
+        <div class="flex items-start gap-2">
+          <dt class="sr-only">Delivery address</dt>
+          <ng-icon name="lucideMapPin" size="15" class="mt-0.5 text-text-muted" aria-hidden="true" />
+          <dd class="text-text-body">{{ o.address }}</dd>
+        </div>
+      }
+      <div class="flex items-center gap-2 text-text-body">
+        <dt class="sr-only">Payment</dt>
+        <dd>{{ paymentLabel() }}</dd>
+      </div>
+    </dl>
+    @if (o.notes) {
+      <p class="mt-4 flex gap-2 border border-border-strong bg-bg-sunken px-3 py-2.5 text-sm text-text-primary">
+        <ng-icon name="lucideStickyNote" size="15" class="mt-0.5 shrink-0 text-primary-600" aria-hidden="true" />
+        <span><span class="sr-only">Customer note: </span>{{ o.notes }}</span>
+      </p>
+    }
+  </section>
+
+  <!-- Items and bill -->
+  <section class="px-6 py-5" aria-labelledby="items-heading">
+    <h3 id="items-heading" class="label-caps mb-1 text-text-muted">Items</h3>
+    <ul role="list">
+      @for (line of o.lines; track line.itemId) {
+        <li class="flex items-baseline gap-3 border-b border-border-subtle py-2.5 text-sm">
+          <span class="w-7 shrink-0 text-text-muted tabular-nums">{{ line.quantity }}×</span>
+          <span class="flex-1 text-text-primary">{{ line.name }}</span>
+          <span class="text-text-body tabular-nums">{{ rupees(line.price * line.quantity) }}</span>
+        </li>
+      }
+    </ul>
+    <dl class="mt-3 grid gap-1.5 text-sm">
+      <div class="flex justify-between text-text-body">
+        <dt>Subtotal</dt>
+        <dd class="tabular-nums">{{ rupees(o.subtotal) }}</dd>
+      </div>
+      <div class="flex justify-between text-text-body">
+        <dt>Tax (5%)</dt>
+        <dd class="tabular-nums">{{ rupees(o.tax) }}</dd>
+      </div>
+      @if (o.type === 'delivery') {
+        <div class="flex justify-between text-text-body">
+          <dt>Delivery fee</dt>
+          <dd class="tabular-nums">{{ rupees(o.deliveryFee) }}</dd>
+        </div>
+      }
+      <div class="mt-2 flex items-baseline justify-between border-t border-border-strong pt-3">
+        <dt class="font-semibold text-text-primary">Total</dt>
+        <dd class="font-display text-xl font-semibold text-primary-600 tabular-nums">
+          {{ rupees(o.total) }}
+        </dd>
+      </div>
+    </dl>
+  </section>
+</div>
+
+@if (!closed()) {
+  <footer class="flex flex-wrap gap-3 border-t border-border-subtle bg-bg-surface px-6 py-4">
+    @if (nextLabel(); as label) {
+      <button hlmBtn size="lg" class="flex-1" type="button" (click)="advance.emit(o.number)">
+        {{ label }}
+      </button>
+    }
+    @if (stopLabel(); as label) {
+      <button hlmBtn size="lg" variant="destructive" type="button" (click)="stop.emit(o)">
+        {{ label }}
+      </button>
+    }
+  </footer>
+}

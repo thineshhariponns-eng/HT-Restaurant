@@ -1,0 +1,61 @@
+<a
+  href="#main"
+  class="sr-only z-50 bg-primary-600 px-4 py-2 text-sm font-semibold text-text-inverse focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+>
+  Skip to content
+</a>
+
+<div class="min-h-dvh lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+  <aside
+    class="sticky top-0 hidden h-dvh border-r border-border-subtle bg-bg-sunken lg:block"
+    aria-label="Sidebar"
+  >
+    <app-sidebar-nav />
+  </aside>
+
+  <div class="flex min-w-0 flex-col">
+    <header
+      class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border-subtle bg-bg-base px-4 sm:px-6 lg:px-8"
+    >
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        class="-ml-2 lg:hidden"
+        aria-label="Open navigation"
+        (click)="drawer.set('open')"
+      >
+        <ng-icon name="lucideMenu" size="20" />
+      </button>
+
+      <nav aria-label="Breadcrumb" class="min-w-0 flex-1">
+        <ol class="flex items-center gap-2 text-sm">
+          <li class="hidden text-text-muted sm:block">Admin</li>
+          <li class="hidden text-border-strong sm:block" aria-hidden="true">/</li>
+          <li class="truncate font-medium text-text-primary" aria-current="page">{{ pageLabel() }}</li>
+        </ol>
+      </nav>
+
+      <p class="text-sm whitespace-nowrap text-text-muted">
+        <span class="hidden sm:inline">{{ today() }} · </span>
+        <time class="text-text-body tabular-nums">{{ time() }}</time>
+      </p>
+    </header>
+
+    <main id="main" tabindex="-1" class="flex-1 outline-none">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<hlm-sheet side="left" [state]="drawer()" (closed)="drawer.set('closed')">
+  <hlm-sheet-content
+    *hlmSheetPortal="let ctx"
+    class="w-[280px] border-border-subtle bg-bg-sunken p-0 sm:max-w-[280px]"
+  >
+    <h2 hlmSheetTitle class="sr-only">Navigation</h2>
+    <app-sidebar-nav (navigated)="drawer.set('closed')" />
+  </hlm-sheet-content>
+</hlm-sheet>
+
+<hlm-toaster position="bottom-right" theme="dark" [closeButton]="true" />

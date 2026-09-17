@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+}
+
+/* Horizontal rail: steps share the width evenly; the final step only needs room for its label. */
+@media (min-width: 48rem) {
+  :host {
+    flex: 1 1 0%;
+  }
+
+  :host(:last-child) {
+    flex: 0 0 auto;
+  }
+}

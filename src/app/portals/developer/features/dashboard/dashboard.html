@@ -1,0 +1,97 @@
+<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+  <header class="border-b border-border-subtle pb-5">
+    <h1 class="font-display text-2xl leading-tight font-semibold text-text-primary">Dashboard</h1>
+    <p class="mt-1 text-sm text-text-muted">Consultant / Developer Portal</p>
+  </header>
+
+  <section aria-labelledby="stats-heading" class="mt-6">
+    <h2 id="stats-heading" class="sr-only">Pipeline counts</h2>
+    <dl class="grid grid-cols-2 gap-px border border-border-subtle bg-border-subtle sm:grid-cols-4">
+      @for (stat of stats(); track stat.label) {
+        <div class="bg-bg-surface px-4 py-5">
+          <dt class="label-caps text-text-muted">{{ stat.label }}</dt>
+          <dd class="mt-3 font-display text-3xl leading-none font-semibold text-text-primary tabular-nums">
+            {{ pad(stat.value) }}
+          </dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <section aria-labelledby="overview-heading" class="border border-border-subtle bg-bg-surface">
+      <h2 id="overview-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Client overview
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-sm">
+          <caption class="sr-only">Clients by most recent activity, with build progress</caption>
+          <thead>
+            <tr class="border-b border-border-subtle">
+              <th scope="col" class="px-4 py-2 text-left font-medium text-text-muted sm:px-5">Client</th>
+              <th scope="col" class="px-4 py-2 text-left font-medium text-text-muted">Status</th>
+              <th scope="col" class="px-4 py-2 text-right font-medium text-text-muted">Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (client of overview(); track client.id) {
+              <tr class="border-b border-border-subtle last:border-b-0">
+                <th scope="row" class="px-4 py-3 text-left font-medium text-text-primary sm:px-5">
+                  {{ client.name }}
+                </th>
+                <td class="px-4 py-3 text-text-body">{{ stageLabel(client.stage) }}</td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center justify-end gap-3">
+                    <span
+                      class="hidden h-1.5 w-24 bg-bg-sunken sm:block"
+                      role="img"
+                      [attr.aria-label]="client.progress + ' percent complete'"
+                    >
+                      <span class="block h-full bg-primary-600" [style.width.%]="client.progress"></span>
+                    </span>
+                    <span class="w-10 text-right text-text-body tabular-nums">{{ client.progress }}%</span>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="pipeline-heading" class="border border-border-subtle bg-bg-surface">
+      <h2 id="pipeline-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Onboarding progress
+      </h2>
+
+      <ul role="list" class="px-4 py-2 sm:px-5">
+        @for (step of pipeline(); track step.stage) {
+          <li class="flex items-center gap-3 border-b border-border-subtle py-3 last:border-b-0">
+            <span class="flex-1 text-sm text-text-body">{{ step.label }}</span>
+            <span class="h-1.5 w-16 bg-bg-sunken" aria-hidden="true">
+              <span class="block h-full bg-primary-600" [style.width.%]="step.share"></span>
+            </span>
+            <span class="w-5 text-right text-sm text-text-primary tabular-nums">{{ step.count }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+
+  <section aria-labelledby="activity-heading" class="mt-6 border border-border-subtle bg-bg-surface">
+    <h2 id="activity-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+      Recent activity
+    </h2>
+
+    <ul role="list" class="px-4 py-2 sm:px-5">
+      @for (entry of activity(); track entry.id) {
+        <li class="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-border-subtle py-3 last:border-b-0">
+          <time class="w-12 shrink-0 text-sm text-text-muted tabular-nums">{{ entry.time }}</time>
+          <span class="w-36 shrink-0 text-sm font-medium text-text-primary">{{ entry.client }}</span>
+          <span class="text-sm text-text-body">{{ entry.event }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+</div>

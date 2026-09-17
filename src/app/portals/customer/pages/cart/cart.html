@@ -1,0 +1,56 @@
+@if (cart.lines().length > 0) {
+  <section class="border-b border-border-strong">
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <h1 class="font-display text-3xl font-semibold text-text-primary sm:text-4xl">Your Cart</h1>
+
+      <a
+        routerLink="/menu"
+        class="mt-3 inline-flex items-center gap-2 text-sm font-medium text-text-muted transition-colors duration-150 hover:text-primary-600"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        Continue Shopping
+      </a>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="grid gap-10 lg:grid-cols-[1fr_360px] lg:items-start">
+      <div>
+        @for (line of cart.lines(); track line.slug) {
+          <app-cart-item
+            [slug]="line.slug"
+            [name]="line.name"
+            [price]="line.price"
+            [quantity]="line.quantity"
+            (increment)="cart.incrementQuantity(line.slug)"
+            (decrement)="cart.decrementQuantity(line.slug)"
+            (remove)="cart.removeItem(line.slug)"
+          />
+        }
+      </div>
+
+      <div class="lg:sticky lg:top-24">
+        <app-order-summary
+          [subtotal]="cart.subtotal()"
+          [tax]="cart.tax()"
+          [delivery]="cart.deliveryFee()"
+          [total]="cart.total()"
+          (checkout)="onCheckout()"
+        />
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="mx-auto flex max-w-6xl flex-col items-center px-4 py-24 text-center sm:px-6 lg:px-8">
+    <p class="font-display text-xl font-semibold text-text-primary">Your cart is empty.</p>
+    <p class="mt-2 text-sm text-text-muted">Browse our menu and add something delicious.</p>
+    <a
+      routerLink="/menu"
+      class="mt-6 inline-block bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+    >
+      Explore Menu
+    </a>
+  </section>
+}

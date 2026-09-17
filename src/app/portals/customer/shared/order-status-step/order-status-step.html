@@ -1,0 +1,38 @@
+<div class="flex flex-1 items-start gap-3 md:flex-col md:gap-0">
+  <div class="flex flex-col items-center self-stretch md:w-full md:flex-row">
+    <span class="flex h-5 w-5 shrink-0 items-center justify-center border-2" [class]="markerClasses()">
+      @switch (state()) {
+        @case ('done') {
+          <svg class="h-3 w-3 text-text-inverse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12l4 4L19 6" />
+          </svg>
+        }
+        @case ('current') {
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-600 opacity-75 motion-reduce:animate-none"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-primary-600"></span>
+          </span>
+        }
+        @case ('terminal') {
+          <svg class="h-3 w-3 text-text-inverse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        }
+      }
+    </span>
+
+    @if (!isLast()) {
+      <span class="mt-0 min-h-8 w-0.5 flex-1 md:ml-0 md:mt-0 md:h-0.5 md:min-h-0 md:w-full" [class]="railClasses()"></span>
+    }
+  </div>
+
+  <div class="pb-6 md:pb-0 md:pr-6 md:pt-3">
+    <p class="text-xs font-semibold uppercase tracking-widest" [class]="labelClasses()">
+      <span class="sr-only">{{ srStateText() }}</span>
+      {{ label() }}
+    </p>
+    <p class="mt-1 text-xs tabular-nums text-text-muted">
+      {{ time() ? (time() | date: 'h:mm a' : '+0530') : '—' }}
+    </p>
+  </div>
+</div>

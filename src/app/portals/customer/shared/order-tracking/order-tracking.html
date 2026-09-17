@@ -1,0 +1,97 @@
+<div class="border border-border-subtle bg-bg-surface p-6 lg:p-8">
+  <p class="text-xs font-semibold uppercase tracking-widest text-text-muted">Order Status</p>
+
+  <div class="mt-6">
+    <app-order-status-tracker [type]="order().type" [status]="order().status" [history]="order().history" />
+  </div>
+
+  @if (isCancelled()) {
+    <div class="mt-8 border-t border-border-subtle pt-6">
+      <app-cancelled-order-state [order]="order()" />
+    </div>
+  } @else {
+    <div class="mt-8 flex flex-wrap items-start justify-between gap-6 border-t border-border-subtle pt-6" aria-live="polite">
+      <div>
+        <h2 class="font-display text-4xl font-semibold text-text-primary sm:text-5xl">
+          {{ statusCopy().label }}
+        </h2>
+        <p class="mt-2 max-w-md text-text-body">{{ statusCopy().message }}</p>
+      </div>
+
+      <div class="text-left sm:text-right">
+        @if (isActive() && !isReadyForPickup()) {
+          <p class="font-display text-3xl font-semibold tabular-nums text-primary-600">
+            {{ order().type === 'delivery' ? 'Arriving by' : 'Ready by' }} {{ readyBy() | date: 'h:mm a' : '+0530' }}
+          </p>
+        }
+
+        @if (isReadyForPickup()) {
+          <p class="font-display text-2xl font-semibold tabular-nums text-primary-600">
+            Ready since {{ lastEventAt() | date: 'h:mm a' : '+0530' }}
+          </p>
+        }
+
+        @if (isEnded()) {
+          <p class="font-display text-2xl font-semibold tabular-nums text-status-delivered">
+            {{ order().type === 'delivery' ? 'Delivered at' : 'Picked up at' }} {{ lastEventAt() | date: 'h:mm a' : '+0530' }}
+          </p>
+          <a
+            routerLink="/menu"
+            class="mt-3 inline-block bg-primary-600 px-5 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+          >
+            Order Again
+          </a>
+        }
+
+        @if (isRejected()) {
+          <a
+            [href]="contact.phoneHref"
+            class="inline-block bg-primary-600 px-5 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+          >
+            Call the Restaurant
+          </a>
+        }
+      </div>
+    </div>
+  }
+
+  @if (isActive()) {
+    <div class="mt-8 flex border-t border-border-subtle pt-5 sm:justify-end">
+      @if (order().cancellable) {
+        <button
+          type="button"
+          (click)="openCancelDialog()"
+          data-testid="cancel-order"
+          class="group inline-flex w-full items-center justify-center gap-2 border border-border-strong px-5 py-2.5 text-sm font-semibold text-text-body transition-colors duration-150 hover:border-error hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 sm:w-auto"
+        >
+          <svg class="h-4 w-4 text-text-muted transition-colors duration-150 group-hover:text-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+          Cancel Order
+        </button>
+      } @else {
+        <div class="flex items-start gap-3" data-testid="not-cancellable">
+          <svg class="mt-0.5 h-4 w-4 shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="11" width="14" height="10" />
+            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </svg>
+          <div class="sm:text-right">
+            <p class="text-sm text-text-primary">This order can no longer be cancelled.</p>
+            <p class="mt-1 text-sm text-text-muted">
+              Need help?
+              <a
+                [href]="contact.phoneHref"
+                class="text-text-body underline decoration-border-strong underline-offset-4 transition-colors duration-150 hover:text-primary-600 hover:decoration-primary-600"
+                >Call the Restaurant</a
+              >
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (order().cancellable) {
+  <app-cancel-order-dialog [order]="order()" (confirmed)="onCancelConfirmed($event)" />
+}

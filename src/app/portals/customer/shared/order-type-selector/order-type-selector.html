@@ -1,0 +1,75 @@
+<div role="radiogroup" aria-label="Order type" class="grid grid-cols-2 gap-4">
+  <button
+    type="button"
+    role="radio"
+    [attr.aria-checked]="isSelected('delivery')"
+    (click)="select('delivery')"
+    class="flex min-h-24 flex-col items-center justify-center gap-1.5 border px-4 py-4 text-center transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+    [class.border-border-subtle]="!isSelected('delivery')"
+    [class.bg-bg-surface]="!isSelected('delivery')"
+    [class.hover:border-primary-600]="!isSelected('delivery')"
+    [class.border-primary-600]="isSelected('delivery')"
+    [class.bg-primary-100]="isSelected('delivery')"
+  >
+    <svg
+      class="h-6 w-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      [class.text-primary-600]="isSelected('delivery')"
+      [class.text-text-muted]="!isSelected('delivery')"
+    >
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="17" cy="18" r="2" />
+      <path d="M4 18h1V9h6l4 5h4v4h-1M11 9V6h3l3 3" />
+    </svg>
+    <span
+      class="font-display text-sm font-semibold"
+      [class.text-text-primary]="isSelected('delivery')"
+      [class.text-text-body]="!isSelected('delivery')"
+    >
+      Delivery
+    </span>
+    <span class="text-xs text-text-muted">Delivered to your address</span>
+  </button>
+
+  <button
+    type="button"
+    role="radio"
+    [attr.aria-checked]="isSelected('pickup')"
+    (click)="select('pickup')"
+    class="flex min-h-24 flex-col items-center justify-center gap-1.5 border px-4 py-4 text-center transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+    [class.border-border-subtle]="!isSelected('pickup')"
+    [class.bg-bg-surface]="!isSelected('pickup')"
+    [class.hover:border-primary-600]="!isSelected('pickup')"
+    [class.border-primary-600]="isSelected('pickup')"
+    [class.bg-primary-100]="isSelected('pickup')"
+  >
+    <svg
+      class="h-6 w-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      [class.text-primary-600]="isSelected('pickup')"
+      [class.text-text-muted]="!isSelected('pickup')"
+    >
+      <path d="M4 9l1.5-5h13L20 9M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9z M9 13a3 3 0 0 0 6 0" />
+    </svg>
+    <span
+      class="font-display text-sm font-semibold"
+      [class.text-text-primary]="isSelected('pickup')"
+      [class.text-text-body]="!isSelected('pickup')"
+    >
+      Pickup
+    </span>
+    <span class="text-xs text-text-muted">Collect from HT Restaurant Erode</span>
+  </button>
+</div>

@@ -1,0 +1,145 @@
+<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+  <a routerLink="/developer/clients" class="text-sm font-medium text-primary-600 hover:underline">← Clients</a>
+
+  @if (client(); as client) {
+    <header class="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-border-subtle pb-5">
+      <h1 class="font-display text-2xl leading-tight font-semibold text-text-primary">
+        {{ client.name }} {{ client.city }}
+      </h1>
+      <p class="flex items-center gap-2 text-sm text-text-body">
+        <span class="h-2 w-2 shrink-0" [class]="stageDot(client.stage)" aria-hidden="true"></span>
+        {{ stageLabel(client.stage) }}
+      </p>
+    </header>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+      <section aria-labelledby="info-heading" class="border border-border-subtle bg-bg-surface">
+        <h2 id="info-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+          Client information
+        </h2>
+
+        <dl class="divide-y divide-border-subtle">
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+            <dt class="w-28 shrink-0 text-sm text-text-muted">Client ID</dt>
+            <dd class="text-sm text-text-primary tabular-nums">{{ client.code }}</dd>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+            <dt class="w-28 shrink-0 text-sm text-text-muted">Name</dt>
+            <dd class="text-sm text-text-primary">{{ client.name }}</dd>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+            <dt class="w-28 shrink-0 text-sm text-text-muted">Contact</dt>
+            <dd class="text-sm text-text-primary">{{ client.contact }}</dd>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+            <dt class="w-28 shrink-0 text-sm text-text-muted">Created</dt>
+            <dd class="text-sm text-text-primary tabular-nums">{{ date(client.createdOn) }}</dd>
+          </div>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+            <dt class="w-28 shrink-0 text-sm text-text-muted">Updated</dt>
+            <dd class="text-sm text-text-primary tabular-nums">{{ date(client.updatedOn) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="status-heading" class="border border-border-subtle bg-bg-surface">
+        <h2 id="status-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+          Onboarding status
+        </h2>
+
+        <div class="flex items-center gap-3 border-b border-border-subtle px-4 py-4 sm:px-5">
+          <span
+            class="h-3 flex-1 bg-bg-sunken"
+            role="img"
+            [attr.aria-label]="client.progress + ' percent complete'"
+          >
+            <span class="block h-full bg-primary-600" [style.width.%]="client.progress"></span>
+          </span>
+          <span class="text-sm text-text-body tabular-nums">{{ client.progress }}%</span>
+        </div>
+
+        <ul role="list" class="px-4 py-2 sm:px-5">
+          @for (step of steps(); track step.label) {
+            <li class="flex items-center gap-3 border-b border-border-subtle py-3 last:border-b-0">
+              <span
+                class="w-4 shrink-0 text-center text-sm"
+                [class]="step.done ? 'text-primary-600' : 'text-border-strong'"
+                aria-hidden="true"
+              >
+                {{ step.done ? '✓' : '·' }}
+              </span>
+              <span class="text-sm" [class]="step.done ? 'text-text-primary' : 'text-text-muted'">
+                {{ step.label }}
+              </span>
+              <span class="sr-only">{{ step.done ? 'done' : 'not started' }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+
+    <section aria-labelledby="domains-heading" class="mt-6 border border-border-subtle bg-bg-surface">
+      <h2 id="domains-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Domains
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[32rem] border-collapse text-sm">
+          <caption class="sr-only">Domains for this client</caption>
+          <thead>
+            <tr class="border-b border-border-subtle">
+              <th scope="col" class="px-4 py-2 text-left font-medium text-text-muted sm:px-5">Domain</th>
+              <th scope="col" class="px-4 py-2 text-left font-medium text-text-muted">Type</th>
+              <th scope="col" class="px-4 py-2 text-left font-medium text-text-muted">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of domains(); track row.host) {
+              <tr class="border-b border-border-subtle last:border-b-0">
+                <th scope="row" class="px-4 py-3 text-left font-medium text-text-primary sm:px-5">
+                  {{ row.host }}
+                </th>
+                <td class="px-4 py-3 text-text-body">{{ row.type }}</td>
+                <td class="px-4 py-3 text-text-body">{{ row.status }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="actions-heading" class="mt-6 border border-border-subtle bg-bg-surface">
+      <h2 id="actions-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Actions
+      </h2>
+
+      <div class="flex flex-wrap gap-3 px-4 py-4 sm:px-5">
+        <a
+          [routerLink]="['/developer/clients', client.id, 'edit']"
+          class="flex h-9 items-center border border-border-strong px-3 text-sm font-medium text-text-body hover:border-primary-600 hover:text-text-primary"
+        >
+          Edit client
+        </a>
+        <a
+          routerLink="/developer/domains"
+          class="flex h-9 items-center border border-border-strong px-3 text-sm font-medium text-text-body hover:border-primary-600 hover:text-text-primary"
+        >
+          Manage domains
+        </a>
+        <a
+          routerLink="/developer/deployments"
+          class="flex h-9 items-center border border-border-strong px-3 text-sm font-medium text-text-body hover:border-primary-600 hover:text-text-primary"
+        >
+          View kanban
+        </a>
+      </div>
+    </section>
+  } @else {
+    <h1 class="font-display mt-4 text-2xl leading-tight font-semibold text-text-primary">
+      Client not found
+    </h1>
+    <p class="mt-2 max-w-prose text-sm text-text-body">
+      No client matches this address. It may have been removed from the demo data.
+    </p>
+  }
+</div>
