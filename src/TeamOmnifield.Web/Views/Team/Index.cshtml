@@ -1,0 +1,21 @@
+@model DashboardViewModel
+@{ ViewData["Title"] = "TeamOmnifield"; }
+<section class="container band-tight" style="padding-top:32px">
+    <p class="label-caps text-primary">teamomnifield.ai</p>
+    <h1 class="headline" style="margin-top:8px">Restaurant operations at a glance</h1>
+    <p class="text-body" style="margin-top:8px">Central operational view for HT Restaurant Erode.</p>
+</section>
+<section class="container" style="padding-bottom:48px">
+    <div class="metric-grid">
+        <div class="metric-card"><span>Database</span><strong>Connected</strong></div>
+        <div class="metric-card"><span>Orders today</span><strong>@Model.TotalOrdersToday</strong></div>
+        <div class="metric-card"><span>Sales today</span><strong>₹@Model.SalesToday.ToString("0.00")</strong></div>
+        <div class="metric-card"><span>Pending</span><strong>@Model.PendingOrders</strong></div>
+        <div class="metric-card"><span>Preparing</span><strong>@Model.PreparingOrders</strong></div>
+        <div class="metric-card"><span>Ready</span><strong>@Model.ReadyOrders</strong></div>
+    </div>
+    <div class="actions-row">
+        <a class="btn btn-primary" href="http://htrestaurant.com:8080">Customer site</a>
+        <a class="btn btn-secondary" href="http://admin.htrestaurant.com:8080">Admin console</a>
+    </div>
+</section>

@@ -1,0 +1,120 @@
+@model IEnumerable<Category>
+@{ ViewData["Title"] = "Menu"; }
+<section class="band band-strong">
+    <div class="container">
+        <h1 class="display" style="font-size:clamp(1.875rem,3vw,2.25rem)">Menu</h1>
+        <p class="text-body" style="margin-top:8px">Explore our menu</p>
+    </div>
+</section>
+
+<section class="band-surface" style="border-bottom:1px solid var(--color-border-subtle)">
+    <div class="container band-tight">
+        <div class="search-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+            <input type="search" id="menuSearch" placeholder="Search menu items..." aria-label="Search menu items" />
+        </div>
+        <div class="tabbar" style="border-bottom:0;padding:0;margin-top:20px;flex-wrap:wrap;gap:10px" role="tablist" aria-label="Menu categories" id="menuFilters">
+            <button type="button" class="active" data-category="all" style="border:1px solid var(--color-border-subtle);border-radius:999px;padding:8px 16px">All</button>
+            @foreach (var category in Model)
+            {
+                <button type="button" data-category="@category.Name" style="border:1px solid var(--color-border-subtle);border-radius:999px;padding:8px 16px">@category.Name</button>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="container band" style="border-bottom:0">
+    <div id="menuGrid" class="grid grid-3">
+        @foreach (var category in Model)
+        {
+            foreach (var product in category.Products)
+            {
+                <article class="card" data-dish-name="@product.Name.ToLowerInvariant()" data-category="@category.Name" style="display:flex;flex-direction:column">
+                    <div class="card-photo">
+                        @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" alt="@product.Name" />
+                        }
+                        else
+                        {
+                            <span>Photo coming soon</span>
+                        }
+                        @if (!product.IsAvailable)
+                        {
+                            <div style="position:absolute;inset:0;background:rgba(15,13,10,.7);display:flex;align-items:center;justify-content:center">
+                                <span class="label-caps" style="border:1px solid var(--color-border-strong);padding:4px 12px">Unavailable</span>
+                            </div>
+                        }
+                    </div>
+                    <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;flex:1">
+                        <h3 class="title" style="font-size:1rem">@product.Name</h3>
+                        @if (!string.IsNullOrWhiteSpace(product.Description))
+                        {
+                            <p class="text-body" style="font-size:0.875rem;margin:0">@product.Description</p>
+                        }
+                        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:8px">
+                            <span class="price tabular @(product.IsAvailable ? "" : "muted")" style="font-size:1.125rem">₹@product.Price.ToString("0")</span>
+                            <span class="text-muted" style="font-size:0.75rem;display:flex;align-items:center;gap:6px">
+                                <span class="dot @(product.IsAvailable ? "dot-done" : "")" style="@(product.IsAvailable ? "" : "background:var(--color-text-muted)")"></span>
+                                @(product.IsAvailable ? "Available" : "Unavailable")
+                            </span>
+                        </div>
+                        <form asp-controller="Cart" asp-action="Add" method="post">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <button type="submit" class="btn btn-primary btn-block" @(product.IsAvailable ? "" : "disabled")>@(product.IsAvailable ? "Add to Cart" : "Unavailable")</button>
+                        </form>
+                    </div>
+                </article>
+            }
+        }
+    </div>
+    <div id="menuEmpty" class="empty-state" style="display:none">
+        <p class="title">No dishes found</p>
+        <p class="hint text-muted">Try another search or category.</p>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+(function () {
+  var search = document.getElementById('menuSearch');
+  var filters = document.getElementById('menuFilters');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('#menuGrid [data-dish-name]'));
+  var empty = document.getElementById('menuEmpty');
+  var grid = document.getElementById('menuGrid');
+  var category = 'all';
+
+  function apply() {
+    var q = search.value.trim().toLowerCase();
+    var visible = 0;
+    cards.forEach(function (card) {
+      var matchesCategory = category === 'all' || card.getAttribute('data-category') === category;
+      var matchesSearch = !q || card.getAttribute('data-dish-name').indexOf(q) !== -1;
+      var show = matchesCategory && matchesSearch;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    grid.style.display = visible ? '' : 'none';
+    empty.style.display = visible ? 'none' : '';
+  }
+
+  search.addEventListener('input', apply);
+  filters.querySelectorAll('button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      filters.querySelectorAll('button').forEach(function (b) {
+        b.classList.remove('active');
+        b.style.borderColor = 'transparent';
+        b.style.color = 'var(--color-text-body)';
+      });
+      btn.classList.add('active');
+      btn.style.borderColor = 'var(--color-primary-600)';
+      btn.style.color = 'var(--color-primary-600)';
+      category = btn.getAttribute('data-category');
+      apply();
+    });
+  });
+  var first = filters.querySelector('button.active');
+  if (first) { first.style.borderColor = 'var(--color-primary-600)'; first.style.color = 'var(--color-primary-600)'; }
+})();
+</script>
+}

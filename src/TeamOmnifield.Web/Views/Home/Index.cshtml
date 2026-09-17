@@ -1,0 +1,124 @@
+@model object
+@{ ViewData["Title"] = "HT Restaurant Erode"; }
+<section class="band band-strong">
+    <div class="container hero-grid">
+        <div>
+            <p class="status-pill"><span class="dot dot-done"></span>Open Now &middot; Closes 10:30 PM</p>
+            <h1 class="display" style="margin-top:16px">HT Restaurant<br /><span class="text-primary">Erode</span></h1>
+            <p class="text-body" style="margin-top:16px;max-width:26rem">Today's kitchen card, straight from Perundurai Road &mdash; order for pickup, delivery or dine-in.</p>
+            <div class="actions-row" style="margin-top:32px">
+                <a href="/Menu" class="btn btn-primary">Order Now</a>
+                <a href="/Menu" class="btn btn-secondary">Explore Menu</a>
+            </div>
+            <dl class="grid grid-2" style="max-width:26rem;border-top:1px solid var(--color-border-subtle);padding-top:24px;margin-top:40px;font-size:0.875rem;gap:16px">
+                <div><dt class="label-caps">Location</dt><dd class="text-body" style="margin:4px 0 0">Perundurai Road, Erode</dd></div>
+                <div><dt class="label-caps">Today's Hours</dt><dd class="text-body tabular" style="margin:4px 0 0">11:00 AM &ndash; 10:30 PM</dd></div>
+            </dl>
+        </div>
+        <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--color-border-strong);padding-bottom:12px">
+                <h2 class="label-caps" style="margin:0">Today's Kitchen</h2>
+                <span class="text-muted tabular" style="font-size:0.75rem">@(((IEnumerable<Product>)ViewBag.Featured).Count()) dishes today</span>
+            </div>
+            <div style="margin-top:8px">
+                @foreach (Product product in (IEnumerable<Product>)ViewBag.Featured)
+                {
+                    <div class="ruled-row">
+                        <span class="text-primary" style="font-weight:500">@product.Name</span>
+                        <span style="display:flex;align-items:baseline;gap:16px">
+                            <span class="price tabular">₹@product.Price.ToString("0")</span>
+                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <button type="submit" class="add-btn" aria-label="Add @product.Name to cart">+</button>
+                            </form>
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="band" style="border-bottom:0">
+    <div class="container">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;border-bottom:1px solid var(--color-border-strong);padding-bottom:16px">
+            <h2 class="headline">Customer Favorites</h2>
+            <a href="/Menu" class="text-primary" style="font-size:0.875rem;font-weight:500">View full menu &rarr;</a>
+        </div>
+        <div class="grid grid-3" style="margin-top:32px">
+            @foreach (Product product in (IEnumerable<Product>)ViewBag.Featured)
+            {
+                <article class="card">
+                    <div class="card-photo">
+                        @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" alt="@product.Name" />
+                        }
+                        else
+                        {
+                            <span>Photo coming soon</span>
+                        }
+                    </div>
+                    <div style="padding-top:12px">
+                        <h3 class="title">@product.Name</h3>
+                        @if (!string.IsNullOrWhiteSpace(product.Description))
+                        {
+                            <p class="text-body" style="font-size:0.875rem;margin-top:6px">@product.Description</p>
+                        }
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+                            <span class="price tabular" style="font-size:1.125rem">₹@product.Price.ToString("0")</span>
+                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="band-surface" style="border-top:1px solid var(--color-border-subtle);border-bottom:1px solid var(--color-border-subtle)">
+    <div class="container band">
+        <h2 class="headline">Browse the Full Card</h2>
+        <div style="margin-top:24px">
+            <a href="/Menu" class="ruled-row" style="align-items:center;cursor:pointer">
+                <span class="headline" style="font-size:1.25rem">Full Menu</span>
+                <span class="text-muted" style="display:flex;align-items:center;gap:8px;font-size:0.875rem">
+                    <span class="text-primary tabular">@(((IEnumerable<Product>)ViewBag.Featured).Count()) dishes</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+                </span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="band" style="border-bottom:0;max-width:720px;margin:0 auto">
+    <div class="container">
+        <h2 class="headline">About HT Restaurant Erode</h2>
+        <div style="border-left:2px solid var(--color-primary-600);padding-left:24px;margin-top:16px">
+            <p class="text-body">HT Restaurant has been serving Erode with a menu built around the region's own turmeric and local produce. Our kitchen blends traditional Tamil Nadu cooking with a modern, considered plate &mdash; for dine-in, pickup and delivery alike.</p>
+            <p class="text-body" style="margin-top:16px">Every dish is prepared fresh to order, using recipes developed by our kitchen team and ingredients sourced close to home.</p>
+        </div>
+    </div>
+</section>
+
+<section class="band">
+    <div class="container">
+        <div style="display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+            <div><h3 class="label-caps text-primary">Location</h3><p class="text-body" style="margin-top:12px;font-size:0.875rem">142, Perundurai Road,<br />Erode, Tamil Nadu 638011</p></div>
+            <div><h3 class="label-caps text-primary">Hours</h3><p class="text-body" style="margin-top:12px;font-size:0.875rem">Mon&ndash;Fri: 11:00 AM &ndash; 10:30 PM<br />Sat&ndash;Sun: 10:30 AM &ndash; 11:00 PM</p></div>
+            <div><h3 class="label-caps text-primary">Contact</h3><p class="text-body" style="margin-top:12px;font-size:0.875rem"><a href="tel:+919876543210">+91 98765 43210</a><br /><a href="mailto:hello@htrestauranterode.in">hello@htrestauranterode.in</a></p></div>
+            <div><h3 class="label-caps text-primary">Delivery &amp; Pickup</h3><p class="text-body" style="margin-top:12px;font-size:0.875rem">Pickup ready in 20 minutes, or delivery within 5 km of Perundurai Road.</p></div>
+        </div>
+    </div>
+</section>
+
+<section style="border-top:1px solid var(--color-border-subtle)">
+    <div class="container band">
+        <p class="label-caps">Open Now</p>
+        <h2 class="display" style="margin-top:12px;max-width:36rem">The full card is ready<br /><span class="text-primary">whenever you are.</span></h2>
+        <a href="/Menu" class="btn btn-primary" style="margin-top:24px;padding:16px 24px">View Full Menu</a>
+    </div>
+</section>

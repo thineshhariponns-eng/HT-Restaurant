@@ -1,0 +1,66 @@
+@model Order
+@{ ViewData["Title"] = "Order confirmed"; }
+<section class="container" style="max-width:768px;text-align:center;padding-top:48px;padding-bottom:32px;border-bottom:1px solid var(--color-border-strong)">
+    <span style="display:inline-flex;height:56px;width:56px;align-items:center;justify-content:center;border:1px solid var(--color-primary-600);color:var(--color-primary-600)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+    </span>
+    <h1 class="display" style="margin-top:20px;font-size:1.875rem">Order Confirmed!</h1>
+    <p class="text-body" style="margin-top:12px">Thank you for ordering from HT Restaurant, @Model.CustomerName!</p>
+    <p class="text-muted tabular" style="margin-top:8px;font-size:0.875rem">Delivery &middot; Placed @Model.CreatedUtc.ToLocalTime().ToString("d MMM, h:mm tt")</p>
+</section>
+
+<section class="container" style="max-width:768px;padding-top:24px">
+    <div style="border:1px solid var(--color-border-strong);background:var(--color-bg-surface)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;border-bottom:1px solid var(--color-border-subtle)">
+            <span class="label-caps">Order number</span>
+            <span style="display:inline-flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--color-text-primary)"><span class="dot dot-kitchen"></span>@Model.Status</span>
+        </div>
+        <p class="display tabular" style="text-align:center;padding:32px 16px;margin:0;font-size:clamp(1.5rem,6vw,2.5rem);color:var(--color-text-primary)">
+            <span class="text-muted">#</span>@Model.OrderNumber
+        </p>
+        <div style="padding:12px 20px;border-top:1px solid var(--color-border-subtle)">
+            <p class="text-body" style="font-size:0.875rem;margin:0">Mention this number if you call us about your order.</p>
+        </div>
+    </div>
+
+    <div style="margin-top:20px;display:flex;justify-content:center">
+        <a href="/Menu" class="btn btn-primary">Back to Menu</a>
+    </div>
+</section>
+
+<section class="container" style="max-width:768px;padding-top:56px;padding-bottom:64px">
+    <div style="border-top:1px solid var(--color-border-strong);display:grid;gap:32px" class="confirm-grid">
+        <div style="padding-top:32px">
+            <h2 class="title">Your order</h2>
+            <ul style="list-style:none;margin:20px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;font-size:0.875rem">
+                @foreach (var line in Model.Items)
+                {
+                    <li style="display:flex;justify-content:space-between;gap:12px">
+                        <span class="text-body">@line.ProductNameSnapshot <span class="text-muted">&times; @line.Quantity</span></span>
+                        <span class="tabular" style="color:var(--color-text-primary)">₹@line.LineTotal.ToString("0")</span>
+                    </li>
+                }
+            </ul>
+            <dl style="margin:20px 0 0;border-top:1px solid var(--color-border-subtle);padding-top:16px;font-size:0.875rem">
+                <div class="summary-row"><dt>Subtotal</dt><dd class="tabular" style="color:var(--color-text-primary);margin:0">₹@Model.Subtotal.ToString("0.00")</dd></div>
+                <div class="summary-row"><dt>Delivery</dt><dd class="tabular" style="color:var(--color-text-primary);margin:0">₹@Model.DeliveryFee.ToString("0.00")</dd></div>
+            </dl>
+            <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@Model.Total.ToString("0.00")</span></div>
+            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+            {
+                <p class="text-muted" style="margin-top:20px;font-size:0.875rem"><span class="text-body">Note:</span> @Model.Notes</p>
+            }
+        </div>
+        <div style="padding-top:32px;border-top:1px solid var(--color-border-subtle)" class="confirm-address">
+            <h2 class="title">Delivering to</h2>
+            <address style="margin-top:20px;font-style:normal;font-size:0.875rem" class="text-body">
+                <p style="font-weight:600;color:var(--color-text-primary);margin:0 0 4px">@Model.CustomerName</p>
+                <p style="margin:0">@Model.DeliveryAddress</p>
+                <p class="tabular" style="margin-top:8px">@Model.Phone</p>
+            </address>
+        </div>
+    </div>
+</section>
+<style>
+  @@media (min-width: 768px) { .confirm-grid { grid-template-columns: 1fr 1fr; } .confirm-address { border-top: 0; border-left: 1px solid var(--color-border-subtle); padding-left: 32px; margin-top:0!important; } }
+</style>

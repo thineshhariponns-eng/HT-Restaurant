@@ -1,0 +1,84 @@
+@model CheckoutViewModel
+@using Microsoft.EntityFrameworkCore
+@inject TeamOmnifield.Web.Services.CartService CartServiceInstance
+@inject TeamOmnifield.Web.Data.AppDbContext Db
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Checkout";
+    var cart = CartServiceInstance.Get();
+    var products = await Db.Products.Where(x => cart.Keys.Contains(x.Id)).ToListAsync();
+    var subtotal = products.Sum(p => p.Price * cart[p.Id]);
+    var deliveryFee = Configuration.GetValue<decimal>("Restaurant:DeliveryFee", 40m);
+}
+<section class="band band-strong">
+    <div class="container">
+        <h1 class="display" style="font-size:clamp(1.875rem,3vw,2.25rem)">Checkout</h1>
+        <a href="/Cart" class="text-muted" style="margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-size:0.875rem;font-weight:500">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+            Back to Cart
+        </a>
+    </div>
+</section>
+
+<section class="container band" style="border-bottom:0">
+    <div asp-validation-summary="ModelOnly" class="alert-error"></div>
+    <form asp-action="Index" method="post" style="display:grid;gap:40px" class="checkout-layout">
+        <div>
+            <p class="hint" style="margin-bottom:20px">Fields marked <span class="text-primary">*</span> are required.</p>
+
+            <fieldset style="border:0;padding:0 0 32px;margin:0;border-bottom:1px solid var(--color-border-subtle)">
+                <legend class="label-caps" style="margin-bottom:16px">Customer Information</legend>
+                <div class="field">
+                    <label asp-for="CustomerName">Name <span class="req">*</span></label>
+                    <input asp-for="CustomerName" />
+                    <span asp-validation-for="CustomerName" class="field-error-text"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Phone">Phone <span class="req">*</span></label>
+                    <input asp-for="Phone" placeholder="10-digit mobile number" />
+                    <span asp-validation-for="Phone" class="field-error-text"></span>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:0;padding:24px 0 32px;margin:0;border-bottom:1px solid var(--color-border-subtle)">
+                <legend class="label-caps" style="margin-bottom:16px">Delivery Details</legend>
+                <div class="field">
+                    <label asp-for="DeliveryAddress">Address <span class="req">*</span></label>
+                    <textarea asp-for="DeliveryAddress" rows="3"></textarea>
+                    <span asp-validation-for="DeliveryAddress" class="field-error-text"></span>
+                </div>
+            </fieldset>
+
+            <fieldset style="border:0;padding:24px 0 0;margin:0">
+                <legend class="label-caps" style="margin-bottom:16px">Order Notes</legend>
+                <div class="field" style="margin-bottom:0">
+                    <label asp-for="Notes">Notes</label>
+                    <textarea asp-for="Notes" rows="3" placeholder="e.g. less spicy, no onions..." maxlength="500"></textarea>
+                    <span asp-validation-for="Notes" class="field-error-text"></span>
+                </div>
+            </fieldset>
+        </div>
+
+        <div>
+            <div class="summary-panel">
+                <h2>Order Summary</h2>
+                <div style="margin-top:16px">
+                    @foreach (var p in products)
+                    {
+                        <div class="summary-row"><span>@p.Name &times; @cart[p.Id]</span><span class="tabular" style="color:var(--color-text-primary)">₹@((p.Price * cart[p.Id]).ToString("0"))</span></div>
+                    }
+                </div>
+                <div style="margin-top:12px;border-top:1px solid var(--color-border-subtle);padding-top:12px">
+                    <div class="summary-row"><span>Subtotal</span><span class="tabular" style="color:var(--color-text-primary)">₹@subtotal.ToString("0.00")</span></div>
+                    <div class="summary-row"><span>Delivery</span><span class="tabular" style="color:var(--color-text-primary)">₹@deliveryFee.ToString("0.00")</span></div>
+                </div>
+                <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@((subtotal + deliveryFee).ToString("0.00"))</span></div>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Place Order</button>
+            </div>
+        </div>
+    </form>
+</section>
+<style>
+  @@media (min-width: 1024px) { .checkout-layout { grid-template-columns: 1fr 380px; align-items: start; } .checkout-layout > div:last-child { position: sticky; top: 96px; } }
+</style>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
