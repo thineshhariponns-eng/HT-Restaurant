@@ -30,8 +30,15 @@ public class CheckoutViewModel
 
 public class LoginViewModel
 {
-    [Required, EmailAddress] public string Email { get; set; } = string.Empty;
-    [Required, DataType(DataType.Password)] public string Password { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Enter your email address.")]
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Enter your password.")]
+    [DataType(DataType.Password)]
+    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+    [RegularExpression(@"^(?=.*[^a-zA-Z0-9]).+$", ErrorMessage = "Password must include at least one special character.")]
+    public string Password { get; set; } = string.Empty;
 }
 
 public class ProductEditViewModel

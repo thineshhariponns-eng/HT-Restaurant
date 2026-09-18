@@ -8,7 +8,7 @@
     <div class="form-card narrow">
         <p class="label-caps text-primary">@(developer ? "Consultant portal" : "Owner console")</p>
         <h1 class="headline" style="margin-top:8px">@(developer ? "Developer login" : "Admin login")</h1>
-        <div asp-validation-summary="ModelOnly" class="alert-error" style="margin-top:20px"></div>
+        <div asp-validation-summary="All" class="alert-error" style="margin-top:20px"></div>
         <form asp-action="Login" method="post" style="margin-top:20px">
             <input type="hidden" name="returnUrl" value="@Context.Request.Query["returnUrl"]" />
             <div class="field">
@@ -21,10 +21,5 @@
             </div>
             <button class="btn btn-primary btn-block" type="submit">Sign in</button>
         </form>
-        <p class="hint" style="margin-top:16px">
-            Local evaluation accounts, both with password Admin@@12345:<br />
-            admin@@htrestaurant.com &middot; owner console<br />
-            developer@@htrestaurant.com &middot; consultant portal
-        </p>
     </div>
 </div>
