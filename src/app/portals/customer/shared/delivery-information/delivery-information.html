@@ -1,0 +1,26 @@
+<div class="border border-border-subtle bg-bg-surface p-6">
+  <h2 class="font-display text-lg font-semibold text-text-primary">
+    {{ type() === 'delivery' ? 'Delivery Information' : 'Pickup Information' }}
+  </h2>
+
+  <dl class="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+    <div>
+      <dt class="text-xs uppercase tracking-widest text-text-muted">Customer</dt>
+      <dd class="mt-1 text-text-body">{{ customer().name }}</dd>
+    </div>
+    <div>
+      <dt class="text-xs uppercase tracking-widest text-text-muted">Order Type</dt>
+      <dd class="mt-1 text-text-body">{{ type() === 'delivery' ? 'Delivery' : 'Pickup' }}</dd>
+    </div>
+    <div class="col-span-2">
+      <dt class="text-xs uppercase tracking-widest text-text-muted">
+        {{ type() === 'delivery' ? 'Delivery Address' : 'Pickup From' }}
+      </dt>
+      @if (type() === 'delivery' && address(); as deliveryAddress) {
+        <dd class="mt-1 text-text-body">{{ deliveryAddress.address }}<br />{{ deliveryAddress.city }} {{ deliveryAddress.postalCode }}</dd>
+      } @else {
+        <dd class="mt-1 text-text-body">{{ restaurant.name }}<br />{{ restaurant.addressLines[0] }} {{ restaurant.addressLines[1] }}</dd>
+      }
+    </div>
+  </dl>
+</div>

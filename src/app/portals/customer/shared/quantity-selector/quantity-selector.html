@@ -1,0 +1,21 @@
+<div class="inline-flex items-center border border-border-subtle">
+  <button
+    type="button"
+    [disabled]="decrementDisabled()"
+    (click)="onDecrement()"
+    aria-label="Decrease quantity"
+    class="flex h-10 w-10 items-center justify-center text-text-primary transition-colors duration-150 hover:text-primary-600 disabled:cursor-not-allowed disabled:text-text-muted disabled:opacity-50"
+  >
+    &minus;
+  </button>
+  <span class="w-10 text-center tabular-nums text-text-primary">{{ quantity() }}</span>
+  <button
+    type="button"
+    [disabled]="disabled()"
+    (click)="onIncrement()"
+    aria-label="Increase quantity"
+    class="flex h-10 w-10 items-center justify-center text-text-primary transition-colors duration-150 hover:text-primary-600 disabled:cursor-not-allowed disabled:text-text-muted disabled:opacity-50"
+  >
+    +
+  </button>
+</div>

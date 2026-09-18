@@ -8,3 +8,10 @@ TestResults/
 .env
 .env.*
 !*.env.example
+
+node_modules/
+dist/
+.angular/
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

@@ -1,0 +1,77 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    var clients = DemoClientStore.All();
+    var activity = DemoClientStore.RecentActivity();
+    var recent = clients.OrderByDescending(x => x.UpdatedUtc).Take(5).ToList();
+}
+<div class="container admin-pad">
+    <header class="page-heading">
+        <h1>Dashboard</h1>
+        <p class="text-muted" style="font-size:0.875rem">Consultant / Developer Portal</p>
+    </header>
+
+    <div class="metric-grid">
+        <div class="metric-card"><span>Total clients</span><strong class="tabular">@clients.Count.ToString("00")</strong></div>
+        <div class="metric-card"><span>Onboarding</span><strong class="tabular">@DemoClientStore.CountOf(ClientStage.Onboarding).ToString("00")</strong></div>
+        <div class="metric-card"><span>Development</span><strong class="tabular">@DemoClientStore.CountOf(ClientStage.Development).ToString("00")</strong></div>
+        <div class="metric-card"><span>Live</span><strong class="tabular">@DemoClientStore.CountOf(ClientStage.Production).ToString("00")</strong></div>
+    </div>
+
+    <div class="grid grid-2" style="align-items:start">
+        <section class="summary-panel">
+            <h2 class="title" style="font-size:1rem">Client overview</h2>
+            <table class="ruled" style="margin-top:16px;border:0;background:transparent">
+                <thead>
+                <tr><th>Client</th><th>Status</th><th style="text-align:right">Progress</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var client in recent)
+                {
+                    <tr>
+                        <td class="text-primary">
+                            <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
+                        </td>
+                        <td class="text-body">@DemoClientStore.Label(client.Stage)</td>
+                        <td style="text-align:right">
+                            <span style="display:inline-flex;align-items:center;gap:10px;justify-content:flex-end">
+                                <span class="meter" role="img" aria-label="@client.Progress percent complete"><span style="width:@(client.Progress)%"></span></span>
+                                <span class="tabular text-body">@client.Progress%</span>
+                            </span>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="summary-panel">
+            <h2 class="title" style="font-size:1rem">Onboarding progress</h2>
+            <ul style="list-style:none;margin:16px 0 0;padding:0">
+                @foreach (var stage in DemoClientStore.Pipeline)
+                {
+                    var count = DemoClientStore.CountOf(stage);
+                    var share = clients.Count == 0 ? 0 : (int)Math.Round(count * 100.0 / clients.Count);
+                    <li style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle)">
+                        <span class="text-body" style="flex:1;font-size:0.875rem">@DemoClientStore.Label(stage)</span>
+                        <span class="meter" style="width:64px" aria-hidden="true"><span style="width:@(share)%"></span></span>
+                        <span class="tabular text-primary" style="width:20px;text-align:right">@count</span>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
+
+    <section class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Recent activity</h2>
+        <ul style="list-style:none;margin:16px 0 0;padding:0">
+            @foreach (var entry in activity)
+            {
+                <li style="display:flex;flex-wrap:wrap;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle)">
+                    <time class="tabular text-muted" style="width:48px;font-size:0.875rem">@entry.Time</time>
+                    <span class="text-primary" style="width:150px;font-size:0.875rem;font-weight:500">@entry.Client</span>
+                    <span class="text-body" style="font-size:0.875rem">@entry.Event</span>
+                </li>
+            }
+        </ul>
+    </section>
+</div>

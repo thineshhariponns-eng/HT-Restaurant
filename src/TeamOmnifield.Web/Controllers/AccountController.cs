@@ -25,10 +25,13 @@ public class AccountController(AppDbContext db, IPasswordHasher<AdminUser> hashe
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
             return View(model);
         }
-        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), new Claim(ClaimTypes.Name, user.DisplayName), new Claim(ClaimTypes.Email, user.Email), new Claim(ClaimTypes.Role, "Admin") };
+        var role = RoleFor(user.Email);
+        var claims = new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), new Claim(ClaimTypes.Name, user.DisplayName), new Claim(ClaimTypes.Email, user.Email), new Claim(ClaimTypes.Role, role) };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
-        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+        return role == DeveloperRole
+            ? RedirectToAction("Index", "Dashboard", new { area = "Platform" })
+            : RedirectToAction("Index", "Dashboard", new { area = "Admin" });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -39,4 +42,11 @@ public class AccountController(AppDbContext db, IPasswordHasher<AdminUser> hashe
     }
 
     public IActionResult Denied() => View();
+
+    public const string AdminRole = "Admin";
+    public const string DeveloperRole = "Developer";
+
+    /// <summary>The consultant account drives the platform portal; every other account is an operator.</summary>
+    private static string RoleFor(string email) =>
+        email.Equals("developer@htrestaurant.com", StringComparison.OrdinalIgnoreCase) ? DeveloperRole : AdminRole;
 }

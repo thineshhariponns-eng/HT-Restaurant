@@ -42,6 +42,17 @@
     });
   });
 
+  // Password visibility toggle on the login form.
+  document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var input = btn.closest('.auth-input').querySelector('[data-password-input]');
+      if (!input) return;
+      var shown = input.type === 'text';
+      input.type = shown ? 'password' : 'text';
+      btn.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+    });
+  });
+
   // Admin clock.
   var clock = document.querySelector('[data-admin-clock]');
   if (clock) {

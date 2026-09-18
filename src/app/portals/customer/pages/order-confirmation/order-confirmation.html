@@ -1,0 +1,252 @@
+<div class="selection:bg-primary-600 selection:text-text-inverse">
+  <section class="border-b border-border-strong">
+    <div class="mx-auto flex max-w-3xl flex-col items-center px-4 pt-8 pb-6 text-center sm:px-6 sm:pt-16 sm:pb-10 lg:px-8">
+      <span class="flex h-14 w-14 items-center justify-center rounded-sm bg-primary-600 text-text-inverse" aria-hidden="true">
+        <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+          <path class="tick-draw" pathLength="1" d="M5 12.5l4.5 4.5L19 7.5" />
+        </svg>
+      </span>
+
+      <h1
+        #heading
+        tabindex="-1"
+        class="mt-5 font-display text-3xl font-semibold text-balance text-text-primary outline-none sm:mt-6 sm:text-4xl"
+      >
+        Order Confirmed!
+      </h1>
+      <p class="mt-3 text-base text-balance text-text-body">Thank you for ordering from HT Restaurant.</p>
+      <p class="mt-2 text-sm tabular-nums text-text-muted">
+        {{ isPickup() ? 'Pickup' : 'Delivery' }} · Placed {{ placedLabel() }}
+      </p>
+
+      @if (isSample()) {
+        <p class="mt-4 border border-border-subtle px-3 py-1 text-xs text-text-muted sm:mt-5">Sample order shown for preview</p>
+      }
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8" aria-labelledby="order-number-label">
+    <div class="border border-border-strong bg-bg-surface">
+      <div class="flex items-center justify-between gap-4 border-b border-border-subtle px-5 py-3 sm:px-6">
+        <span id="order-number-label" class="text-xs font-semibold uppercase tracking-widest text-text-muted">Order number</span>
+        <span class="inline-flex items-center gap-2 text-sm font-medium text-text-primary">
+          <span class="h-2 w-2 rounded-full bg-status-confirmed" aria-hidden="true"></span>
+          {{ statusLabel() }}
+        </span>
+      </div>
+
+      <p
+        class="px-4 py-6 text-center font-display text-[clamp(1.25rem,7.2vw,3rem)] leading-none font-bold tracking-tight whitespace-nowrap tabular-nums text-text-primary sm:py-11 md:text-[4rem]"
+        data-testid="order-number"
+      >
+        <span class="sr-only select-none">{{ order().orderNumber }}</span>
+        <span aria-hidden="true"
+          ><span class="select-none text-text-muted">#</span
+          ><span class="select-all"
+            >{{ numberParts().prefix }}<span class="ml-[0.2em]">{{ numberParts().date }}</span
+            ><span class="ml-[0.2em]">{{ numberParts().sequence }}</span></span
+          ></span
+        >
+      </p>
+
+      <div class="flex items-center justify-between gap-4 border-t border-border-subtle px-5 py-3 text-left sm:gap-6 sm:px-6 sm:py-4">
+        <p class="text-sm text-pretty text-text-body">
+          @if (isPickup()) {
+            Show this number at the pickup counter.
+          } @else {
+            Mention this number if you call us about your order.
+          }
+        </p>
+        <button
+          type="button"
+          (click)="copyOrderNumber()"
+          data-testid="copy-order-number"
+          class="inline-flex shrink-0 items-center gap-2 py-1 text-sm font-medium text-text-muted transition-colors duration-150 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-600"
+        >
+          @if (copyState() === 'copied') {
+            <svg class="h-4 w-4 text-primary-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+            Copied
+          } @else if (copyState() === 'failed') {
+            Couldn't copy
+          } @else {
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="11" height="11" />
+              <path d="M5 15V5a1 1 0 0 1 1-1h9" />
+            </svg>
+            Copy<span class="sr-only"> order number</span>
+          }
+        </button>
+        <span class="sr-only" aria-live="polite">{{ copyState() === 'copied' ? 'Order number copied' : '' }}</span>
+      </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:flex sm:justify-center">
+      <button
+        type="button"
+        (click)="trackOrder()"
+        data-testid="track-order"
+        class="inline-flex items-center justify-center gap-2 bg-primary-600 px-3 py-3 text-sm font-semibold whitespace-nowrap text-text-inverse transition-colors duration-150 hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 sm:px-6"
+      >
+        Track Order
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14M6 13l6 6 6-6" />
+        </svg>
+      </button>
+      <a
+        routerLink="/menu"
+        data-testid="back-to-menu"
+        class="inline-flex items-center justify-center border border-border-strong px-3 py-3 whitespace-nowrap sm:px-6 text-sm font-semibold text-text-primary transition-colors duration-150 hover:border-primary-600 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+      >
+        Back to Menu
+      </a>
+    </div>
+  </section>
+
+  <section
+    #statusSection
+    id="order-status"
+    class="mx-auto max-w-3xl scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-8"
+    aria-labelledby="order-status-heading"
+  >
+    <div class="border-t border-border-strong pt-8">
+      <h2
+        #statusHeading
+        id="order-status-heading"
+        tabindex="-1"
+        class="font-display text-xl font-semibold text-text-primary outline-none sm:text-2xl"
+      >
+        {{ timingHeadline() }}
+      </h2>
+      <p class="mt-2 text-sm tabular-nums text-text-muted">{{ timingDetail() }}</p>
+
+      <ol class="mt-8 sm:grid sm:grid-cols-4" aria-label="Order progress">
+        @for (step of steps(); track step.label; let last = $last) {
+          <li
+            class="relative flex gap-4 pb-7 last:pb-0 sm:flex-col sm:gap-3 sm:pr-4 sm:pb-0"
+            [attr.aria-current]="step.state === 'current' ? 'step' : null"
+          >
+            @if (!last) {
+              <span
+                class="absolute top-5 bottom-0 left-[9.5px] w-px sm:top-[9.5px] sm:right-0 sm:bottom-auto sm:left-5 sm:h-px sm:w-auto"
+                [class]="segmentClass(step.state)"
+                aria-hidden="true"
+              ></span>
+            }
+            <span
+              class="relative flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border"
+              [class]="markerClass(step.state)"
+              aria-hidden="true"
+            >
+              @if (step.state === 'completed' || step.state === 'current') {
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+              }
+            </span>
+            <span class="flex min-w-0 flex-col gap-0.5">
+              <span
+                class="text-sm font-semibold"
+                [class.text-text-primary]="step.state !== 'upcoming'"
+                [class.text-text-muted]="step.state === 'upcoming'"
+              >
+                {{ step.label }}
+              </span>
+              @if (step.detail) {
+                <span class="text-xs tabular-nums text-text-muted">{{ step.detail }}</span>
+              }
+              <span class="sr-only">{{ step.state === 'next' ? 'upcoming' : step.state }}</span>
+            </span>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pt-14 pb-20 sm:px-6 lg:px-8">
+    <div class="grid border-t border-border-strong md:grid-cols-2">
+      <div class="pt-8 md:pr-8">
+        <h2 class="font-display text-lg font-semibold text-text-primary">Your order</h2>
+
+        <ul class="mt-5 space-y-3 text-sm">
+          @for (line of order().lines; track line.slug) {
+            <li class="flex items-start justify-between gap-3">
+              <span class="text-text-body">
+                {{ line.name }}
+                <span class="text-text-muted">× {{ line.quantity }}</span>
+              </span>
+              <span class="shrink-0 tabular-nums text-text-primary">₹{{ line.price * line.quantity }}</span>
+            </li>
+          }
+        </ul>
+
+        <dl class="mt-5 space-y-2 border-t border-border-subtle pt-4 text-sm">
+          <div class="flex items-center justify-between">
+            <dt class="text-text-body">Subtotal</dt>
+            <dd class="tabular-nums text-text-primary">₹{{ order().subtotal }}</dd>
+          </div>
+          <div class="flex items-center justify-between">
+            <dt class="text-text-body">Tax</dt>
+            <dd class="tabular-nums text-text-primary">₹{{ order().tax }}</dd>
+          </div>
+          @if (order().deliveryFee > 0) {
+            <div class="flex items-center justify-between" data-testid="delivery-fee">
+              <dt class="text-text-body">Delivery</dt>
+              <dd class="tabular-nums text-text-primary">₹{{ order().deliveryFee }}</dd>
+            </div>
+          }
+        </dl>
+
+        <div class="mt-4 flex items-baseline justify-between border-t border-border-strong pt-4">
+          <span class="font-display text-base font-semibold text-text-primary">Total</span>
+          <span class="font-display text-xl font-semibold tabular-nums text-primary-600" data-testid="order-total"
+            >₹{{ order().total }}</span
+          >
+        </div>
+
+        @if (order().notes) {
+          <p class="mt-5 text-sm text-text-muted"><span class="text-text-body">Note:</span> {{ order().notes }}</p>
+        }
+      </div>
+
+      <div class="mt-10 border-t border-border-subtle pt-8 md:mt-0 md:border-t-0 md:border-l md:pl-8">
+        @if (isPickup()) {
+          <h2 class="font-display text-lg font-semibold text-text-primary">Pickup from</h2>
+          <address class="mt-5 space-y-1 text-sm not-italic text-text-body">
+            <p class="font-semibold text-text-primary">{{ contact.name }}</p>
+            <p>{{ contact.addressLines[0] }}<br />{{ contact.addressLines[1] }}</p>
+          </address>
+          <p class="mt-4 text-sm">
+            <a
+              [href]="contact.phoneHref"
+              class="tabular-nums text-text-primary underline decoration-border-strong underline-offset-4 transition-colors duration-150 hover:text-primary-600 hover:decoration-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+              >{{ contact.phoneDisplay }}</a
+            >
+          </p>
+          <p class="mt-4 max-w-xs text-sm text-text-muted">Questions about your order? Call us and mention your order number.</p>
+        } @else {
+          <h2 class="font-display text-lg font-semibold text-text-primary">Delivering to</h2>
+          <address class="mt-5 space-y-1 text-sm not-italic text-text-body">
+            <p class="font-semibold text-text-primary">{{ order().customer.name }}</p>
+            @if (order().deliveryAddress; as address) {
+              <p>{{ address.address }}<br />{{ address.city }} {{ address.postalCode }}</p>
+            }
+            <p class="tabular-nums">{{ customerPhone() }}</p>
+          </address>
+
+          <div class="mt-6 border-t border-border-subtle pt-5">
+            <p class="max-w-xs text-sm text-text-muted">
+              Questions about your order? Call {{ contact.name }} on
+              <a
+                [href]="contact.phoneHref"
+                class="whitespace-nowrap tabular-nums text-text-primary underline decoration-border-strong underline-offset-4 transition-colors duration-150 hover:text-primary-600 hover:decoration-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                >{{ contact.phoneDisplay }}</a
+              >.
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,7 @@
+<div class="flex items-center justify-between gap-4 border-b border-border-subtle py-3 text-sm last:border-b-0">
+  <p class="text-text-body">
+    <span class="text-text-primary">{{ line().name }}</span>
+    <span class="text-text-muted">&times; {{ line().quantity }}</span>
+  </p>
+  <p class="shrink-0 tabular-nums text-text-primary">₹{{ lineTotal() }}</p>
+</div>

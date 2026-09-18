@@ -1,3 +1,181 @@
-/* You can add global styles to this file, and also import other style files */
-
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Archivo+Expanded:wght@500;600;700&display=swap');
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+  HT Restaurant Erode Admin â€” "The Daily Card", operator's edition.
+  Same system as the customer app (DEMO branch): ink ground, parchment type,
+  turmeric as the single signal colour, hairline rules, square corners, tabular figures.
+  Admin deltas: denser type scale, a stronger input stroke and a lighter muted text
+  so both clear WCAG AA on raised ink.
+*/
+
+/* The admin is always on ink: spartan's dark: variants follow the .dark class, not the OS. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary-600: #e8b33c;
+  --color-primary-700: #f2c568;
+  --color-primary-100: #2a2113;
+
+  /* accent mirrors primary: the customer app's components still name it */
+  --color-accent-600: #e8b33c;
+  --color-accent-700: #f2c568;
+  --color-accent-100: #2a2113;
+
+  --color-bg-base: #14110d;
+  --color-bg-surface: #1f1b15;
+  --color-bg-sunken: #0f0d0a;
+
+  --color-text-primary: #f0eadc;
+  --color-text-body: #c9bea8;
+  --color-text-muted: #9a8f7e; /* admin: DEMO's #8c8272 falls to 4.2:1 on turmeric wash */
+  --color-text-inverse: #14110d;
+
+  --color-border-subtle: #2a251c;
+  --color-border-strong: #3a342a;
+  --color-border-input: #756b5c; /* 3:1 against raised ink for form controls */
+
+  --color-status-pending: #e8b33c;
+  --color-status-confirmed: #3e6fa6;
+  --color-status-delivery: #8a5cb0;
+  --color-status-delivered: #4e9a5f;
+  --color-status-cancelled: #c4552f;
+
+  /* consultant portal: client delivery pipeline */
+  --color-status-new: #756b5c;
+  --color-status-onboarding: #e8b33c;
+  --color-status-development: #3e6fa6;
+  --color-status-review: #8a5cb0;
+  --color-status-production: #4e9a5f;
+
+  --color-error: #c4552f;
+  --color-error-100: #2a1912;
+  --color-error-text: #e0764f; /* rust lifted to 5.6:1 for small text */
+
+  --font-display: 'Archivo Expanded', sans-serif;
+  --font-sans: 'Archivo', sans-serif;
+
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+}
+
+/* spartan / shadcn semantic tokens, mapped onto the Daily Card palette. */
+@theme inline {
+  --color-background: var(--color-bg-base);
+  --color-foreground: var(--color-text-primary);
+  --color-card: var(--color-bg-surface);
+  --color-card-foreground: var(--color-text-primary);
+  --color-popover: var(--color-bg-surface);
+  --color-popover-foreground: var(--color-text-primary);
+  --color-primary: var(--color-primary-600);
+  --color-primary-foreground: var(--color-text-inverse);
+  --color-secondary: var(--color-border-subtle);
+  --color-secondary-foreground: var(--color-text-primary);
+  --color-muted: var(--color-bg-surface);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-accent: var(--color-primary-100);
+  --color-accent-foreground: var(--color-text-primary);
+  --color-destructive: var(--color-error-text);
+  --color-border: var(--color-border-subtle);
+  --color-input: var(--color-border-input);
+  --color-ring: var(--color-primary-600);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scrollbar-color: var(--color-border-strong) var(--color-bg-base);
+  }
+
+  body {
+    background-color: var(--color-bg-base);
+    color: var(--color-text-body);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-600);
+    color: var(--color-text-inverse);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-primary-600);
+  }
+
+  a,
+  button,
+  [role='button'],
+  [tabindex]:not([tabindex='-1']) {
+    &:focus-visible {
+      outline: 2px solid var(--color-primary-600);
+      outline-offset: 2px;
+    }
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+}
+
+@layer utilities {
+  /* Uppercase meta label: list headers, field-group legends, status labels. */
+  .label-caps {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.33;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Toasts sit on raised ink with a strong rule, square, no shadow. */
+[data-sonner-toaster] {
+  --normal-bg: var(--color-bg-surface);
+  --normal-text: var(--color-text-primary);
+  --normal-border: var(--color-border-strong);
+  --border-radius: 0;
+  font-family: var(--font-sans);
+}
+
+[data-sonner-toast] {
+  box-shadow: none !important;
+}
+
+[data-sonner-toast] [data-button] {
+  border-radius: 0 !important;
+  background: var(--color-primary-600) !important;
+  color: var(--color-text-inverse) !important;
+  font-weight: 600;
+}
+
+/* Kanban drag state: the card keeps its square, hairline look while moving. */
+.cdk-drag-preview {
+  border: 1px solid var(--color-primary-600);
+  background-color: var(--color-bg-base);
+  box-shadow: none;
+  opacity: 0.97;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.cdk-drag-animating,
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+}

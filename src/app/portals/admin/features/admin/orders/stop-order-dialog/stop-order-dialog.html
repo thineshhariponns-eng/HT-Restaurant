@@ -1,0 +1,66 @@
+<hlm-alert-dialog [state]="state()" (closed)="close()">
+  <hlm-alert-dialog-content *hlmAlertDialogPortal="let ctx" class="sm:max-w-md">
+    @if (order(); as order) {
+      <hlm-alert-dialog-header>
+        <h2 hlmAlertDialogTitle class="font-display text-lg font-semibold text-text-primary">
+          {{ verb() }} order #{{ order.number }}?
+        </h2>
+        <p hlmAlertDialogDescription class="text-sm text-text-body">
+          {{ order.customerName }}'s order moves to Closed with this reason in its history. You can
+          undo it for a few seconds afterwards.
+        </p>
+      </hlm-alert-dialog-header>
+
+      <fieldset class="grid gap-2" [attr.aria-invalid]="showError() || null">
+        <legend class="label-caps mb-2 text-text-muted">Reason</legend>
+        @for (option of reasons(); track option) {
+          <label
+            class="flex cursor-pointer items-center gap-3 border px-3 py-2.5 text-sm transition-colors"
+            [class]="
+              reason() === option
+                ? 'border-primary-600 bg-primary-100 text-text-primary'
+                : 'border-border-strong text-text-body hover:border-primary-600'
+            "
+          >
+            <input
+              type="radio"
+              name="stop-reason"
+              class="size-4 accent-primary-600"
+              [value]="option"
+              [checked]="reason() === option"
+              (change)="choose(option)"
+            />
+            {{ option }}
+          </label>
+        }
+      </fieldset>
+
+      @if (reason() === 'Other') {
+        <label class="grid gap-2 text-sm font-medium text-text-primary">
+          What happened?
+          <textarea
+            hlmTextarea
+            rows="3"
+            class="min-h-20"
+            placeholder="A short note for the order history"
+            [value]="note()"
+            (input)="note.set($any($event.target).value)"
+          ></textarea>
+        </label>
+      }
+
+      @if (showError()) {
+        <p class="text-sm text-error-text" role="alert">
+          {{ reason() === 'Other' ? 'Add a short note so the reason is on record.' : 'Choose a reason first.' }}
+        </p>
+      }
+
+      <hlm-alert-dialog-footer>
+        <button hlmBtn variant="outline" type="button" (click)="close()">Keep order</button>
+        <button hlmBtn variant="destructive" type="button" (click)="confirm()">
+          {{ verb() }} order
+        </button>
+      </hlm-alert-dialog-footer>
+    }
+  </hlm-alert-dialog-content>
+</hlm-alert-dialog>

@@ -1,0 +1,121 @@
+@model Product
+@{
+    ViewData["Title"] = Model.Name;
+    var related = ViewBag.Related as List<Product> ?? new List<Product>();
+}
+<section class="container band-tight" style="padding-top:28px">
+    <p class="text-muted" style="font-size:0.875rem">
+        <a href="/Menu">Menu</a>
+        @if (Model.Category is not null)
+        {
+            <span class="text-muted"> / </span>
+            <span>@Model.Category.Name</span>
+        }
+    </p>
+</section>
+
+<section class="container" style="padding-bottom:48px">
+    <div class="grid grid-2" style="align-items:start;gap:32px">
+        <div class="card-photo" style="min-height:280px">
+            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.Name" />
+            }
+            else
+            {
+                <span>Photo coming soon</span>
+            }
+            @if (!Model.IsAvailable)
+            {
+                <div style="position:absolute;inset:0;background:rgba(15,13,10,.7);display:flex;align-items:center;justify-content:center">
+                    <span class="label-caps" style="border:1px solid var(--color-border-strong);padding:4px 12px">Unavailable today</span>
+                </div>
+            }
+        </div>
+
+        <div>
+            @if (Model.Category is not null)
+            {
+                <p class="label-caps text-primary">@Model.Category.Name</p>
+            }
+            <h1 class="display" style="margin-top:8px;font-size:clamp(1.75rem,4vw,2.25rem)">@Model.Name</h1>
+
+            <p class="price tabular @(Model.IsAvailable ? "" : "muted")" style="font-size:1.5rem;margin-top:16px">₹@Model.Price.ToString("0")</p>
+
+            <p class="text-muted" style="margin-top:8px;font-size:0.8125rem;display:flex;align-items:center;gap:8px">
+                <span class="dot @(Model.IsAvailable ? "dot-done" : "dot-stopped")"></span>
+                @(Model.IsAvailable ? "Available now" : "Not being served today")
+            </p>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <p class="text-body" style="margin-top:20px">@Model.Description</p>
+            }
+
+            <form asp-controller="Cart" asp-action="Add" method="post" style="margin-top:28px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <div class="qty-stepper">
+                    <button type="button" data-qty-step="-1" aria-label="Fewer">&minus;</button>
+                    <input type="number" name="quantity" id="qty" value="1" min="1" max="20" aria-label="Quantity" />
+                    <button type="button" data-qty-step="1" aria-label="More">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary" @(Model.IsAvailable ? "" : "disabled")>
+                    @(Model.IsAvailable ? "Add to cart" : "Unavailable")
+                </button>
+                <a href="/Menu" class="btn btn-ghost">Back to menu</a>
+            </form>
+        </div>
+    </div>
+</section>
+
+@if (related.Count > 0)
+{
+    <section class="container band" style="border-bottom:0">
+        <div class="section-heading">
+            <h2 class="title" style="font-size:1.125rem">More from @Model.Category?.Name</h2>
+            <a href="/Menu" class="text-muted" style="font-size:0.875rem">See the full menu</a>
+        </div>
+        <div class="grid grid-3">
+            @foreach (var other in related)
+            {
+                <article class="card" style="display:flex;flex-direction:column">
+                    <a asp-controller="Menu" asp-action="Details" asp-route-id="@other.Id" class="card-photo">
+                        @if (!string.IsNullOrWhiteSpace(other.ImageUrl))
+                        {
+                            <img src="@other.ImageUrl" alt="@other.Name" />
+                        }
+                        else
+                        {
+                            <span>Photo coming soon</span>
+                        }
+                    </a>
+                    <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;flex:1">
+                        <h3 class="title" style="font-size:1rem">
+                            <a asp-controller="Menu" asp-action="Details" asp-route-id="@other.Id">@other.Name</a>
+                        </h3>
+                        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:8px">
+                            <span class="price tabular" style="font-size:1.125rem">₹@other.Price.ToString("0")</span>
+                            <a class="btn btn-secondary btn-sm" asp-controller="Menu" asp-action="Details" asp-route-id="@other.Id">View</a>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+}
+
+@section Scripts {
+<script>
+(function () {
+  var input = document.getElementById('qty');
+  if (!input) return;
+  document.querySelectorAll('[data-qty-step]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var step = parseInt(button.getAttribute('data-qty-step'), 10);
+      var next = (parseInt(input.value, 10) || 1) + step;
+      input.value = Math.min(20, Math.max(1, next));
+    });
+  });
+})();
+</script>
+}

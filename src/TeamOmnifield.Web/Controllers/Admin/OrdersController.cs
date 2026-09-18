@@ -5,7 +5,7 @@ using TeamOmnifield.Web.Services;
 
 namespace TeamOmnifield.Web.Controllers.Admin;
 
-[Area("Admin"), Authorize]
+[Area("Admin"), Authorize(Roles = "Admin")]
 public class OrdersController(OrderService orders) : Controller
 {
     public async Task<IActionResult> Index(OrderStatus? status, string? search) => View(await orders.GetAdminListAsync(status, search));

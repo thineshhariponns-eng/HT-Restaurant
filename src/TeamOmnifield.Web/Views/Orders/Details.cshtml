@@ -1,0 +1,101 @@
+@model Order
+@{
+    ViewData["Title"] = $"Order #{Model.OrderNumber}";
+    var steps = new (OrderStatus Status, string Label)[] {
+        (OrderStatus.Pending, "Order placed"),
+        (OrderStatus.Confirmed, "Confirmed"),
+        (OrderStatus.Preparing, "In the kitchen"),
+        (OrderStatus.Ready, "Ready"),
+        (OrderStatus.OutForDelivery, "Out for delivery"),
+        (OrderStatus.Delivered, "Delivered"),
+    };
+    var cancelled = Model.Status == OrderStatus.Cancelled;
+    var reached = cancelled ? -1 : Array.FindIndex(steps, s => s.Status == Model.Status);
+    string StateFor(int index) => index < reached ? "done" : index == reached ? "current" : "upcoming";
+}
+<section class="container band-tight" style="padding-top:32px">
+    <a href="/Orders" class="text-muted" style="font-size:0.875rem">&larr; My orders</a>
+    <div class="section-heading" style="margin-top:16px;margin-bottom:0">
+        <div>
+            <h1 class="display tabular" style="font-size:clamp(1.5rem,4vw,2rem)"><span class="text-muted">#</span>@Model.OrderNumber</h1>
+            <p class="text-muted tabular" style="margin-top:8px;font-size:0.875rem">
+                Placed @Model.CreatedUtc.ToLocalTime().ToString("d MMM yyyy, h:mm tt")
+            </p>
+        </div>
+        <span class="status-pill">
+            <span class="dot @(cancelled ? "dot-stopped" : Model.Status == OrderStatus.Delivered ? "dot-done" : "dot-kitchen")"></span>
+            @(cancelled ? "Cancelled" : Model.Status.ToString())
+        </span>
+    </div>
+</section>
+
+<section class="container" style="padding-bottom:56px">
+    <div class="grid grid-2" style="margin-top:24px;align-items:start">
+        <div class="summary-panel">
+            <h2 class="title" style="font-size:1rem">Progress</h2>
+            @if (cancelled)
+            {
+                <p class="text-body" style="font-size:0.875rem;margin-top:16px">
+                    This order was cancelled. Nothing further is on its way.
+                </p>
+            }
+            else
+            {
+                <ul class="lifecycle" style="margin-top:20px">
+                    @for (var i = 0; i < steps.Length; i++)
+                    {
+                        <li class="@StateFor(i)">
+                            <span class="rail"></span>
+                            <span class="marker">
+                                @if (i < reached)
+                                {
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                                }
+                                else if (i == reached)
+                                {
+                                    <span></span>
+                                }
+                            </span>
+                            <span class="label">@steps[i].Label</span>
+                            <span class="time">@(i == reached ? "Now" : "")</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="summary-panel">
+            <h2 class="title" style="font-size:1rem">Your order</h2>
+            <ul style="list-style:none;margin:20px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;font-size:0.875rem">
+                @foreach (var line in Model.Items)
+                {
+                    <li style="display:flex;justify-content:space-between;gap:12px">
+                        <span class="text-body">@line.ProductNameSnapshot <span class="text-muted">&times; @line.Quantity</span></span>
+                        <span class="tabular text-primary">₹@line.LineTotal.ToString("0")</span>
+                    </li>
+                }
+            </ul>
+            <dl style="margin:20px 0 0;border-top:1px solid var(--color-border-subtle);padding-top:16px;font-size:0.875rem">
+                <div class="summary-row"><dt>Subtotal</dt><dd class="tabular text-primary" style="margin:0">₹@Model.Subtotal.ToString("0.00")</dd></div>
+                <div class="summary-row"><dt>Delivery</dt><dd class="tabular text-primary" style="margin:0">₹@Model.DeliveryFee.ToString("0.00")</dd></div>
+            </dl>
+            <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@Model.Total.ToString("0.00")</span></div>
+
+            <h2 class="title" style="font-size:1rem;margin-top:28px">Delivering to</h2>
+            <address style="margin-top:12px;font-style:normal;font-size:0.875rem" class="text-body">
+                <p style="font-weight:600;color:var(--color-text-primary);margin:0 0 4px">@Model.CustomerName</p>
+                <p style="margin:0">@Model.DeliveryAddress</p>
+                <p class="tabular" style="margin-top:8px">@Model.Phone</p>
+            </address>
+            @if (!string.IsNullOrWhiteSpace(Model.Notes))
+            {
+                <p class="text-muted" style="margin-top:16px;font-size:0.875rem"><span class="text-body">Note:</span> @Model.Notes</p>
+            }
+        </div>
+    </div>
+
+    <div class="actions-row">
+        <a class="btn btn-primary" href="/Menu">Order again</a>
+        <a class="btn btn-secondary" href="/Orders">All my orders</a>
+    </div>
+</section>

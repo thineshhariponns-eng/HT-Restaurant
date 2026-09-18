@@ -23,8 +23,9 @@
         </div>
     </div>
 
-    <div style="margin-top:20px;display:flex;justify-content:center">
-        <a href="/Menu" class="btn btn-primary">Back to Menu</a>
+    <div style="margin-top:20px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+        <a asp-controller="Orders" asp-action="Details" asp-route-orderNumber="@Model.OrderNumber" class="btn btn-primary">Track this order</a>
+        <a href="/Menu" class="btn btn-secondary">Back to Menu</a>
     </div>
 </section>
 

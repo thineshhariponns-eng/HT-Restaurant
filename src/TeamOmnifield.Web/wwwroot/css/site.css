@@ -126,7 +126,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; color: var(--co
   background: var(--color-error-100); border: 1px solid var(--color-error); color: var(--color-error-text);
   padding: 12px 16px; margin-bottom: 18px; font-size: 0.875rem;
 }
-.alert-error:empty { display: none; }
+.alert-error:empty, .alert-error.validation-summary-valid { display: none; }
 .hint { font-size: 0.75rem; color: var(--color-text-muted); }
 
 /* ---------- cards / grids ---------- */
@@ -350,5 +350,96 @@ table.ruled tbody tr:hover { background: var(--color-bg-base); }
 .product-thumb.placeholder { display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-weight: 700; }
 .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
 .form-card { max-width: 640px; margin: 0 auto; background: var(--color-bg-surface); border: 1px solid var(--color-border-subtle); padding: 32px; }
-.form-card.narrow { max-width: 420px; }
-.center-page { min-height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+
+/* ---------- auth (admin / developer login) ---------- */
+.auth-page {
+  position: relative; overflow: hidden;
+  min-height: calc(100vh - 200px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px 16px;
+  background:
+    radial-gradient(ellipse 900px 480px at 50% 10%, rgba(232, 179, 60, 0.12), transparent 60%),
+    repeating-linear-gradient(135deg, rgba(232, 179, 60, 0.05) 0px, rgba(232, 179, 60, 0.05) 1px, transparent 1px, transparent 64px),
+    var(--color-bg-base);
+}
+.auth-card {
+  position: relative; z-index: 1; width: 100%; max-width: 480px;
+  background: var(--color-bg-surface); border: 1px solid var(--color-border-strong);
+  border-radius: 20px; padding: 40px;
+  box-shadow: 0 0 0 1px rgba(232, 179, 60, 0.08), 0 24px 60px -20px rgba(0, 0, 0, 0.6), 0 0 40px -12px rgba(232, 179, 60, 0.14);
+}
+.auth-badge {
+  width: 64px; height: 64px; margin: 0 auto 18px;
+  display: flex; align-items: center; justify-content: center; color: var(--color-primary-600);
+}
+.auth-eyebrow { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0; }
+.auth-eyebrow::before, .auth-eyebrow::after { content: ""; height: 1px; width: 28px; background: var(--color-border-strong); }
+.auth-title { text-align: center; margin-top: 8px; font-size: clamp(1.75rem, 2vw + 1rem, 2.125rem); }
+.auth-subtitle { text-align: center; margin: 10px 0 0; font-size: 0.9375rem; }
+.auth-form { margin-top: 28px; }
+.auth-field { margin-bottom: 20px; }
+.auth-field label { display: block; font-size: 0.9375rem; font-weight: 600; color: var(--color-text-primary); margin-bottom: 8px; }
+.auth-input { position: relative; }
+.auth-input input {
+  background: var(--color-bg-sunken); border: 1px solid var(--color-border-input);
+  color: var(--color-text-primary); padding: 12px 16px 12px 44px; font: inherit; font-size: 0.9375rem;
+  border-radius: 10px; width: 100%;
+}
+.auth-input input::placeholder { color: var(--color-text-muted); }
+.auth-input input:focus {
+  border-color: var(--color-primary-600); outline: none; box-shadow: 0 0 0 1px var(--color-primary-600);
+}
+.auth-input.has-toggle input { padding-right: 44px; }
+.auth-input .icon-left { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); pointer-events: none; }
+.auth-input .icon-toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  background: none; border: 0; padding: 6px; color: var(--color-text-muted); cursor: pointer; display: flex;
+}
+.auth-input .icon-toggle:hover { color: var(--color-primary-600); }
+.auth-submit {
+  width: 100%; margin-top: 6px; border-radius: 10px; padding: 14px 20px; font-size: 1rem;
+  color: var(--color-text-inverse);
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-600));
+}
+.auth-submit:hover { filter: brightness(1.05); }
+.auth-footer {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 28px; color: var(--color-text-muted); font-size: 0.8125rem;
+}
+.auth-footer::before, .auth-footer::after { content: ""; height: 1px; flex: 1; background: var(--color-border-strong); }
+
+/* ---------- consultant portal: pipeline stages, meters, kanban ---------- */
+.stage-new, .stage-dot-new { color: var(--color-text-muted); }
+.stage-onboarding, .stage-dot-onboarding { color: var(--color-status-pending); }
+.stage-development, .stage-dot-development { color: var(--color-status-confirmed); }
+.stage-review, .stage-dot-review { color: var(--color-status-delivery); }
+.stage-production, .stage-dot-production { color: var(--color-status-delivered); }
+.dot.stage-dot-new { background: var(--color-text-muted); }
+.dot.stage-dot-onboarding { background: var(--color-status-pending); }
+.dot.stage-dot-development { background: var(--color-status-confirmed); }
+.dot.stage-dot-review { background: var(--color-status-delivery); }
+.dot.stage-dot-production { background: var(--color-status-delivered); }
+
+.meter { display: inline-block; width: 96px; height: 6px; background: var(--color-bg-sunken); }
+.meter > span { display: block; height: 100%; background: var(--color-primary-600); }
+
+.kanban { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
+.kanban-col { flex: 0 0 256px; background: var(--color-bg-surface); border: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; }
+.kanban-col > header { padding: 12px; border-bottom: 1px solid var(--color-border-subtle); }
+.kanban-col > header p { margin: 0; }
+.kanban-col .count { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--color-text-primary); margin-top: 8px; }
+.kanban-list { list-style: none; margin: 0; padding: 12px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 128px; }
+.kanban-list.over { background: var(--color-primary-100); }
+.kanban-card { border: 1px solid var(--color-border-strong); background: var(--color-bg-base); padding: 12px; cursor: grab; }
+.kanban-card:hover { border-color: var(--color-primary-600); }
+.kanban-card.dragging { opacity: 0.4; }
+.kanban-card .row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.kanban-card .row a { font-size: 0.875rem; font-weight: 500; color: var(--color-text-primary); }
+.kanban-card .row a:hover { color: var(--color-primary-600); }
+.kanban-card .nudge { display: flex; gap: 4px; opacity: 0; transition: opacity 120ms; }
+.kanban-card:hover .nudge, .kanban-card:focus-within .nudge { opacity: 1; }
+.kanban-card .nudge button { width: 24px; height: 24px; border: 1px solid var(--color-border-strong); background: transparent; color: var(--color-text-body); cursor: pointer; line-height: 1; }
+.kanban-card .nudge button:hover { border-color: var(--color-primary-600); color: var(--color-text-primary); }
+.kanban-card .nudge form { display: inline; }
+.kanban-card .host { font-size: 0.75rem; margin: 8px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kanban-empty { font-size: 0.75rem; text-align: center; padding: 20px 8px; }

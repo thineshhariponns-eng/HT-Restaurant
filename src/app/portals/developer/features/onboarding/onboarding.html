@@ -1,0 +1,153 @@
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+  <header class="border-b border-border-subtle pb-5">
+    <h1 class="font-display text-2xl leading-tight font-semibold text-text-primary">Client onboarding</h1>
+    <p class="mt-1 text-sm text-text-muted">Create a new restaurant client.</p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <section aria-labelledby="info-heading" class="mt-6 border border-border-subtle bg-bg-surface">
+      <h2 id="info-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Client information
+      </h2>
+
+      <div class="grid gap-5 px-4 py-5 sm:px-5">
+        <div>
+          <label for="name" class="block text-sm font-medium text-text-primary">Client name</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            autocomplete="organization"
+            class="mt-2 h-10 w-full border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted"
+            [attr.aria-invalid]="invalid('name')"
+            [attr.aria-describedby]="invalid('name') ? 'name-error' : null"
+          />
+          @if (invalid('name')) {
+            <p id="name-error" class="mt-2 text-sm text-error-text">Enter the restaurant's name.</p>
+          }
+        </div>
+
+        <div>
+          <label for="city" class="block text-sm font-medium text-text-primary">
+            Branch or town <span class="text-text-muted">(optional)</span>
+          </label>
+          <input
+            id="city"
+            type="text"
+            formControlName="city"
+            autocomplete="address-level2"
+            class="mt-2 h-10 w-full border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted"
+          />
+        </div>
+
+        <div>
+          <label for="contact" class="block text-sm font-medium text-text-primary">Contact name</label>
+          <input
+            id="contact"
+            type="text"
+            formControlName="contact"
+            autocomplete="name"
+            class="mt-2 h-10 w-full border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted"
+            [attr.aria-invalid]="invalid('contact')"
+            [attr.aria-describedby]="invalid('contact') ? 'contact-error' : null"
+          />
+          @if (invalid('contact')) {
+            <p id="contact-error" class="mt-2 text-sm text-error-text">Enter who you deal with.</p>
+          }
+        </div>
+
+        <div>
+          <label for="contactEmail" class="block text-sm font-medium text-text-primary">Contact email</label>
+          <input
+            id="contactEmail"
+            type="email"
+            formControlName="contactEmail"
+            autocomplete="email"
+            class="mt-2 h-10 w-full border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted"
+            [attr.aria-invalid]="invalid('contactEmail')"
+            [attr.aria-describedby]="invalid('contactEmail') ? 'email-error' : null"
+          />
+          @if (invalid('contactEmail')) {
+            <p id="email-error" class="mt-2 text-sm text-error-text">Enter a valid email address.</p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="domain-heading" class="mt-6 border border-border-subtle bg-bg-surface">
+      <h2 id="domain-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Domain configuration
+      </h2>
+
+      <div class="grid gap-5 px-4 py-5 sm:px-5">
+        <div>
+          <label for="domain" class="block text-sm font-medium text-text-primary">Customer hostname</label>
+          <input
+            id="domain"
+            type="text"
+            formControlName="domain"
+            inputmode="url"
+            placeholder="spicegarden.com"
+            class="mt-2 h-10 w-full border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted"
+            [attr.aria-invalid]="invalid('domain')"
+            [attr.aria-describedby]="invalid('domain') ? 'domain-error' : null"
+          />
+          @if (invalid('domain')) {
+            <p id="domain-error" class="mt-2 text-sm text-error-text">
+              Use a hostname such as spicegarden.com — lowercase, no protocol.
+            </p>
+          }
+        </div>
+
+        <div>
+          <label for="adminDomain" class="block text-sm font-medium text-text-primary">Admin hostname</label>
+          <input
+            id="adminDomain"
+            type="text"
+            formControlName="adminDomain"
+            inputmode="url"
+            placeholder="admin.spicegarden.local"
+            class="mt-2 h-10 w-full border border-border-input bg-bg-sunken px-3 text-sm text-text-primary placeholder:text-text-muted"
+            [attr.aria-invalid]="invalid('adminDomain')"
+            [attr.aria-describedby]="invalid('adminDomain') ? 'admin-error' : 'admin-hint'"
+          />
+          @if (invalid('adminDomain')) {
+            <p id="admin-error" class="mt-2 text-sm text-error-text">
+              Use a hostname such as admin.spicegarden.local — lowercase, no protocol.
+            </p>
+          } @else {
+            <p id="admin-hint" class="mt-2 text-sm text-text-muted">
+              Filled from the customer hostname until you change it.
+            </p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="status-heading" class="mt-6 border border-border-subtle bg-bg-surface">
+      <h2 id="status-heading" class="label-caps border-b border-border-subtle px-4 py-3 text-text-muted sm:px-5">
+        Initial status
+      </h2>
+
+      <p class="flex items-center gap-2 border-b border-border-subtle px-4 py-4 text-sm text-text-body sm:px-5">
+        <span class="h-2 w-2 shrink-0 bg-status-new" aria-hidden="true"></span>
+        New client
+      </p>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-5">
+        <a
+          routerLink="/developer/clients"
+          class="flex h-9 items-center border border-border-strong px-3 text-sm font-medium text-text-body hover:border-primary-600 hover:text-text-primary"
+        >
+          Cancel
+        </a>
+        <button
+          type="submit"
+          class="flex h-9 items-center bg-primary-600 px-4 text-sm font-semibold text-text-inverse hover:bg-primary-700"
+        >
+          Create client
+        </button>
+      </div>
+    </section>
+  </form>
+</div>

@@ -68,17 +68,23 @@ public static class DbInitializer
             if (unpictured.Count > 0) await db.SaveChangesAsync();
         }
 
-        if (!await db.AdminUsers.AnyAsync())
+        // Seeded per account, so an existing database still picks up accounts added later.
+        var seededUsers = new[]
         {
-            var admin = new AdminUser
-            {
-                Email = "admin@htrestaurant.com",
-                DisplayName = "HT Restaurant Owner"
-            };
-            admin.PasswordHash = hasher.HashPassword(admin, "Admin@12345");
-            db.AdminUsers.Add(admin);
-            await db.SaveChangesAsync();
+            ("admin@htrestaurant.com", "HT Restaurant Owner"),
+            ("developer@htrestaurant.com", "TeamOmnifield Consultant"),
+        };
+
+        var added = false;
+        foreach (var (email, displayName) in seededUsers)
+        {
+            if (await db.AdminUsers.AnyAsync(x => x.Email == email)) continue;
+            var user = new AdminUser { Email = email, DisplayName = displayName };
+            user.PasswordHash = hasher.HashPassword(user, "Admin@12345");
+            db.AdminUsers.Add(user);
+            added = true;
         }
+        if (added) await db.SaveChangesAsync();
     }
 
     private const string DefaultImage = "https://loremflickr.com/640/480/indianfood,restaurant";

@@ -30,7 +30,7 @@
             foreach (var product in category.Products)
             {
                 <article class="card" data-dish-name="@product.Name.ToLowerInvariant()" data-category="@category.Name" style="display:flex;flex-direction:column">
-                    <div class="card-photo">
+                    <a asp-controller="Menu" asp-action="Details" asp-route-id="@product.Id" class="card-photo">
                         @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                         {
                             <img src="@product.ImageUrl" alt="@product.Name" />
@@ -45,9 +45,11 @@
                                 <span class="label-caps" style="border:1px solid var(--color-border-strong);padding:4px 12px">Unavailable</span>
                             </div>
                         }
-                    </div>
+                    </a>
                     <div style="padding-top:12px;display:flex;flex-direction:column;gap:8px;flex:1">
-                        <h3 class="title" style="font-size:1rem">@product.Name</h3>
+                        <h3 class="title" style="font-size:1rem">
+                            <a asp-controller="Menu" asp-action="Details" asp-route-id="@product.Id">@product.Name</a>
+                        </h3>
                         @if (!string.IsNullOrWhiteSpace(product.Description))
                         {
                             <p class="text-body" style="font-size:0.875rem;margin:0">@product.Description</p>
