@@ -1,0 +1,28 @@
+# Site-essentials standard item 12; see seolith-dev-standards docs/BATCH3_ROLLOUT.md.
+#
+# Report-only by default: budget regressions appear as annotations plus the
+# lighthouse-results artifact but do not fail the check. Set
+# continue-on-error: false (and consider runs: 3) to enforce -- required
+# end-state for marketing pages.
+
+name: Lighthouse Budgets
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    uses: seolith-llc/seolith-dev-standards/.github/workflows/lighthouse.yml@main
+    with:
+      project-path: "."
+      output-dir: "dist/HTRestaurent/browser"
+      urls: |
+        /
+        /menu
+        /cart
+      budget-preset: "marketing"
+      # continue-on-error: false         # flip to enforce
