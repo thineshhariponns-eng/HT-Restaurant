@@ -28,6 +28,7 @@ services:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=teamomnifield;Username=teamomnifield;Password=teamomnifield_dev_password
       Restaurant__DeliveryFee: "40"
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
     ports:
       - "8091:8080"
     depends_on:

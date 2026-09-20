@@ -73,6 +73,7 @@
                     <div class="summary-row"><span>Delivery</span><span class="tabular" style="color:var(--color-text-primary)">₹@deliveryFee.ToString("0.00")</span></div>
                 </div>
                 <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@((subtotal + deliveryFee).ToString("0.00"))</span></div>
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAAE9fpxDwK7HMkpzO" style="margin-top:16px"></div>
                 <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Place Order</button>
             </div>
         </div>
@@ -81,4 +82,7 @@
 <style>
   @@media (min-width: 1024px) { .checkout-layout { grid-template-columns: 1fr 380px; align-items: start; } .checkout-layout > div:last-child { position: sticky; top: 96px; } }
 </style>
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+}

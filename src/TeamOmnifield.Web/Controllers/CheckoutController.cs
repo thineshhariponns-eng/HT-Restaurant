@@ -4,7 +4,7 @@ using TeamOmnifield.Web.ViewModels;
 
 namespace TeamOmnifield.Web.Controllers;
 
-public class CheckoutController(CartService cartService, OrderService orderService) : Controller
+public class CheckoutController(CartService cartService, OrderService orderService, TurnstileService turnstile) : Controller
 {
     [HttpGet]
     public IActionResult Index()
@@ -16,6 +16,12 @@ public class CheckoutController(CartService cartService, OrderService orderServi
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(CheckoutViewModel model)
     {
+        if (!await turnstile.VerifyAsync(Request.Form["cf-turnstile-response"], HttpContext.Connection.RemoteIpAddress?.ToString()))
+        {
+            ModelState.AddModelError(string.Empty, "Spam verification failed. Please try again.");
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+            return View(model);
+        }
         if (!ModelState.IsValid) return View(model);
         try
         {

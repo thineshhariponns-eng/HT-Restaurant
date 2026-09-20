@@ -31,6 +31,7 @@ builder.Services.AddScoped<IPasswordHasher<AdminUser>, PasswordHasher<AdminUser>
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<HostContextService>();
+builder.Services.AddHttpClient<TurnstileService>();
 
 var app = builder.Build();
 

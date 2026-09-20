@@ -57,6 +57,14 @@ The root path on each named host automatically routes to the appropriate experie
 
 Change this immediately if this is ever used outside local evaluation.
 
+## Spam protection
+
+The public checkout form is protected by Cloudflare Turnstile (sitekey for `htrestaurant.com`, public and embedded in the page). Server-side verification is controlled by one environment variable:
+
+- `TURNSTILE_SECRET_KEY` — Turnstile secret for `htrestaurant.com`. **Unset (default): soft mode** — submissions are accepted and a warning is logged, so the site works out of the box. **Set: strict mode** — checkout submissions without a valid `cf-turnstile-response` token are rejected with HTTP 400.
+
+To enable strict mode locally: `TURNSTILE_SECRET_KEY=<secret> docker compose up --build -d` (compose passes `${TURNSTILE_SECRET_KEY:-}` through). Never commit the secret.
+
 ## Useful commands
 
 ```bash
