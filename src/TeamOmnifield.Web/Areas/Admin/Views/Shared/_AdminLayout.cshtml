@@ -11,8 +11,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] &middot; HT Restaurant Admin</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
-<body>
+<body class="admin">
 <div class="admin-shell">
     <aside class="admin-sidebar" aria-label="Sidebar">
         <div class="admin-sidebar-inner">
@@ -87,5 +88,6 @@
 
 @await RenderSectionAsync("Scripts", required: false)
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/admin.js" asp-append-version="true"></script>
 </body>
 </html>

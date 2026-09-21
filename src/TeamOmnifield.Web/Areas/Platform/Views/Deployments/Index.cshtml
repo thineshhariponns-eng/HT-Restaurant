@@ -13,7 +13,7 @@
         @foreach (var stage in pipeline)
         {
             var column = clients.Where(x => x.Stage == stage).ToList();
-            <section class="kanban-col" data-stage="@stage" aria-label="@DemoClientStore.Label(stage)">
+            <section class="kanban-col tone-@stage.ToString().ToLowerInvariant()" data-stage="@stage" aria-label="@DemoClientStore.Label(stage)">
                 <header>
                     <p class="label-caps" style="display:flex;align-items:center;gap:8px">
                         <span class="dot stage-dot-@stage.ToString().ToLowerInvariant()"></span>

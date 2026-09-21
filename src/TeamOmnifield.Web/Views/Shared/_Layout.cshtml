@@ -1,3 +1,8 @@
+@{
+    // Customer pages get the storefront theme; the admin login (Account) and the TeamOmnifield page keep the original look.
+    var controller = ViewContext.RouteData.Values["controller"] as string;
+    var bodyClass = ViewData["BodyClass"] as string ?? (controller is "Account" or "Team" ? "" : "customer");
+}
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,8 +10,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - HT Restaurant Erode</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @if (bodyClass.Contains("customer"))
+    {
+        <link rel="stylesheet" href="~/css/customer.css" asp-append-version="true" />
+    }
+    @await RenderSectionAsync("Head", required: false)
 </head>
-<body>
+<body class="@bodyClass">
 <header class="site-header">
     <div class="container bar">
         <a href="/" class="brand-mark">
@@ -48,6 +58,11 @@
         <a href="/Orders">My Orders</a>
         <a href="/Cart">Cart</a>
         @if (User.Identity?.IsAuthenticated == true) { <a href="/Admin">Admin</a> }
+        else
+        {
+            <a href="/Account/Login" class="auth-link" hidden>Admin Login</a>
+            <a href="/Platform" class="auth-link" hidden>Developer Login</a>
+        }
     </nav>
 </header>
 <main>
