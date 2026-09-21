@@ -20,28 +20,38 @@
     <div class="grid grid-2" style="align-items:start">
         <section class="summary-panel">
             <h2 class="title" style="font-size:1rem">Client overview</h2>
-            <table class="ruled" style="margin-top:16px;border:0;background:transparent">
-                <thead>
-                <tr><th>Client</th><th>Status</th><th style="text-align:right">Progress</th></tr>
-                </thead>
-                <tbody>
-                @foreach (var client in recent)
-                {
-                    <tr>
-                        <td class="text-primary">
-                            <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
-                        </td>
-                        <td class="text-body">@DemoClientStore.Label(client.Stage)</td>
-                        <td style="text-align:right">
-                            <span style="display:inline-flex;align-items:center;gap:10px;justify-content:flex-end">
-                                <span class="meter" role="img" aria-label="@client.Progress percent complete"><span style="width:@(client.Progress)%"></span></span>
-                                <span class="tabular text-body">@client.Progress%</span>
-                            </span>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+            @if (recent.Count == 0)
+            {
+                <div class="empty-state" style="margin-top:16px">
+                    <p class="title">No clients yet</p>
+                    <p class="hint text-muted">Onboard a client to see it here.</p>
+                </div>
+            }
+            else
+            {
+                <table class="ruled" style="margin-top:16px;border:0;background:transparent">
+                    <thead>
+                    <tr><th>Client</th><th>Status</th><th style="text-align:right">Progress</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var client in recent)
+                    {
+                        <tr>
+                            <td class="text-primary">
+                                <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
+                            </td>
+                            <td class="text-body">@DemoClientStore.Label(client.Stage)</td>
+                            <td style="text-align:right">
+                                <span style="display:inline-flex;align-items:center;gap:10px;justify-content:flex-end">
+                                    <span class="meter" role="img" aria-label="@client.Progress percent complete"><span style="width:@(client.Progress)%"></span></span>
+                                    <span class="tabular text-body">@client.Progress%</span>
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
         </section>
 
         <section class="summary-panel">
@@ -63,15 +73,25 @@
 
     <section class="summary-panel" style="margin-top:24px">
         <h2 class="title" style="font-size:1rem">Recent activity</h2>
-        <ul style="list-style:none;margin:16px 0 0;padding:0">
-            @foreach (var entry in activity)
-            {
-                <li style="display:flex;flex-wrap:wrap;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle)">
-                    <time class="tabular text-muted" style="width:48px;font-size:0.875rem">@entry.Time</time>
-                    <span class="text-primary" style="width:150px;font-size:0.875rem;font-weight:500">@entry.Client</span>
-                    <span class="text-body" style="font-size:0.875rem">@entry.Event</span>
-                </li>
-            }
-        </ul>
+        @if (activity.Count == 0)
+        {
+            <div class="empty-state" style="margin-top:16px">
+                <p class="title">No activity yet</p>
+                <p class="hint text-muted">Client updates will show up here as they happen.</p>
+            </div>
+        }
+        else
+        {
+            <ul style="list-style:none;margin:16px 0 0;padding:0">
+                @foreach (var entry in activity)
+                {
+                    <li style="display:flex;flex-wrap:wrap;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle)">
+                        <time class="tabular text-muted" style="width:48px;font-size:0.875rem">@entry.Time</time>
+                        <span class="text-primary" style="width:150px;font-size:0.875rem;font-weight:500">@entry.Client</span>
+                        <span class="text-body" style="font-size:0.875rem">@entry.Event</span>
+                    </li>
+                }
+            </ul>
+        }
     </section>
 </div>
