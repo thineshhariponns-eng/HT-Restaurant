@@ -27,11 +27,18 @@
         </form>
     </div>
 
-    @if (clients.Count == 0)
+    @if (clients.Count == 0 && query.Length > 0)
     {
-        <div class="empty-state">
-            <p class="title">No client matches “@query”</p>
-            <p class="hint text-muted">Try a different name or domain.</p>
+        <div class=”empty-state”>
+            <p class=”title”>No client matches “@query”</p>
+            <p class=”hint text-muted”>Try a different name or domain.</p>
+        </div>
+    }
+    else if (clients.Count == 0)
+    {
+        <div class=”empty-state”>
+            <p class=”title”>No clients yet</p>
+            <p class=”hint text-muted”>Add your first client to start tracking its delivery.</p>
         </div>
     }
     else
