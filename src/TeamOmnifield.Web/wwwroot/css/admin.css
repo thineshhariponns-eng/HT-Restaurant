@@ -1,0 +1,349 @@
+/* HT Restaurant Erode - Admin ("Mist Glass").
+   Loaded by Areas/Admin/Views/Shared/_AdminLayout only. Design only: it re-points the design tokens that
+   site.css already uses and restyles the existing classes under body.admin, so no markup, forms, routes or
+   scripts change. Palette pulled from the reference by pixel extraction: #263431 / #657c77 / #7b9592 storm
+   slate-teal, plus the horizon's warm glow, mapped to the brand's turmeric. */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+html { background: #0e1514; scrollbar-color: #3a4a47 #0e1514; }
+
+body.admin {
+  --font-display: 'Manrope', sans-serif;
+  --font-sans: 'Manrope', sans-serif;
+
+  --mg-glass: rgba(10, 18, 17, .55);
+  --mg-glass-strong: rgba(255, 255, 255, .14);
+  --mg-line: rgba(255, 255, 255, .12);
+  --mg-line-strong: rgba(255, 255, 255, .22);
+  --mg-ink: #0f1a18;
+  --mg-mist: #eef4f2;
+  --mg-gold: #f0c36a;
+  --mg-rose: #ef7d5a;
+  --mg-radius: 24px;
+  --mg-ease: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --color-bg-base: #121b19;
+  --color-bg-surface: var(--mg-glass);
+  --color-bg-sunken: rgba(6, 12, 11, .38);
+  --color-text-primary: var(--mg-mist);
+  --color-text-body: #bccbc7;
+  --color-text-muted: #8fa39f;
+  --color-text-inverse: var(--mg-ink);
+  --color-primary-100: rgba(240, 195, 106, .12);
+  --color-primary-600: var(--mg-gold);
+  --color-primary-700: #f7d58e;
+  --color-border-subtle: var(--mg-line);
+  --color-border-strong: var(--mg-line-strong);
+  --color-border-input: rgba(255, 255, 255, .28);
+  --color-status-pending: #f0c36a;
+  --color-status-confirmed: #7fb3e8;
+  --color-status-delivery: #b892e0;
+  --color-status-delivered: #6cc38a;
+  --color-status-cancelled: #ef7d5a;
+  --color-error: #ef7d5a;
+  --color-error-100: rgba(239, 125, 90, .12);
+  --color-error-text: #f5a487;
+  color-scheme: dark;
+
+  background: transparent;
+  color: var(--color-text-body);
+  font-family: var(--font-sans);
+}
+
+/* ---------- Atmosphere: misty-lake photo under a teal tint, fixed behind the glass ----------
+   Photo: "Misty Alpine Lake Mountain Reflection" by Sakin Shrestha (WordPress Photo Directory, CC0 1.0),
+   https://wordpress.org/photos/photo/2206a2acc0/ (voluntary credit; CC0 requires none). */
+body.admin::before {
+  content: ""; position: fixed; inset: -12px; z-index: -2; pointer-events: none;
+  background: url("../img/admin-mist.jpg") center 42% / cover no-repeat;
+  filter: saturate(.9) brightness(.86);
+}
+body.admin::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 78% -10%, rgba(123, 149, 146, .32), transparent 62%),
+    radial-gradient(38rem 26rem at 94% 98%, rgba(224, 185, 107, .14), transparent 62%),
+    linear-gradient(90deg, rgba(16, 26, 24, .66) 0%, rgba(16, 26, 24, .34) 100%);
+}
+
+/* ---------- Floating app frame ---------- */
+@media (min-width: 1024px) {
+  body.admin .admin-shell {
+    margin: 20px; min-height: calc(100vh - 40px); grid-template-columns: 236px minmax(0, 1fr);
+    border: 1px solid var(--mg-line); border-radius: 32px; overflow: clip;
+    background: rgba(8, 14, 13, .14); box-shadow: 0 40px 80px -32px rgba(0, 0, 0, .65);
+  }
+  body.admin .admin-sidebar { top: 20px; height: calc(100vh - 40px); }
+  body.admin .admin-topbar { top: 20px; }
+}
+
+/* ---------- Sidebar ---------- */
+body.admin .admin-sidebar {
+  background: rgba(10, 18, 17, .5); border-right: 1px solid var(--mg-line);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+}
+body.admin .admin-brand { padding: 28px 22px 22px; border-bottom: 0; }
+body.admin .admin-brand .name { font-size: 1.0625rem; font-weight: 800; letter-spacing: -.01em; }
+body.admin .admin-brand .place { font-size: .625rem; letter-spacing: .16em; color: var(--color-text-muted); }
+body.admin .admin-nav { padding: 8px 14px; }
+body.admin .admin-nav .group-label { padding: 20px 12px 8px; font-size: .625rem; letter-spacing: .16em; }
+body.admin .admin-nav-link {
+  height: 44px; gap: 12px; padding: 0 14px; border-radius: 999px; font-weight: 600; color: var(--color-text-body);
+  transition: background-color 160ms, color 160ms;
+}
+body.admin .admin-nav-link::before {
+  content: ""; flex: none; width: 18px; height: 18px; background: currentColor;
+  -webkit-mask: var(--ic) center / contain no-repeat; mask: var(--ic) center / contain no-repeat;
+}
+body.admin .admin-nav-link[href="/Admin"] { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='3' y='14' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='14' width='7' height='7' rx='1.5'/%3E%3C/svg%3E"); }
+body.admin .admin-nav-link[href="/Admin/Orders"] { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h12v18l-3-2-3 2-3-2-3 2z'/%3E%3Cpath d='M9 8h6M9 12h6'/%3E%3C/svg%3E"); }
+body.admin .admin-nav-link[href="/Admin/Products"] { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8l9-5 9 5v8l-9 5-9-5z'/%3E%3Cpath d='M3 8l9 5 9-5M12 13v8'/%3E%3C/svg%3E"); }
+body.admin .admin-nav-link:hover { background: var(--mg-glass-strong); color: var(--color-text-primary); }
+body.admin .admin-nav-link.active { background: var(--mg-glass-strong); color: var(--mg-gold); box-shadow: inset 0 0 0 1px var(--mg-line-strong); }
+body.admin .admin-nav-link .count { height: 22px; min-width: 22px; border-radius: 999px; padding: 0 7px; font-weight: 700; }
+body.admin .admin-footnote { border-top: 1px solid var(--mg-line); padding: 16px 18px 20px; line-height: 1.5; }
+
+/* ---------- Topbar ---------- */
+body.admin .admin-topbar {
+  height: 68px; padding: 0 20px; border-bottom: 1px solid var(--mg-line); background: rgba(14, 21, 20, .55);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+@media (min-width: 640px) { body.admin .admin-topbar { padding: 0 32px; } }
+body.admin .admin-breadcrumb { font-weight: 600; }
+body.admin .admin-clock { padding: 8px 16px; border-radius: 999px; background: var(--mg-glass); border: 1px solid var(--mg-line); }
+body.admin .admin-drawer-toggle { width: 40px; height: 40px; border-radius: 50%; border-color: var(--mg-line-strong); background: var(--mg-glass); }
+body.admin .admin-mobile-sidebar .scrim { background: rgba(6, 12, 11, .72); }
+body.admin .admin-mobile-sidebar .panel {
+  background: rgba(16, 26, 24, .94); border-right: 1px solid var(--mg-line);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+}
+
+/* ---------- Page heading = the hero of each screen ---------- */
+body.admin .page-heading { border-bottom: 0; padding: clamp(28px, 4vw, 48px) 20px 8px; }
+@media (min-width: 640px) { body.admin .page-heading { padding-inline: 32px; } }
+body.admin .page-heading h1 { font-weight: 300; font-size: clamp(2rem, 4.4vw, 3.5rem); letter-spacing: -.035em; line-height: 1.05; }
+body.admin .page-heading .label-caps.text-primary {
+  display: inline-block; margin-bottom: 14px; padding: 6px 14px; border-radius: 999px; background: var(--mg-glass-strong);
+  border: 1px solid var(--mg-line); color: var(--mg-mist); font-size: .6875rem; letter-spacing: .1em;
+}
+body.admin .admin-pad { padding: 20px; }
+@media (min-width: 640px) { body.admin .admin-pad { padding: 24px 32px; } }
+
+/* ---------- Buttons ---------- */
+body.admin .btn {
+  min-height: 42px; padding: 0 22px; border-radius: 999px; font-size: .875rem; font-weight: 600; letter-spacing: 0;
+  transition: background-color 160ms, color 160ms, border-color 160ms, transform 160ms var(--mg-ease);
+}
+body.admin .btn:active { transform: scale(.97); }
+body.admin .btn-sm { min-height: 36px; padding: 0 16px; font-size: .8125rem; }
+body.admin .btn-primary { background: var(--mg-mist); color: var(--mg-ink); }
+body.admin .btn-primary:hover { background: #fff; }
+body.admin .btn-secondary { background: var(--mg-glass); color: var(--color-text-primary); border: 1px solid var(--mg-line-strong); }
+body.admin .btn-secondary:hover { background: var(--mg-glass-strong); border-color: rgba(255, 255, 255, .4); color: #fff; }
+body.admin .btn-ghost { min-height: 36px; padding: 0 12px; color: var(--color-text-body); }
+body.admin .btn-ghost:hover { color: #fff; background: var(--mg-glass); }
+body.admin .btn-danger { background: transparent; color: var(--color-error-text); border: 1px solid rgba(239, 125, 90, .55); }
+body.admin .btn-danger:hover { background: rgba(239, 125, 90, .16); color: #fbc2ad; }
+body.admin .btn:disabled { background: rgba(255, 255, 255, .05); color: var(--color-text-muted); border-color: transparent; }
+
+/* ---------- Glass surfaces ---------- */
+body.admin .metric-card, body.admin .card, body.admin .form-card, body.admin .summary-panel {
+  background: var(--mg-glass); border: 1px solid var(--mg-line); border-radius: var(--mg-radius);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2);
+}
+body.admin .card { padding: 20px; transition: border-color 160ms, background-color 160ms; }
+body.admin .card:hover { border-color: var(--mg-line-strong); }
+body.admin .form-card { padding: clamp(24px, 4vw, 40px); }
+body.admin .card-photo { border-bottom: 0; border-radius: 16px; background: var(--color-bg-sunken); }
+body.admin .card .title { font-weight: 600; letter-spacing: -.01em; }
+body.admin h3.label-caps { color: var(--color-text-muted); letter-spacing: .14em; font-size: .6875rem; }
+
+/* Dashboard metrics: two feature tiles, four supporting tiles */
+body.admin .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 20px 0 28px; }
+@media (min-width: 900px) {
+  body.admin .metric-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  body.admin .metric-card { grid-column: span 3; }
+  body.admin .metric-card:nth-child(-n+2) { grid-column: span 6; padding: 28px; }
+  body.admin .metric-card:nth-child(-n+2) strong { font-size: clamp(2.75rem, 5vw, 4.25rem); }
+}
+body.admin .metric-card { padding: 22px; }
+body.admin .metric-card span { font-size: .6875rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--color-text-muted); }
+body.admin .metric-card strong { margin-top: 12px; font-weight: 300; font-size: clamp(1.75rem, 3vw, 2.5rem); letter-spacing: -.035em; line-height: 1; font-variant-numeric: tabular-nums; }
+body.admin .metric-card:nth-child(2) strong { color: var(--mg-gold); }
+
+/* ---------- Tabs, toolbar, search ---------- */
+body.admin .tabbar { gap: 8px; padding: 12px 20px 4px; background: transparent; border-bottom: 0; }
+@media (min-width: 640px) { body.admin .tabbar { padding-inline: 32px; } }
+body.admin .tabbar button {
+  gap: 10px; padding: 9px 16px; border: 1px solid transparent; border-radius: 999px; font-weight: 600;
+  transition: background-color 160ms, color 160ms, border-color 160ms, transform 160ms var(--mg-ease);
+}
+body.admin .tabbar button:hover { background: var(--mg-glass); border-color: var(--mg-line); color: var(--color-text-primary); }
+body.admin .tabbar button:active { transform: scale(.97); }
+body.admin .tabbar button.active { background: var(--mg-glass-strong); border-color: var(--mg-line-strong); color: #fff; }
+body.admin .tabbar .count { font-size: .75rem; font-variant-numeric: tabular-nums; opacity: .8; }
+body.admin .tabbar .count.attn { color: var(--mg-gold); opacity: 1; }
+body.admin .toolbar { border-bottom: 0; padding: 12px 20px 4px; }
+@media (min-width: 640px) { body.admin .toolbar { padding-inline: 32px; } }
+body.admin .search-wrap { max-width: 380px; }
+body.admin .search-wrap svg { left: 16px; }
+body.admin .search-wrap input { min-height: 44px; padding: 10px 18px 10px 42px; border-radius: 999px; background: var(--mg-glass); border-color: var(--mg-line-strong); font-size: .875rem; }
+body.admin .search-wrap input::placeholder { color: var(--color-text-muted); }
+body.admin .search-wrap input:focus { border-color: var(--mg-gold); box-shadow: 0 0 0 3px rgba(240, 195, 106, .18); }
+
+/* ---------- Tables ---------- */
+body.admin table.ruled {
+  border: 1px solid var(--mg-line); border-collapse: separate; border-spacing: 0; border-radius: var(--mg-radius); overflow: hidden;
+  background: var(--mg-glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+body.admin table.ruled th { padding: 16px 20px; font-size: .6875rem; font-weight: 700; letter-spacing: .14em; background: rgba(255, 255, 255, .04); }
+body.admin table.ruled td { padding: 16px 20px; border-bottom-color: var(--mg-line); }
+body.admin table.ruled tbody tr { transition: background-color 140ms; }
+body.admin table.ruled tbody tr:hover { background: rgba(255, 255, 255, .06); }
+body.admin .sort-btn:hover { color: #fff; }
+body.admin .product-thumb { border-radius: 14px; }
+body.admin .price { font-family: var(--font-sans); font-weight: 600; color: var(--mg-gold); }
+body.admin .badge { padding: 6px 14px; border-radius: 999px; border-color: var(--mg-line-strong); background: rgba(255, 255, 255, .06); color: var(--color-text-primary); font-size: .6875rem; letter-spacing: .06em; }
+body.admin .dot { box-shadow: 0 0 0 3px rgba(255, 255, 255, .06); }
+body.admin .pager .btns { gap: 8px; }
+
+/* ---------- Order detail ---------- */
+body.admin .summary-row { color: var(--color-text-body); }
+body.admin .summary-total { border-top-color: var(--mg-line-strong); }
+body.admin .summary-total .amount { font-family: var(--font-sans); font-weight: 300; font-size: 1.75rem; letter-spacing: -.03em; color: var(--mg-gold); }
+body.admin .ruled-row { border-bottom-color: var(--mg-line); }
+body.admin .lifecycle li .rail { background: var(--mg-line-strong); }
+body.admin .lifecycle .marker { background: var(--mg-glass); border-color: var(--mg-line-strong); border-radius: 50%; }
+body.admin .lifecycle li.current .marker { box-shadow: 0 0 0 4px rgba(240, 195, 106, .18); }
+body.admin .lifecycle li.done .rail { background: var(--mg-gold); }
+
+/* ---------- Forms ---------- */
+body.admin .field label { font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--color-text-muted); }
+body.admin .field input, body.admin .field textarea, body.admin .field select {
+  min-height: 46px; padding: 12px 16px; border-radius: 16px; background: var(--color-bg-sunken); border-color: var(--mg-line-strong); color: var(--color-text-primary);
+}
+body.admin .field textarea { min-height: 96px; }
+body.admin .field select option { background: #16211f; color: var(--mg-mist); }
+body.admin .field input:focus, body.admin .field textarea:focus, body.admin .field select:focus {
+  border-color: var(--mg-gold); box-shadow: 0 0 0 3px rgba(240, 195, 106, .18);
+}
+body.admin .field.has-error input, body.admin .field.has-error textarea { border-color: var(--mg-rose); box-shadow: 0 0 0 3px rgba(239, 125, 90, .18); }
+body.admin .checkbox-row input { accent-color: var(--mg-gold); }
+body.admin .alert-error { border-radius: 16px; }
+body.admin .empty-state { padding-block: 64px; }
+
+/* ---------- Focus ---------- */
+body.admin a:focus-visible, body.admin button:focus-visible, body.admin input:focus-visible,
+body.admin select:focus-visible, body.admin textarea:focus-visible { outline: 2px solid var(--mg-gold); outline-offset: 2px; }
+
+/* Browsers without backdrop-filter: keep the glass legible */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body.admin { --mg-glass: rgba(30, 44, 41, .92); --mg-glass-strong: rgba(48, 66, 62, .95); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.admin .btn, body.admin .tabbar button, body.admin .card, body.admin table.ruled tbody tr { transition: none; }
+}
+
+/* =====================================================================
+   Motion. Admin is used all day, so this is small: one calm entrance on the dashboard,
+   the mobile drawer's spatial story, message feedback, and press states. transform + opacity only.
+   ===================================================================== */
+body.admin { --mg-drawer: cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* Entrance: each screen's blocks rise into place, top to bottom, on load. transform + opacity, ~380ms. */
+@keyframes mg-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes mg-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  body.admin .admin-content > * { animation: mg-rise 380ms var(--mg-ease) backwards; }
+  body.admin .admin-content > :nth-child(2) { animation-delay: 60ms; }
+  body.admin .admin-content > :nth-child(3) { animation-delay: 120ms; }
+  body.admin .admin-content > :nth-child(4) { animation-delay: 180ms; }
+  /* dashboard: the tiles are the show, so the wrapper stays still and the tiles do the rising */
+  body.admin .admin-content > .admin-pad:has(.metric-grid) { animation: none; }
+  body.admin .metric-grid .metric-card, body.admin .grid-3 > .card, body.admin .actions-row { animation: mg-rise 380ms var(--mg-ease) backwards; }
+  body.admin .metric-grid .metric-card:nth-child(1) { animation-delay: 100ms; }
+  body.admin .metric-grid .metric-card:nth-child(2) { animation-delay: 150ms; }
+  body.admin .metric-grid .metric-card:nth-child(3) { animation-delay: 200ms; }
+  body.admin .metric-grid .metric-card:nth-child(4) { animation-delay: 250ms; }
+  body.admin .metric-grid .metric-card:nth-child(5) { animation-delay: 300ms; }
+  body.admin .metric-grid .metric-card:nth-child(6) { animation-delay: 350ms; }
+  body.admin .actions-row { animation-delay: 300ms; }
+  body.admin .grid-3 > .card { animation-delay: 350ms; }
+  body.admin .grid-3 > .card:nth-child(2) { animation-delay: 400ms; }
+  body.admin .grid-3 > .card:nth-child(3) { animation-delay: 450ms; }
+  body.admin .grid-3 > .card:nth-child(n+4) { animation-delay: 500ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.admin .admin-content > *, body.admin .metric-grid .metric-card, body.admin .grid-3 > .card, body.admin .actions-row { animation: mg-fade 150ms ease backwards; }
+}
+
+/* Mobile drawer: the panel slides in from the left edge it belongs to, the scrim fades, and it leaves the same way.
+   Visibility (not display) is toggled so the exit can play; a hidden drawer stays out of the tab order. */
+body.admin .admin-mobile-sidebar { display: block; visibility: hidden; transition: visibility 0s linear 220ms; }
+body.admin .admin-mobile-sidebar.open { visibility: visible; transition-delay: 0s; }
+body.admin .admin-mobile-sidebar .scrim { opacity: 0; transition: opacity 220ms var(--mg-ease); }
+body.admin .admin-mobile-sidebar.open .scrim { opacity: 1; transition-duration: 300ms; }
+body.admin .admin-mobile-sidebar .panel { transform: translateX(-100%); transition: transform 220ms var(--mg-drawer); }
+body.admin .admin-mobile-sidebar.open .panel { transform: translateX(0); transition-duration: 300ms; }
+@media (min-width: 1024px) { body.admin .admin-mobile-sidebar { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  body.admin .admin-mobile-sidebar .panel { transform: none; opacity: 0; transition: opacity 150ms ease; }
+  body.admin .admin-mobile-sidebar.open .panel { opacity: 1; }
+}
+
+/* Messages: validation text and error banners ease in when they appear (class applied by the validator) */
+@keyframes mg-msg-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: no-preference) {
+  body.admin .field-validation-error, body.admin .alert-error:not(.validation-summary-valid) { animation: mg-msg-in 160ms var(--mg-ease); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.admin .field-validation-error, body.admin .alert-error:not(.validation-summary-valid) { animation: mg-fade 150ms ease; }
+}
+
+/* Press feedback on controls that had none (the pill buttons already scale) */
+body.admin .admin-drawer-toggle { transition: transform 160ms var(--mg-ease), background-color 160ms; }
+body.admin .admin-drawer-toggle:active { transform: scale(.95); }
+body.admin .admin-nav-link { transition: transform 160ms var(--mg-ease), background-color 160ms, color 160ms; }
+body.admin .admin-nav-link:active { transform: scale(.98); }
+
+/* ---------- Ambient + interaction motion ---------- */
+
+/* The photo drifts very slowly, so the background reads as weather rather than a wallpaper */
+@keyframes mg-drift {
+  from { transform: scale(1.06) translate3d(-1.2%, 0, 0); }
+  to   { transform: scale(1.15) translate3d(1.2%, -1.4%, 0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body.admin::before { animation: mg-drift 50s ease-in-out infinite alternate; will-change: transform; }
+}
+
+/* Cards and tiles lift under a real pointer */
+@media (hover: hover) and (pointer: fine) {
+  body.admin .metric-card, body.admin .grid-3 > .card { transition: transform 220ms var(--mg-ease), border-color 160ms, background-color 160ms; }
+  body.admin .metric-card:hover, body.admin .grid-3 > .card:hover { transform: translateY(-4px); border-color: rgba(255, 255, 255, .32); }
+  body.admin .admin-nav-link::before { transition: transform 200ms var(--mg-ease); }
+  body.admin .admin-nav-link:hover::before { transform: translateX(3px); }
+}
+
+/* A new (pending) order's dot sends out a soft ring: the one thing in the queue that wants attention */
+@keyframes mg-ping { 0% { transform: scale(1); opacity: .6; } 75%, 100% { transform: scale(3.2); opacity: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  body.admin .dot-attention { position: relative; }
+  body.admin .dot-attention::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--color-status-pending);
+    animation: mg-ping 1.9s var(--mg-ease) infinite;
+  }
+}
+
+/* Order detail: the progress rail fills, then the current step lands */
+@keyframes mg-rail { from { transform: scaleY(0); } }
+@keyframes mg-marker { from { opacity: 0; transform: scale(.6); } }
+@media (prefers-reduced-motion: no-preference) {
+  body.admin .lifecycle li.done .rail { transform-origin: top; animation: mg-rail 320ms var(--mg-ease) backwards; }
+  body.admin .lifecycle li:nth-child(2) .rail { animation-delay: 60ms; }
+  body.admin .lifecycle li:nth-child(3) .rail { animation-delay: 120ms; }
+  body.admin .lifecycle li:nth-child(4) .rail { animation-delay: 180ms; }
+  body.admin .lifecycle li:nth-child(5) .rail { animation-delay: 240ms; }
+  body.admin .lifecycle li.current .marker span { animation: mg-marker 240ms var(--mg-ease) 320ms backwards; }
+}

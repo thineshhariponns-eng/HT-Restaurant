@@ -1,16 +1,16 @@
 @model Order
 @{ ViewData["Title"] = "Order confirmed"; }
 <section class="container" style="max-width:768px;text-align:center;padding-top:48px;padding-bottom:32px;border-bottom:1px solid var(--color-border-strong)">
-    <span style="display:inline-flex;height:56px;width:56px;align-items:center;justify-content:center;border:1px solid var(--color-primary-600);color:var(--color-primary-600)">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+    <span class="confirm-mark" style="display:inline-flex;height:56px;width:56px;align-items:center;justify-content:center;border:1px solid var(--color-primary-600);color:var(--color-primary-600)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" /></svg>
     </span>
-    <h1 class="display" style="margin-top:20px;font-size:1.875rem">Order Confirmed!</h1>
-    <p class="text-body" style="margin-top:12px">Thank you for ordering from HT Restaurant, @Model.CustomerName!</p>
-    <p class="text-muted tabular" style="margin-top:8px;font-size:0.875rem">Delivery &middot; Placed @Model.CreatedUtc.ToLocalTime().ToString("d MMM, h:mm tt")</p>
+    <h1 class="display confirm-rise" style="margin-top:20px;font-size:1.875rem">Order Confirmed!</h1>
+    <p class="text-body confirm-rise" style="margin-top:12px">Thank you for ordering from HT Restaurant, @Model.CustomerName!</p>
+    <p class="text-muted tabular confirm-rise" style="margin-top:8px;font-size:0.875rem">Delivery &middot; Placed @Model.CreatedUtc.ToLocalTime().ToString("d MMM, h:mm tt")</p>
 </section>
 
 <section class="container" style="max-width:768px;padding-top:24px">
-    <div style="border:1px solid var(--color-border-strong);background:var(--color-bg-surface)">
+    <div class="confirm-rise confirm-rise--late" style="border:1px solid var(--color-border-strong);background:var(--color-bg-surface)">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;border-bottom:1px solid var(--color-border-subtle)">
             <span class="label-caps">Order number</span>
             <span style="display:inline-flex;align-items:center;gap:8px;font-size:0.875rem;color:var(--color-text-primary)"><span class="dot dot-kitchen"></span>@Model.Status</span>

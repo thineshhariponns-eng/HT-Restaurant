@@ -112,7 +112,17 @@
       btn.style.borderColor = 'var(--color-primary-600)';
       btn.style.color = 'var(--color-primary-600)';
       category = btn.getAttribute('data-category');
+      var before = cards.map(function (c) { return c.style.display !== 'none'; });
       apply();
+      // Presentation only: dishes that just appeared ease in (filtering itself is unchanged).
+      var order = 0;
+      cards.forEach(function (c, i) {
+        c.classList.remove('is-entering');
+        if (c.style.display === 'none' || before[i]) return;
+        void c.offsetWidth;
+        c.style.setProperty('--i', Math.min(order++, 7));
+        c.classList.add('is-entering');
+      });
     });
   });
   var first = filters.querySelector('button.active');

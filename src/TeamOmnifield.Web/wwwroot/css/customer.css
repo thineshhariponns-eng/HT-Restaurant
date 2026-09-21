@@ -1,0 +1,250 @@
+/* HT Restaurant Erode — customer storefront theme ("Open Kitchen").
+   Loaded by Views/Shared/_Layout for customer pages only (Home, Menu, Cart, Checkout, Orders).
+   Account (admin login) and Team pages opt out, and the Admin / Platform areas use their own layouts.
+   Design only: it re-skins the existing site.css classes by re-pointing their design tokens under
+   body.customer, so no markup, forms, routes or scripts are involved. */
+
+body.customer {
+  --lp-ink: #100d09;
+  --lp-paper: #fbf8f2;
+  --lp-paper-deep: #f1e8d8;
+  --lp-olive: #6f6444;
+  --lp-turmeric: #e8b33c;
+  --lp-rust: #c4552f;
+  --lp-line-dark: rgba(16, 13, 9, .16);
+  --lp-line-light: rgba(255, 255, 255, .22);
+  --lp-wrap: 1360px;
+  --lp-gutter: clamp(20px, 4vw, 56px);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* paper theme: content areas read dark-on-light */
+  --color-bg-base: var(--lp-paper);
+  --color-bg-surface: #fff;
+  --color-bg-sunken: var(--lp-paper-deep);
+  --color-text-primary: var(--lp-ink);
+  --color-text-body: #3c352a;
+  --color-text-muted: #6b6253;
+  --color-text-inverse: #fff;
+  --color-primary-600: #8a5f00;
+  --color-primary-700: #6e4a00;
+  --color-border-subtle: rgba(16, 13, 9, .14);
+  --color-border-strong: rgba(16, 13, 9, .3);
+  --color-border-input: #8a7f6d;
+  --color-error: #c4552f;
+  --color-error-100: #fbe9e2;
+  --color-error-text: #9c3517;
+  --color-status-delivered: #2f7a43;
+  color-scheme: light;
+  background: var(--lp-paper);
+  color: var(--color-text-body);
+}
+html { scrollbar-color: #8a7f6d #fbf8f2; }
+
+/* dark surfaces inside the paper theme: same tokens, flipped */
+body.customer .band-strong,
+body.customer .summary-panel,
+body.customer .site-header,
+body.customer .site-footer {
+  --color-bg-base: var(--lp-ink);
+  --color-bg-surface: #1c1812;
+  --color-bg-sunken: #0c0a07;
+  --color-text-primary: #fff;
+  --color-text-body: rgba(255, 255, 255, .84);
+  --color-text-muted: rgba(255, 255, 255, .68);
+  --color-text-inverse: var(--lp-ink);
+  --color-primary-600: var(--lp-turmeric);
+  --color-primary-700: #f2c568;
+  --color-border-subtle: rgba(255, 255, 255, .16);
+  --color-border-strong: rgba(255, 255, 255, .3);
+  --color-border-input: rgba(255, 255, 255, .4);
+  --color-error-text: #f0906d;
+  --color-status-delivered: #4e9a5f;
+  color: var(--color-text-body);
+}
+
+.customer .container { max-width: var(--lp-wrap); padding-inline: var(--lp-gutter); }
+
+/* the layout's flash-message strip must not add a gap under the header; errors still show */
+.customer main { position: relative; }
+.customer main > .container:first-child { position: absolute; z-index: 50; top: 16px; left: 0; right: 0; padding-top: 0 !important; }
+.landing main > .container:first-child { top: 84px; }
+
+/* ---------- Header ---------- */
+.customer .site-header { background: var(--lp-ink); border-bottom: 1px solid var(--lp-line-light); }
+.customer .site-header .bar { max-width: var(--lp-wrap); padding-inline: var(--lp-gutter); height: 72px; }
+.customer .brand-mark .name { font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; color: #fff; }
+.customer .brand-mark .place { color: var(--lp-turmeric); }
+.customer .primary-nav a { color: #fff; border-bottom: 0; padding: 8px 14px; font-size: .6875rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .88; }
+.customer .primary-nav a:hover { color: #fff; opacity: 1; text-decoration: underline; text-underline-offset: 6px; }
+.customer .cart-btn { border-color: var(--lp-line-light); color: #fff; }
+.customer .cart-btn:hover { border-color: #fff; }
+.customer .header-actions .btn-secondary { color: #fff; border-color: var(--lp-line-light); }
+.customer .header-actions .btn-secondary:hover { background: transparent; border-color: #fff; color: #fff; }
+.customer .header-actions .btn-ghost { color: rgba(255, 255, 255, .82); }
+.customer .header-actions .btn-ghost:hover { color: #fff; }
+.customer .header-actions .btn { font-size: .6875rem; }
+.customer .nav-toggle { border-color: var(--lp-line-light); color: #fff; }
+.customer .mobile-nav { background: rgba(16, 13, 9, .98); border-top: 1px solid var(--lp-line-light); padding: 12px var(--lp-gutter) 20px; }
+.customer .mobile-nav a { color: #fff; padding: 14px 0; border-bottom: 1px solid var(--lp-line-light); font-size: .8125rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+@media (max-width: 720px) {
+  .customer .header-actions .btn-secondary, .customer .header-actions .btn-ghost { display: none; }
+  .customer .mobile-nav .auth-link { display: block; }
+}
+
+/* ---------- Footer ---------- */
+.customer .site-footer { background: #000; border-top: 1px solid var(--lp-line-light); }
+.customer .site-footer h2 { color: #fff; font-family: var(--font-sans); font-size: .6875rem; letter-spacing: .12em; }
+.customer .site-footer .bottom { border-top-color: var(--lp-line-light); }
+.customer .site-footer a:hover { color: var(--lp-turmeric); }
+
+/* ---------- Type ---------- */
+.customer h1, .customer h2, .customer h3 { font-weight: 600; }
+.customer .headline, .customer .title { font-family: var(--font-sans); font-weight: 600; letter-spacing: -.01em; }
+.customer .label-caps { font-weight: 700; letter-spacing: .12em; }
+
+/* page-title band: the dark "hero-lite" every inner page opens with */
+.customer .band-strong { background: var(--lp-ink); border-bottom: 0; padding: clamp(40px, 6vw, 80px) 0 clamp(32px, 5vw, 64px); }
+.customer .band-strong .display {
+  font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: -.02em; line-height: 1;
+  font-size: clamp(1.75rem, 5.4vw, 3.75rem) !important; text-wrap: balance;
+}
+.customer .band-strong .display + p, .customer .band-strong p.text-body { font-size: 1.0625rem; max-width: 34rem; }
+.customer .band { border-bottom: 1px solid var(--color-border-subtle); }
+.customer .band-surface { background: #fff; }
+
+/* ---------- Buttons ---------- */
+.customer .btn {
+  min-height: 44px; padding: 0 22px; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  border-radius: 0; transition: background-color 160ms, color 160ms, border-color 160ms, transform 160ms;
+}
+.customer .btn:active { transform: translateY(1px); }
+.customer .btn-sm { min-height: 40px; padding: 0 16px; font-size: .6875rem; }
+.customer .btn-primary { background: var(--lp-ink); color: #fff; }
+.customer .btn-primary:hover { background: var(--lp-olive); }
+.customer .btn-secondary { background: transparent; color: var(--lp-ink); border: 1px solid rgba(16, 13, 9, .35); }
+.customer .btn-secondary:hover { background: var(--lp-ink); border-color: var(--lp-ink); color: #fff; }
+.customer .btn-ghost { min-height: 40px; padding: 0 4px; color: var(--color-text-muted); }
+.customer .btn-ghost:hover { color: var(--lp-ink); text-decoration: underline; text-underline-offset: 4px; }
+.customer .btn:disabled { background: var(--lp-paper-deep); color: var(--color-text-muted); border-color: transparent; }
+.customer .summary-panel .btn-primary { background: #fff; color: var(--lp-ink); }
+.customer .summary-panel .btn-primary:hover { background: var(--lp-turmeric); }
+.customer .add-btn { width: 32px; height: 32px; }
+
+/* ---------- Forms ---------- */
+.customer .field label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.customer .field input, .customer .field textarea, .customer .field select,
+.customer .search-wrap input { background: #fff; min-height: 46px; }
+.customer .search-wrap { max-width: 420px; }
+.customer .search-wrap input { padding-block: 12px; font-size: .9375rem; }
+.customer .field input:focus, .customer .field textarea:focus, .customer .field select:focus,
+.customer .search-wrap input:focus { border-color: var(--lp-ink); box-shadow: 0 0 0 1px var(--lp-ink); }
+.customer a:focus-visible, .customer button:focus-visible, .customer input:focus-visible,
+.customer textarea:focus-visible, .customer select:focus-visible, .customer summary:focus-visible { outline: 2px solid var(--lp-ink); outline-offset: 2px; }
+.customer .site-header a:focus-visible, .customer .site-header button:focus-visible,
+.customer .site-footer a:focus-visible, .customer .lp-hero a:focus-visible, .customer .lp-faq :focus-visible,
+.customer .lp-ways :focus-visible, .customer .summary-panel :focus-visible, .customer .band-strong :focus-visible { outline-color: var(--lp-turmeric); }
+.customer .alert-error { border-radius: 0; }
+
+/* ---------- Menu: category filter chips ---------- */
+.customer #menuFilters button {
+  min-height: 44px; border-radius: 0 !important; border-color: var(--lp-line-dark) !important; background: transparent;
+  font-size: .6875rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--lp-ink) !important;
+  transition: transform 160ms var(--ease-out), background-color 160ms, color 160ms;
+}
+.customer #menuFilters button:hover { background: var(--lp-paper-deep); }
+.customer #menuFilters button.active { background: var(--lp-ink); border-color: var(--lp-ink) !important; color: #fff !important; }
+
+/* ---------- Cards: photo-led, no box ---------- */
+.customer .card { background: transparent; border: 0; padding: 0; }
+.customer a.card:hover, .customer .card.linkable:hover { border-color: transparent; }
+.customer .card-photo { border-bottom: 0; background: var(--lp-paper-deep); }
+.customer .card-photo img { transition: transform 600ms cubic-bezier(.2, .7, .2, 1); }
+.customer .card:hover .card-photo img { transform: scale(1.04); }
+.customer .card .title { font-size: .8125rem !important; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; line-height: 1.4; }
+.customer .card .title a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.customer .card .text-body { color: #3c352a; }
+.customer .price { font-family: var(--font-sans); font-weight: 600; }
+.customer .grid { gap: clamp(20px, 2.4vw, 32px); }
+.customer .grid-3 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+/* ---------- Cart / checkout / order panels ---------- */
+.customer .summary-panel { border: 0; padding: clamp(20px, 3vw, 32px); }
+.customer .summary-panel h2 { font-family: var(--font-sans); font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255, 255, 255, .68); }
+.customer .summary-total .amount { font-family: var(--font-sans); font-size: 1.5rem; }
+.customer .ruled-row { border-bottom-color: var(--color-border-subtle); }
+.customer .qty-stepper { background: #fff; border-color: rgba(16, 13, 9, .35); }
+.customer .qty-stepper button { width: 44px; height: 44px; }
+.customer .qty-stepper button:hover:not(:disabled) { background: var(--lp-ink); color: #fff; }
+.customer table.ruled { border-color: var(--color-border-subtle); }
+.customer table.ruled th { font-weight: 700; letter-spacing: .1em; }
+.customer table.ruled tbody tr:hover { background: var(--lp-paper-deep); }
+.customer .badge { border-radius: 0; border-color: var(--color-border-strong); color: var(--lp-ink); }
+.customer .empty-state { padding-block: clamp(56px, 9vw, 112px); }
+.customer .status-pill { color: var(--lp-ink); font-weight: 700; }
+.customer .lifecycle li.done .marker { color: var(--lp-ink); }
+
+@media (max-width: 720px) {
+  .customer table.ruled th, .customer table.ruled td { padding: 12px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .customer .card-photo img, .customer .btn { transition: none; }
+}
+
+/* "Unavailable" badge sits on a dark scrim over the photo */
+.customer .card-photo .label-caps { color: #fff; border-color: rgba(255, 255, 255, .5) !important; }
+
+/* =====================================================================
+   Motion. Tokens: --ease-out / --ease-in-out (top of file). Animate transform + opacity only.
+   ===================================================================== */
+
+/* Press feedback: controls that had no :active state (wide .btn / .lp-btn keep their 1px nudge; scale would squash them). */
+.customer .qty-stepper button, .customer .nav-toggle, .customer .cart-btn, .customer .add-btn {
+  transition: transform 160ms var(--ease-out), background-color 160ms, color 160ms, border-color 160ms, opacity 160ms;
+}
+.customer .qty-stepper button:active:not(:disabled), .customer .nav-toggle:active, .customer .cart-btn:active,
+.customer .add-btn:active:not(:disabled), .customer #menuFilters button:active, .lp-carousel__ctl button:active:not(:disabled) {
+  transform: scale(.97);
+}
+
+/* Mobile menu: drops from the header (origin top), leaves faster than it arrives. */
+.customer .mobile-nav {
+  transform-origin: top; opacity: 0; transform: translateY(-8px);
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out), display 150ms allow-discrete;
+}
+.customer .mobile-nav.open { opacity: 1; transform: none; transition-duration: 200ms; }
+@starting-style { .customer .mobile-nav.open { opacity: 0; transform: translateY(-8px); } }
+
+/* Menu: category chip reveals the dishes that just appeared (script sets .is-entering and --i). */
+.customer #menuGrid .card { display: flex; flex-direction: column; }
+@keyframes dish-in { from { opacity: 0; transform: translateY(8px); } }
+.customer .card.is-entering { animation: dish-in 220ms var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 25ms); }
+
+/* Order tracker: completed rails fill top-down, then the current step lands. */
+@keyframes rail-fill { from { transform: scaleY(0); } }
+@keyframes marker-in { from { opacity: 0; transform: scale(.6); } }
+.customer .lifecycle li.done .rail { background: var(--color-primary-600); transform-origin: top; animation: rail-fill 300ms var(--ease-out) backwards; }
+.customer .lifecycle li:nth-child(2) .rail { animation-delay: 40ms; }
+.customer .lifecycle li:nth-child(3) .rail { animation-delay: 80ms; }
+.customer .lifecycle li:nth-child(4) .rail { animation-delay: 120ms; }
+.customer .lifecycle li:nth-child(5) .rail { animation-delay: 160ms; }
+.customer .lifecycle li.current .marker span { animation: marker-in 200ms var(--ease-out) 200ms backwards; }
+
+/* Order confirmed: the check draws itself, then the details settle in. */
+@keyframes confirm-mark { from { opacity: 0; transform: scale(.9); } }
+@keyframes confirm-draw { from { stroke-dashoffset: 1; } }
+@keyframes confirm-rise { from { opacity: 0; transform: translateY(8px); } }
+.confirm-mark { animation: confirm-mark 350ms var(--ease-out) backwards; }
+.confirm-mark path { stroke-dasharray: 1; animation: confirm-draw 350ms var(--ease-out) 150ms backwards; }
+.confirm-rise { animation: confirm-rise 300ms var(--ease-out) 250ms backwards; }
+.confirm-rise--late { animation-delay: 310ms; }
+
+/* Reduced motion: keep what aids comprehension (fades), drop movement. */
+@media (prefers-reduced-motion: reduce) {
+  .customer .mobile-nav { transform: none; transition: opacity 120ms var(--ease-out), display 120ms allow-discrete; }
+  .customer .card.is-entering { animation: none; }
+  .customer .lifecycle li.done .rail, .customer .lifecycle li.current .marker span { animation: none; }
+  .confirm-mark, .confirm-rise { animation: confirm-fade 150ms ease backwards; animation-delay: 0ms; }
+  .confirm-mark path { animation: none; }
+}
+@keyframes confirm-fade { from { opacity: 0; } }

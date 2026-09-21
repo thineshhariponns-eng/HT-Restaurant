@@ -409,37 +409,50 @@ table.ruled tbody tr:hover { background: var(--color-bg-base); }
 .auth-footer::before, .auth-footer::after { content: ""; height: 1px; flex: 1; background: var(--color-border-strong); }
 
 /* ---------- consultant portal: pipeline stages, meters, kanban ---------- */
-.stage-new, .stage-dot-new { color: var(--color-text-muted); }
+.stage-new, .stage-dot-new { color: #9a9080; }
 .stage-onboarding, .stage-dot-onboarding { color: var(--color-status-pending); }
-.stage-development, .stage-dot-development { color: var(--color-status-confirmed); }
-.stage-review, .stage-dot-review { color: var(--color-status-delivery); }
+.stage-development, .stage-dot-development { color: #4f8bd6; }
+.stage-review, .stage-dot-review { color: #a878d0; }
 .stage-production, .stage-dot-production { color: var(--color-status-delivered); }
-.dot.stage-dot-new { background: var(--color-text-muted); }
+.dot.stage-dot-new { background: #9a9080; }
 .dot.stage-dot-onboarding { background: var(--color-status-pending); }
-.dot.stage-dot-development { background: var(--color-status-confirmed); }
-.dot.stage-dot-review { background: var(--color-status-delivery); }
+.dot.stage-dot-development { background: #4f8bd6; }
+.dot.stage-dot-review { background: #a878d0; }
 .dot.stage-dot-production { background: var(--color-status-delivered); }
 
+/* One accent per stage. Put a tone-* class on any ancestor; children read var(--tone). */
+.tone-new { --tone: #9a9080; }
+.tone-onboarding { --tone: var(--color-status-pending); }
+.tone-development { --tone: #4f8bd6; }
+.tone-review { --tone: #a878d0; }
+.tone-production { --tone: var(--color-status-delivered); }
+.tone-text { color: var(--tone, var(--color-text-body)); }
+
 .meter { display: inline-block; width: 96px; height: 6px; background: var(--color-bg-sunken); }
-.meter > span { display: block; height: 100%; background: var(--color-primary-600); }
+.meter > span { display: block; height: 100%; background: var(--tone, var(--color-primary-600)); }
 
 .kanban { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
-.kanban-col { flex: 0 0 256px; background: var(--color-bg-surface); border: 1px solid var(--color-border-subtle); display: flex; flex-direction: column; }
-.kanban-col > header { padding: 12px; border-bottom: 1px solid var(--color-border-subtle); }
+.kanban-col { flex: 0 0 256px; background: color-mix(in srgb, var(--tone) 6%, var(--color-bg-surface)); border: 1px solid color-mix(in srgb, var(--tone) 30%, var(--color-border-subtle)); border-top: 3px solid var(--tone); display: flex; flex-direction: column; }
+.kanban-col > header { padding: 12px; border-bottom: 1px solid color-mix(in srgb, var(--tone) 30%, var(--color-border-subtle)); background: color-mix(in srgb, var(--tone) 10%, transparent); }
 .kanban-col > header p { margin: 0; }
-.kanban-col .count { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--color-text-primary); margin-top: 8px; }
+.kanban-col > header .label-caps { color: var(--tone); }
+.kanban-col .count { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--tone); margin-top: 8px; }
 .kanban-list { list-style: none; margin: 0; padding: 12px; display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 128px; }
-.kanban-list.over { background: var(--color-primary-100); }
-.kanban-card { border: 1px solid var(--color-border-strong); background: var(--color-bg-base); padding: 12px; cursor: grab; }
-.kanban-card:hover { border-color: var(--color-primary-600); }
+.kanban-list.over { background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.kanban-card { border: 1px solid var(--color-border-strong); border-left: 3px solid var(--tone); background: var(--color-bg-base); padding: 12px; cursor: grab; }
+.kanban-card:hover { border-color: var(--tone); }
 .kanban-card.dragging { opacity: 0.4; }
 .kanban-card .row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .kanban-card .row a { font-size: 0.875rem; font-weight: 500; color: var(--color-text-primary); }
-.kanban-card .row a:hover { color: var(--color-primary-600); }
+.kanban-card .row a:hover { color: var(--tone); }
 .kanban-card .nudge { display: flex; gap: 4px; opacity: 0; transition: opacity 120ms; }
 .kanban-card:hover .nudge, .kanban-card:focus-within .nudge { opacity: 1; }
 .kanban-card .nudge button { width: 24px; height: 24px; border: 1px solid var(--color-border-strong); background: transparent; color: var(--color-text-body); cursor: pointer; line-height: 1; }
-.kanban-card .nudge button:hover { border-color: var(--color-primary-600); color: var(--color-text-primary); }
+.kanban-card .nudge button:hover { border-color: var(--tone); color: var(--tone); }
 .kanban-card .nudge form { display: inline; }
 .kanban-card .host { font-size: 0.75rem; margin: 8px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kanban-empty { font-size: 0.75rem; text-align: center; padding: 20px 8px; }
+
+.scroll-panel { max-height: 360px; overflow-y: auto; scrollbar-color: var(--color-border-strong) transparent; scrollbar-width: thin; }
+.scroll-panel table { margin-top: 0 !important; }
+.scroll-panel thead th { position: sticky; top: 0; z-index: 1; background: var(--color-bg-surface); }

@@ -1,0 +1,218 @@
+/* HT Restaurant Erode — customer landing page ("Open Kitchen" layout).
+   Loaded only by Views/Home/Index, on top of customer.css (tokens, header, footer, buttons).
+   Brand carried over from the Daily Card system: Archivo / Archivo Expanded, turmeric accent, ink black. */
+
+body.landing { background: var(--lp-ink); }
+
+.lp-wrap { max-width: var(--lp-wrap); margin: 0 auto; padding-inline: var(--lp-gutter); }
+
+/* ---------- Header: floats transparent over the hero (shared header styles live in customer.css) ---------- */
+.landing .site-header { position: absolute; inset: 0 0 auto 0; background: transparent; border-bottom: 0; }
+.landing .site-header .bar { height: 76px; }
+.landing .mobile-nav { background: rgba(16, 13, 9, .96); }
+
+/* ---------- Buttons ---------- */
+.lp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 0 24px;
+  border: 1px solid transparent; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  cursor: pointer; transition: background-color 160ms, color 160ms, border-color 160ms, transform 160ms;
+}
+.lp-btn:active { transform: translateY(1px); }
+.lp-btn--solid { background: #fff; color: var(--lp-ink); }
+.lp-btn--solid:hover { background: var(--lp-turmeric); }
+.lp-btn--line { border-color: rgba(255, 255, 255, .55); color: #fff; }
+.lp-btn--line:hover { background: #fff; color: var(--lp-ink); border-color: #fff; }
+.lp-btn--ink { background: var(--lp-ink); color: #fff; }
+.lp-btn--ink:hover { background: var(--lp-olive); }
+.lp-btn--block { width: 100%; }
+.lp-link { display: inline-flex; align-items: center; gap: 8px; font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border-bottom: 1px solid currentColor; padding-bottom: 3px; transition: gap 160ms; }
+.lp-link:hover { gap: 14px; }
+
+/* ---------- 1. Hero ---------- */
+.lp-hero { position: relative; isolation: isolate; display: flex; align-items: center; min-height: min(88vh, 860px); padding: 130px 0 56px; color: #fff; background: var(--lp-ink); overflow: hidden; }
+.lp-hero__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.lp-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background:
+  linear-gradient(90deg, rgba(16, 13, 9, .82) 0%, rgba(16, 13, 9, .35) 55%, rgba(16, 13, 9, .1) 100%),
+  linear-gradient(180deg, rgba(16, 13, 9, .6) 0%, rgba(16, 13, 9, 0) 28%, rgba(16, 13, 9, .7) 100%); }
+.lp-crumb { display: flex; align-items: center; gap: 10px; margin: 0; font-size: .6875rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.lp-crumb .dot { width: 8px; height: 8px; border-radius: 50%; background: #4e9a5f; box-shadow: 0 0 0 4px rgba(78, 154, 95, .25); }
+.lp-hero h1 { margin: 20px 0 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.9rem, 7.4vw, 6.25rem); line-height: .96; letter-spacing: -.02em; text-transform: uppercase; text-wrap: balance; }
+.lp-hero h1 span { color: var(--lp-turmeric); }
+.lp-hero__lede { max-width: 30rem; margin: 22px 0 0; font-size: clamp(1rem, 1.5vw, 1.125rem); line-height: 1.55; color: rgba(255, 255, 255, .88); text-wrap: pretty; }
+.lp-hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.lp-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 30rem; margin: 44px 0 0; padding-top: 22px; border-top: 1px solid var(--lp-line-light); }
+.lp-facts dt { font-size: .6875rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--lp-turmeric); }
+.lp-facts dd { margin: 6px 0 0; font-size: .9375rem; color: #fff; }
+
+/* ---------- 2. Today's menu carousel (paper) ---------- */
+.lp-paper { background: var(--lp-paper); color: var(--lp-ink); }
+.lp-paper .text-muted { color: #6b6253; }
+.lp-menu { padding: clamp(56px, 8vw, 112px) 0 clamp(48px, 6vw, 88px); }
+.lp-menu__head { display: grid; gap: 20px; align-items: start; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .lp-menu__head { grid-template-columns: 1fr 1fr; gap: 64px; } }
+.lp-h2 { margin: 0; font-family: var(--font-sans); font-weight: 500; font-size: clamp(1.875rem, 3.6vw, 3rem); line-height: 1.08; letter-spacing: -.025em; text-wrap: balance; }
+.lp-menu__head p { margin: 0 0 18px; max-width: 30rem; font-size: 1.0625rem; line-height: 1.55; color: #3c352a; text-wrap: pretty; }
+
+.lp-carousel { margin-top: clamp(32px, 5vw, 64px); }
+.lp-track { display: flex; gap: 20px; margin: 0; padding: 0 0 4px; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.lp-track::-webkit-scrollbar { display: none; }
+.lp-dish { flex: 0 0 clamp(272px, 44%, 560px); scroll-snap-align: start; display: flex; flex-direction: column; }
+.lp-dish__photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--lp-paper-deep); }
+.lp-dish__photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms cubic-bezier(.2, .7, .2, 1); }
+.lp-dish:hover .lp-dish__photo img { transform: scale(1.04); }
+.lp-dish__photo span { position: absolute; inset: 0; display: grid; place-items: center; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: #6b6253; }
+.lp-dish__row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.lp-dish__name { margin: 0; font-size: .8125rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.lp-dish__price { font-size: 1.125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.lp-dish__desc { margin: 8px 0 0; font-size: .9375rem; line-height: 1.5; color: #3c352a; text-wrap: pretty; }
+.lp-dish form { margin-top: auto; padding-top: 16px; }
+
+.lp-carousel__ctl { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 20px; font-size: .75rem; font-weight: 600; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.lp-carousel__ctl button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--lp-line-dark); background: transparent; color: var(--lp-ink); cursor: pointer; transition: transform 160ms var(--ease-out), background-color 160ms, color 160ms, opacity 160ms; }
+.lp-carousel__ctl button:hover:not(:disabled) { background: var(--lp-ink); color: #fff; }
+.lp-carousel__ctl button:disabled { opacity: .3; cursor: default; }
+
+/* ---------- 3. Three ways to order (olive) ---------- */
+.lp-ways { background: var(--lp-olive); color: #fffaf0; padding: clamp(64px, 9vw, 128px) 0; }
+.lp-ways__head { max-width: 40rem; margin: 0 auto; text-align: center; }
+.lp-ways__head .lp-h2 { font-weight: 600; }
+.lp-ways__head p { margin: 18px auto 0; max-width: 32rem; font-size: 1rem; line-height: 1.55; opacity: .92; text-wrap: pretty; }
+.lp-steps { display: grid; gap: clamp(48px, 7vw, 96px); margin: clamp(48px, 7vw, 96px) 0 0; padding: 0; list-style: none; }
+.lp-step { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: center; }
+.lp-step__body { grid-column: 1 / -1; }
+.lp-step__no { display: none; font-family: var(--font-display); font-weight: 800; font-size: clamp(5rem, 13vw, 11rem); line-height: .8; color: transparent; -webkit-text-stroke: 1px rgba(255, 250, 240, .38); user-select: none; }
+.lp-step h3 { margin: 0; font-family: var(--font-sans); font-weight: 500; font-size: clamp(1.75rem, 3vw, 2.5rem); line-height: 1.08; letter-spacing: -.02em; }
+.lp-step p { margin: 14px 0 22px; max-width: 26rem; font-size: 1rem; line-height: 1.55; opacity: .94; text-wrap: pretty; }
+.lp-step .lp-link { color: #fffaf0; }
+@media (min-width: 900px) {
+  .lp-step__body { grid-column: 2 / span 5; }
+  .lp-step__no { display: block; grid-column: 8 / span 4; grid-row: 1; justify-self: end; }
+  .lp-step:nth-child(even) .lp-step__body { grid-column: 7 / span 5; }
+  .lp-step:nth-child(even) .lp-step__no { grid-column: 2 / span 4; justify-self: start; }
+}
+
+/* ---------- 4. Dining companions (paper) ---------- */
+.lp-story { padding: clamp(56px, 8vw, 112px) 0; }
+.lp-story__grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) { .lp-story__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 96px); } }
+.lp-story__copy p { margin: 18px 0 0; max-width: 30rem; font-size: 1.0625rem; line-height: 1.6; color: #3c352a; text-wrap: pretty; }
+.lp-story__copy .lp-link { margin-top: 28px; }
+.lp-frame { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 2vw, 24px); padding: clamp(20px, 3vw, 44px) clamp(20px, 3.4vw, 56px); background: var(--lp-paper-deep); border-inline: 8px solid var(--lp-rust); }
+.lp-frame figure { margin: 0; }
+.lp-frame__img { aspect-ratio: 4 / 5; overflow: hidden; background: #e6d9c0; }
+.lp-frame__img img { width: 100%; height: 100%; object-fit: cover; }
+.lp-frame figcaption { margin-top: 12px; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.lp-frame--single { grid-template-columns: 1fr; }
+.lp-frame--single .lp-frame__img { aspect-ratio: 4 / 3; }
+
+/* ---------- 5. FAQ + closing CTA (black) ---------- */
+.lp-faq { background: #000; color: #fff; padding: clamp(64px, 9vw, 128px) 0 clamp(48px, 6vw, 88px); }
+.lp-faq .lp-h2 { text-align: center; font-weight: 600; }
+.lp-faq__list { max-width: 44rem; margin: clamp(32px, 5vw, 56px) auto 0; }
+.lp-faq details { border-bottom: 1px solid var(--lp-line-light); }
+.lp-faq details:first-child { border-top: 1px solid var(--lp-line-light); }
+.lp-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 60px; padding: 14px 0; list-style: none; cursor: pointer; font-size: .9375rem; font-weight: 600; }
+.lp-faq summary::-webkit-details-marker { display: none; }
+.lp-faq summary::after { content: "+"; flex: none; font-size: 1.375rem; font-weight: 400; line-height: 1; color: var(--lp-turmeric); transition: transform 250ms var(--ease-out); }
+.lp-faq details[open] summary::after { transform: rotate(45deg); }
+.lp-faq summary:hover { color: var(--lp-turmeric); }
+.lp-faq details p { margin: 0; padding: 0 40px 22px 0; font-size: .9375rem; line-height: 1.6; color: rgba(255, 255, 255, .78); text-wrap: pretty; }
+.lp-faq details a { color: var(--lp-turmeric); text-decoration: underline; text-underline-offset: 3px; }
+.lp-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px; max-width: 64rem; margin: clamp(56px, 8vw, 104px) auto 0; padding-top: clamp(32px, 4vw, 48px); border-top: 1px solid var(--lp-line-light); }
+.lp-cta h2 { margin: 0; max-width: 32rem; font-family: var(--font-sans); font-weight: 500; font-size: clamp(1.5rem, 2.6vw, 2.125rem); line-height: 1.15; letter-spacing: -.02em; text-wrap: balance; }
+.lp-cta h2 span { color: var(--lp-turmeric); }
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .lp-dish__photo img, .lp-btn, .lp-link, .lp-faq summary::after { transition: none; }
+  .lp-track { scroll-behavior: auto; }
+}
+@media (prefers-reduced-motion: no-preference) { .lp-track { scroll-behavior: smooth; } }
+
+@media (max-width: 560px) {
+  .lp-hero { min-height: 0; padding: 112px 0 40px; }
+  .lp-hero__cta .lp-btn { flex: 1 1 100%; }
+  .lp-facts { grid-template-columns: 1fr; gap: 16px; }
+  .lp-dish { flex-basis: 84%; }
+  .lp-frame { border-inline-width: 6px; }
+  .lp-cta .lp-btn { width: 100%; }
+}
+
+/* headings sit on dark or paper bands here: take the band colour instead of the theme text token */
+.lp-hero h1, .lp-h2, .lp-step h3, .lp-cta h2, .lp-dish__name { color: inherit; }
+
+/* =====================================================================
+   Motion. Tokens come from customer.css. Animate transform + opacity only.
+   ===================================================================== */
+
+/* FAQ: the answer opens with the icon instead of snapping (progressive: older browsers keep the snap). */
+.lp-faq details { interpolate-size: allow-keywords; }
+.lp-faq details::details-content {
+  height: 0; opacity: 0; overflow: clip;
+  transition: height 250ms var(--ease-out), opacity 200ms var(--ease-out), content-visibility 250ms allow-discrete;
+}
+.lp-faq details[open]::details-content { height: auto; opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-faq details::details-content { height: auto; transition: opacity 200ms ease, content-visibility 200ms allow-discrete; }
+}
+
+/* =====================================================================
+   Awwwards pass — "The Pass". GSAP owns the hero and section motion (wwwroot/js/landing.js);
+   this file only supplies the layout and the pre-animation states, applied under .js-motion.
+   ===================================================================== */
+
+/* Lenis (sole smooth-scroll engine) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Pre-animation states: only while motion is allowed and the script is alive */
+.js-motion [data-hero]:not(.is-in), .js-motion [data-reveal]:not(.is-in) { opacity: 0; }
+.js-motion [data-split]:not(.is-split) { visibility: hidden; }
+.js-motion .lp-frame__img:not(.is-in) { clip-path: inset(0 0 100% 0); }
+
+/* Split words: each word sits in a mask and rises out of it */
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 .04em .12em 0; margin: 0 -.04em -.12em 0; }
+.w-i { display: inline-block; will-change: transform; }
+
+/* Hero: taller photo layer so drift and pointer parallax never expose an edge */
+.lp-hero__img { top: -8%; bottom: auto; height: 116%; transform: scale(1.06); animation: none; }
+.lp-hero__glow {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(36rem circle at var(--mx, 72%) var(--my, 38%), rgba(232, 179, 60, .2), transparent 60%);
+}
+.lp-hero__wrap { position: relative; z-index: 1; width: 100%; }
+.lp-hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: end; }
+@media (min-width: 1000px) { .lp-hero__grid { grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: clamp(32px, 6vw, 96px); } }
+.lp-hero h1 span { display: inline; }
+
+/* The kitchen ticket */
+.lp-ticket { position: relative; max-width: 420px; transform: rotate(-2.2deg); filter: drop-shadow(0 26px 28px rgba(0, 0, 0, .45)); }
+.lp-ticket__paper {
+  padding: 22px 24px 40px; background: var(--lp-paper); color: var(--lp-ink);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), 95% 100%, 90% calc(100% - 9px), 85% 100%, 80% calc(100% - 9px), 75% 100%, 70% calc(100% - 9px), 65% 100%, 60% calc(100% - 9px), 55% 100%, 50% calc(100% - 9px), 45% 100%, 40% calc(100% - 9px), 35% 100%, 30% calc(100% - 9px), 25% 100%, 20% calc(100% - 9px), 15% 100%, 10% calc(100% - 9px), 5% 100%, 0 calc(100% - 9px));
+}
+.lp-ticket__head { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding-bottom: 12px; border-bottom: 1px dashed rgba(16, 13, 9, .4); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.lp-ticket__list { list-style: none; margin: 0; padding: 14px 0 18px; display: grid; gap: 10px; }
+.lp-ticket__list li { display: flex; align-items: baseline; gap: 8px; font-size: .9375rem; font-weight: 500; }
+.lp-ticket__list i { flex: 1; min-width: 12px; border-bottom: 1px dotted rgba(16, 13, 9, .45); transform: translateY(-3px); }
+.lp-ticket__list li span:last-child { font-weight: 700; }
+.lp-ticket .lp-link { color: var(--lp-ink); }
+@media (max-width: 999px) { .lp-ticket { transform: rotate(-1deg); max-width: 380px; } }
+
+/* Menu board: names from today's card, outlined type on ink */
+.lp-marquee { overflow: hidden; background: var(--lp-ink); border-block: 1px solid var(--lp-line-light); padding: clamp(16px, 2.4vw, 28px) 0; }
+.lp-marquee__track { display: flex; width: max-content; }
+.lp-marquee__group { display: flex; flex: none; }
+.lp-marquee__item {
+  display: inline-flex; align-items: center; flex: none; padding-right: clamp(28px, 4vw, 56px);
+  font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; white-space: nowrap;
+  font-size: clamp(1.75rem, 4.6vw, 3.75rem); line-height: 1; color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, .55);
+}
+.lp-marquee__item::after { content: ""; width: .28em; height: .28em; margin-left: clamp(28px, 4vw, 56px); border-radius: 50%; background: var(--lp-turmeric); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-hero__img { transform: scale(1.06); }
+  .lp-faq details::details-content { height: auto; transition: opacity 200ms ease, content-visibility 200ms allow-discrete; }
+}
