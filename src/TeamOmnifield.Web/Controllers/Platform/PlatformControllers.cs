@@ -42,6 +42,18 @@ public class OnboardingController : Controller
     {
         if (!ModelState.IsValid) return View(model);
 
+        var domain = model.Domain.Trim().ToLowerInvariant();
+        var adminDomain = model.AdminDomain.Trim().ToLowerInvariant();
+        var clients = DemoClientStore.All();
+
+        bool InUse(string host) => clients.Any(x =>
+            x.Domain.Equals(host, StringComparison.OrdinalIgnoreCase) ||
+            x.ResolvedAdminDomain.Equals(host, StringComparison.OrdinalIgnoreCase));
+
+        if (InUse(domain)) ModelState.AddModelError(nameof(model.Domain), "This name already exist please enter different name");
+        if (InUse(adminDomain)) ModelState.AddModelError(nameof(model.AdminDomain), "This name already exist please enter different name");
+        if (!ModelState.IsValid) return View(model);
+
         var client = DemoClientStore.Add(
             model.Name.Trim(),
             (model.City ?? string.Empty).Trim(),
