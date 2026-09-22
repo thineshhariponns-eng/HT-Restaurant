@@ -19,6 +19,12 @@ public class ProductsController(AppDbContext db) : Controller
     public async Task<IActionResult> Create(ProductEditViewModel model)
     {
         if (!ModelState.IsValid) { ViewBag.Categories = await Categories(); return View("Edit", model); }
+        if (await db.Products.AnyAsync(x => x.Name.ToLower() == model.Name.Trim().ToLower()))
+        {
+            ModelState.AddModelError(nameof(model.Name), "This product already added.");
+            ViewBag.Categories = await Categories();
+            return View("Edit", model);
+        }
         db.Products.Add(new Product { Name = model.Name.Trim(), Description = model.Description.Trim(), Price = model.Price, ImageUrl = model.ImageUrl.Trim(), CategoryId = model.CategoryId, IsAvailable = model.IsAvailable });
         await db.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
@@ -37,6 +43,12 @@ public class ProductsController(AppDbContext db) : Controller
     public async Task<IActionResult> Edit(ProductEditViewModel model)
     {
         if (!ModelState.IsValid) { ViewBag.Categories = await Categories(); return View(model); }
+        if (await db.Products.AnyAsync(x => x.Id != model.Id && x.Name.ToLower() == model.Name.Trim().ToLower()))
+        {
+            ModelState.AddModelError(nameof(model.Name), "This product already added.");
+            ViewBag.Categories = await Categories();
+            return View(model);
+        }
         var p = await db.Products.FindAsync(model.Id);
         if (p is null) return NotFound();
         p.Name = model.Name.Trim(); p.Description = model.Description.Trim(); p.Price = model.Price; p.ImageUrl = model.ImageUrl.Trim(); p.CategoryId = model.CategoryId; p.IsAvailable = model.IsAvailable; p.UpdatedUtc = DateTime.UtcNow;

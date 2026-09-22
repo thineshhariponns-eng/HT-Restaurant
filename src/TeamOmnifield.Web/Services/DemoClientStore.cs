@@ -33,32 +33,9 @@ public static class DemoClientStore
 {
     private static readonly Lock Gate = new();
 
-    private static readonly List<DemoClient> Clients =
-    [
-        new() { Id = "c-1", Code = "CL-001", Name = "HT Restaurant", City = "Erode", Contact = "Admin", ContactEmail = "admin@htrestaurant.com", Domain = "htrestaurant.com", Stage = ClientStage.Production, Progress = 100, CreatedUtc = new DateTime(2026, 9, 10), UpdatedUtc = new DateTime(2026, 9, 16) },
-        new() { Id = "c-2", Code = "CL-002", Name = "Spice Garden", City = "Salem", Contact = "Meena R", ContactEmail = "meena@spicegarden.com", Domain = "spicegarden.com", Stage = ClientStage.Onboarding, Progress = 45, CreatedUtc = new DateTime(2026, 9, 11), UpdatedUtc = new DateTime(2026, 9, 16) },
-        new() { Id = "c-3", Code = "CL-003", Name = "Coastal Bites", City = "Kochi", Contact = "Anand P", ContactEmail = "anand@coastalbites.com", Domain = "coastalbites.com", Stage = ClientStage.Development, Progress = 70, CreatedUtc = new DateTime(2026, 9, 5), UpdatedUtc = new DateTime(2026, 9, 15) },
-        new() { Id = "c-4", Code = "CL-004", Name = "Urban Tiffin", City = "Coimbatore", Contact = "Vikram S", ContactEmail = "vikram@urbantiffin.com", Domain = "urbantiffin.com", Stage = ClientStage.Development, Progress = 60, CreatedUtc = new DateTime(2026, 9, 4), UpdatedUtc = new DateTime(2026, 9, 15) },
-        new() { Id = "c-5", Code = "CL-005", Name = "Royal Curry", City = "Madurai", Contact = "Fathima N", ContactEmail = "fathima@royalcurry.com", Domain = "royalcurry.com", Stage = ClientStage.Review, Progress = 85, CreatedUtc = new DateTime(2026, 8, 28), UpdatedUtc = new DateTime(2026, 9, 12) },
-        new() { Id = "c-6", Code = "CL-006", Name = "Green Leaf Cafe", City = "Tiruppur", Contact = "Joseph K", ContactEmail = "joseph@greenleafcafe.com", Domain = "greenleafcafe.com", Stage = ClientStage.New, Progress = 10, CreatedUtc = new DateTime(2026, 9, 9), UpdatedUtc = new DateTime(2026, 9, 10) },
-        new() { Id = "c-7", Code = "CL-007", Name = "Biryani House", City = "Hyderabad", Contact = "Imran S", ContactEmail = "imran@biryanihouse.com", Domain = "biryanihouse.com", AdminDomain = "admin.biryanihouse.com", Stage = ClientStage.Production, Progress = 100, CreatedUtc = new DateTime(2026, 8, 20), UpdatedUtc = new DateTime(2026, 9, 8) },
-        new() { Id = "c-8", Code = "CL-008", Name = "Dosa Corner", City = "Chennai", Contact = "Lakshmi V", ContactEmail = "lakshmi@dosacorner.com", Domain = "dosacorner.com", Stage = ClientStage.Review, Progress = 90, CreatedUtc = new DateTime(2026, 8, 25), UpdatedUtc = new DateTime(2026, 9, 14) },
-        new() { Id = "c-9", Code = "CL-009", Name = "Pizza Junction", City = "Bengaluru", Contact = "Rohan M", ContactEmail = "rohan@pizzajunction.com", Domain = "pizzajunction.com", Stage = ClientStage.Development, Progress = 55, CreatedUtc = new DateTime(2026, 9, 2), UpdatedUtc = new DateTime(2026, 9, 14) },
-        new() { Id = "c-10", Code = "CL-010", Name = "Tandoor Nights", City = "Pune", Contact = "Simran K", ContactEmail = "simran@tandoornights.com", Domain = "tandoornights.com", Stage = ClientStage.Onboarding, Progress = 30, CreatedUtc = new DateTime(2026, 9, 12), UpdatedUtc = new DateTime(2026, 9, 15) },
-        new() { Id = "c-11", Code = "CL-011", Name = "Sweet Bakes", City = "Mysuru", Contact = "Divya R", ContactEmail = "divya@sweetbakes.com", Domain = "sweetbakes.com", Stage = ClientStage.New, Progress = 10, CreatedUtc = new DateTime(2026, 9, 13), UpdatedUtc = new DateTime(2026, 9, 13) },
-        new() { Id = "c-12", Code = "CL-012", Name = "Wok Express", City = "Trichy", Contact = "Arun T", ContactEmail = "arun@wokexpress.com", Domain = "wokexpress.com", Stage = ClientStage.Development, Progress = 65, CreatedUtc = new DateTime(2026, 9, 1), UpdatedUtc = new DateTime(2026, 9, 16) },
-    ];
+    private static readonly List<DemoClient> Clients = [];
 
-    private static readonly List<ActivityEntry> Activity =
-    [
-        new("21:40", "Wok Express", "Menu import started"),
-        new("21:22", "Dosa Corner", "Sent to Review"),
-        new("21:05", "Spice Garden", "Admin hostname configured"),
-        new("20:42", "Coastal Bites", "Moved to Development"),
-        new("19:30", "HT Restaurant", "Onboarding completed"),
-        new("18:12", "Urban Tiffin", "Menu import reviewed"),
-        new("17:04", "Royal Curry", "Sent to Review"),
-    ];
+    private static readonly List<ActivityEntry> Activity = [];
 
     /// <summary>The delivery pipeline, in order. Drives the board and the checklist.</summary>
     public static readonly ClientStage[] Pipeline =
