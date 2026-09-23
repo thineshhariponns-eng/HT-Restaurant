@@ -56,6 +56,55 @@
     // Click on the backdrop (the dialog element itself, outside its panel content) closes it.
     listen(dialog, 'click', function (e) { if (e.target === dialog) dialog.close(); });
     listen(dialog, 'close', function () { if (lenis) lenis.start(); });
+
+    // City search: filters the list as you type.
+    var search = dialog.querySelector('[data-city-search]');
+    var cityItems = Array.prototype.slice.call(dialog.querySelectorAll('[data-city]'));
+    var emptyMsg = dialog.querySelector('[data-city-empty]');
+    var statusEl = dialog.querySelector('[data-city-status]');
+    if (search) {
+      listen(search, 'input', function () {
+        var q = search.value.trim().toLowerCase();
+        var shown = 0;
+        cityItems.forEach(function (li) {
+          var match = !q || li.getAttribute('data-name').toLowerCase().indexOf(q) !== -1;
+          li.hidden = !match;
+          if (match) shown++;
+        });
+        if (emptyMsg) emptyMsg.hidden = shown > 0;
+      });
+    }
+    listen(dialog, 'close', function () {
+      if (search) { search.value = ''; search.dispatchEvent(new Event('input')); }
+      if (statusEl) statusEl.textContent = '';
+      cityItems.forEach(function (li) { li.classList.remove('is-nearest'); });
+    });
+
+    // Detect my location: highlight the nearest city (straight-line distance). Nothing leaves the browser.
+    var detect = dialog.querySelector('[data-city-detect]');
+    if (detect) {
+      listen(detect, 'click', function () {
+        if (!navigator.geolocation) { statusEl.textContent = 'Location is not available in this browser. Search for your city instead.'; return; }
+        detect.disabled = true;
+        statusEl.textContent = 'Finding your location...';
+        navigator.geolocation.getCurrentPosition(function (pos) {
+          detect.disabled = false;
+          var rad = Math.PI / 180, best = null, bestKm = Infinity;
+          cityItems.forEach(function (li) {
+            var lat = parseFloat(li.getAttribute('data-lat')), lon = parseFloat(li.getAttribute('data-lon'));
+            var dLat = (lat - pos.coords.latitude) * rad, dLon = (lon - pos.coords.longitude) * rad;
+            var h = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(pos.coords.latitude * rad) * Math.cos(lat * rad) * Math.pow(Math.sin(dLon / 2), 2);
+            var km = 12742 * Math.asin(Math.sqrt(h));
+            if (km < bestKm) { bestKm = km; best = li; }
+          });
+          cityItems.forEach(function (li) { li.classList.toggle('is-nearest', li === best); });
+          if (best) statusEl.textContent = 'Nearest city: ' + best.getAttribute('data-name') + '.';
+        }, function () {
+          detect.disabled = false;
+          statusEl.textContent = 'We could not get your location. Search for your city instead.';
+        }, { timeout: 10000, maximumAge: 300000 });
+      });
+    }
   }
 
   /* ---------- Animation layer ---------- */
