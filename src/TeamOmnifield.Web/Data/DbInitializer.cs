@@ -105,7 +105,7 @@ public static class DbInitializer
         new("Starters", "Prawn 65", "Crispy, spicy South Indian prawn starter.", 200),
         new("Starters", "Chilli Chicken", "Indo-Chinese stir-fried chicken with peppers and spicy sauce.", 170),
         new("Starters", "Chicken Lollipop", "Frenched chicken wings tossed in a spicy coating.", 180),
-        new("Starters", "Grilled Chicken", "Marinated chicken grilled to perfection.", 500),
+        new("Starters", "Grill Chicken", "Marinated chicken grilled to perfection.", 500),
         new("Starters", "Fish Fry", "Crisp, spice-marinated fried fish fillets.", 190),
         new("Starters", "Paneer Tikka", "Char-grilled marinated paneer cubes with peppers and onions.", 160),
         new("Starters", "Gobi Manchurian", "Crispy cauliflower florets tossed in a tangy Manchurian sauce.", 130),
@@ -131,8 +131,7 @@ public static class DbInitializer
         new("Desserts", "Gulab Jamun", "Sweet Indian dessert made of milk solids.", 80),
         new("Desserts", "Rasmalai", "Soft paneer discs soaked in sweetened, cardamom-flavoured milk.", 90),
         new("Desserts", "Kesari", "Saffron-flavoured semolina sweet garnished with cashews.", 60),
-        new("Desserts", "Vanilla Ice Cream", "Classic creamy vanilla ice cream scoop.", 70),
-        new("Desserts", "Double Ka Meetha", "Fried bread pudding soaked in sweetened saffron milk.", 90)
+        new("Desserts", "Vanilla Ice Cream", "Classic creamy vanilla ice cream scoop.", 70)
     };
 
     private static readonly Dictionary<string, string> ProductImages = new()
@@ -165,7 +164,7 @@ public static class DbInitializer
         ["Tea"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSck0R1QadchlbSdfFbDk0DsOEJKV8VuCD3ltycnyLbig&s",
         ["Coffee"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwc45iPOVXL-gxnCBA-XUX00HdDlhOix0RxwpzNRBzBw&s=10",
         ["Cold Coffee"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKCZvaMBWO4UTxeLmHt8YbmEwCvRItWcwQPtYaNLuH8g&s=10",
-        ["Orange Juice"] = "https://i.pinimg.com/236x/de/dc/d1/dedcd1e470073b5dc8cdf76f73974da7.jpg",
+        ["Orange Juice"] = "https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         ["Apple Juice"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlfuTQXtqrg7n5udBD81Wg8nhtKyp8b8IPrzp2-DYSNg&s=10",
         ["Mango Juice"] = "https://i.pinimg.com/474x/10/06/d9/1006d93ae757a062819c413b7af49805.jpg?nii=t",
         ["Pineapple Juice"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZQjzeZ9EWgOKX5E14bOyG0_MXGzoL0TvREiyLi-2M7A&s=10",
