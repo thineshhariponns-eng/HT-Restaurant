@@ -1,0 +1,87 @@
+@{
+    // Shared shell for the brand pages served on htrestaurant.com ("/" and "/about"): navbar, footer,
+    // the Locations pop-up and the motion scripts. The ordering storefront keeps its own _Layout.
+    const string orderUrl = "/chennai";
+    var current = ViewData["Current"] as string ?? "";
+    var title = ViewData["Title"] as string ?? "HT Restaurant";
+    var description = ViewData["Description"] as string ?? "HT Restaurant serves home-style Indian cooking. Find your nearest kitchen and order for pickup or delivery.";
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title</title>
+    <meta name="description" content="@description" />
+    <meta name="theme-color" content="#fbf1da" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap" />
+    <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
+    <script>
+        (function () {
+            var d = document.documentElement;
+            d.classList.add('js');
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            d.classList.add('js-motion');
+            // Safety net: if the motion script never reports in, show the final state.
+            setTimeout(function () { if (!window.__ptMotion) d.classList.remove('js-motion'); }, 3000);
+        })();
+    </script>
+</head>
+<body class="pt">
+<a class="pt-skip" href="#main">Skip to content</a>
+
+<header class="pt-header" data-header>
+    <a class="pt-brand" href="/" data-nav-link aria-label="HT Restaurant, home">
+        <span class="pt-brand__mark" aria-hidden="true">HT</span>
+        <span class="pt-brand__name">HT Restaurant</span>
+    </a>
+    <button type="button" class="pt-toggle" data-nav-toggle aria-expanded="false" aria-controls="ptNav" aria-label="Menu">
+        <span class="pt-toggle__bars" aria-hidden="true"></span>
+    </button>
+    <nav id="ptNav" class="pt-nav" aria-label="Primary" data-nav>
+        <a href="/" data-nav-link aria-current="@(current == "home" ? "page" : null)">Home</a>
+        <a href="/about" data-nav-link aria-current="@(current == "about" ? "page" : null)">About</a>
+        <button type="button" data-locations-open aria-haspopup="dialog">Locations</button>
+    </nav>
+</header>
+
+<main id="main">
+    @RenderBody()
+</main>
+
+<footer class="pt-footer">
+    <div class="pt-wrap pt-footer__grid">
+        <a class="pt-brand pt-brand--light" href="/" data-nav-link aria-label="HT Restaurant, back to top">
+            <span class="pt-brand__mark" aria-hidden="true">HT</span>
+            <span class="pt-brand__name">HT Restaurant</span>
+        </a>
+        <nav class="pt-footer__nav" aria-label="Footer">
+            <a href="/" data-nav-link>Home</a>
+            <a href="/about" data-nav-link>About</a>
+            <button type="button" data-locations-open aria-haspopup="dialog">Locations</button>
+            <a href="@orderUrl">Order online</a>
+        </nav>
+    </div>
+    <div class="pt-wrap pt-footer__legal">&copy; @DateTime.Now.Year HT Restaurant &middot; Powered by TeamOmnifield</div>
+</footer>
+
+<!-- Locations pop-up: shell only, content to be added later. -->
+<dialog class="pt-dialog" id="ptLocations" aria-labelledby="ptLocationsTitle" data-locations data-lenis-prevent>
+    <div class="pt-dialog__bar">
+        <h2 id="ptLocationsTitle">Locations</h2>
+        <button type="button" class="pt-dialog__close" data-locations-close aria-label="Close locations">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+    </div>
+    <div class="pt-dialog__body" data-locations-body></div>
+</dialog>
+
+<script src="~/lib/gsap.min.js" asp-append-version="true"></script>
+<script src="~/lib/ScrollTrigger.min.js" asp-append-version="true"></script>
+<script src="~/lib/lenis.min.js" asp-append-version="true"></script>
+<script src="~/js/portal.js" asp-append-version="true"></script>
+</body>
+</html>
