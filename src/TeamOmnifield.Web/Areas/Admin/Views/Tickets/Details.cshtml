@@ -1,0 +1,56 @@
+@model DemoTicket
+@{
+    ViewData["Title"] = $"#{Model.Number} {Model.Title}";
+    string When(DateTime utc) => utc.ToLocalTime().ToString("d MMM yyyy, HH:mm");
+}
+<div class="container admin-pad" style="max-width:860px">
+    <p style="font-size:0.875rem">
+        <a asp-area="Admin" asp-controller="Tickets" asp-action="Index" class="text-muted">&larr; Tickets</a>
+    </p>
+
+    <header class="page-heading" style="margin-top:12px">
+        <h1>@Model.Title <span class="text-muted tabular">#@Model.Number</span></h1>
+        <span class="status-pill">
+            <span class="dot @(Model.IsOpen ? "dot-done" : "stage-dot-review")"></span>
+            @(Model.IsOpen ? "Open" : "Closed")
+        </span>
+    </header>
+
+    <ol class="thread">
+        @for (var i = 0; i < Model.Thread.Count; i++)
+        {
+            var entry = Model.Thread[i];
+            if (entry.Event is not null)
+            {
+                <li class="event"><strong>@entry.Author</strong> @entry.Event &middot; @When(entry.PostedUtc)</li>
+            }
+            else if (i > 0 || entry.Body.Length > 0)
+            {
+                <li>
+                    <div class="head"><strong>@entry.Author</strong> @(i == 0 ? "raised this ticket" : "commented") &middot; @When(entry.PostedUtc)</div>
+                    <div class="body md" data-md>@entry.Body</div>
+                </li>
+            }
+            else
+            {
+                <li class="event"><strong>@entry.Author</strong> raised this ticket &middot; @When(entry.PostedUtc)</li>
+            }
+        }
+    </ol>
+
+    <form method="post" asp-area="Admin" asp-controller="Tickets" asp-action="Comment" asp-route-number="@Model.Number" style="margin-top:8px">
+        <h2 class="title" style="font-size:1rem;margin-bottom:12px">Add a comment</h2>
+        <partial name="_Composer" model="@("body")" />
+        <div class="composer-actions">
+            @if (Model.IsOpen)
+            {
+                <button type="submit" name="action" value="close" class="btn btn-secondary">Close ticket</button>
+            }
+            else
+            {
+                <button type="submit" name="action" value="reopen" class="btn btn-secondary">Reopen ticket</button>
+            }
+            <button type="submit" name="action" value="comment" class="btn btn-primary">Comment</button>
+        </div>
+    </form>
+</div>

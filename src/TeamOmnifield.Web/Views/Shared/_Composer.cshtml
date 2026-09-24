@@ -1,0 +1,23 @@
+@* Write / Preview box with a Markdown toolbar. The model is the textarea's form field name. Behaviour lives in platform.js. *@
+@model string
+<div class="composer" data-composer>
+    <div class="composer-bar">
+        <div class="composer-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected="true" data-tab="write">Write</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="preview">Preview</button>
+        </div>
+        <div class="composer-tools" role="toolbar" aria-label="Formatting">
+            <button type="button" data-fmt="heading" title="Heading" aria-label="Heading">H</button>
+            <button type="button" data-fmt="bold" title="Bold" aria-label="Bold">B</button>
+            <button type="button" data-fmt="italic" title="Italic" aria-label="Italic"><em>I</em></button>
+            <button type="button" data-fmt="quote" title="Quote" aria-label="Quote">&ldquo;</button>
+            <button type="button" data-fmt="code" title="Code" aria-label="Code">&lt;&gt;</button>
+            <button type="button" data-fmt="link" title="Link" aria-label="Link">Link</button>
+            <button type="button" data-fmt="ul" title="Bulleted list" aria-label="Bulleted list">&bull;</button>
+            <button type="button" data-fmt="ol" title="Numbered list" aria-label="Numbered list">1.</button>
+            <button type="button" data-fmt="task" title="Task list" aria-label="Task list">&#9745;</button>
+        </div>
+    </div>
+    <textarea name="@Model" maxlength="@DemoWorkspaceStore.TextMax" placeholder="Use Markdown to format your comment" aria-label="Comment"></textarea>
+    <div class="composer-preview md" hidden></div>
+</div>

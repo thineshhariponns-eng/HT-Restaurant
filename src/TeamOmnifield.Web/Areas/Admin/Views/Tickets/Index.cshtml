@@ -1,0 +1,49 @@
+@model List<DemoTicket>
+@{
+    ViewData["Title"] = "Tickets";
+    var project = (DemoProject)ViewBag.Project;
+    string When(DateTime utc) => utc.ToLocalTime().ToString("d MMM, HH:mm");
+}
+<div class="container admin-pad" style="max-width:860px">
+    <header class="page-heading">
+        <h1>Tickets</h1>
+        <p class="text-muted tabular" style="font-size:0.875rem">@Model.Count(t => t.IsOpen) open &middot; @Model.Count total &middot; sent to the developer team for @project.Name</p>
+    </header>
+
+    <section class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Raise a ticket</h2>
+        <form method="post" asp-area="Admin" asp-controller="Tickets" asp-action="Create" style="margin-top:16px">
+            <div class="field">
+                <label for="ticketTitle">Title</label>
+                <input id="ticketTitle" name="title" maxlength="@DemoWorkspaceStore.TitleMax" placeholder="Short summary of the problem or request" required />
+            </div>
+            <partial name="_Composer" model="@("body")" />
+            <div class="composer-actions">
+                <button type="submit" class="btn btn-primary">Raise ticket</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Your tickets</h2>
+        @if (Model.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">No tickets yet. Raise one above and the developer team will see it straight away.</p>
+        }
+        else
+        {
+            <ul class="feed">
+                @foreach (var ticket in Model)
+                {
+                    <li>
+                        <span class="dot @(ticket.IsOpen ? "dot-done" : "stage-dot-review")" title="@(ticket.IsOpen ? "Open" : "Closed")"></span>
+                        <div style="flex:1;min-width:0">
+                            <a asp-area="Admin" asp-controller="Tickets" asp-action="Details" asp-route-number="@ticket.Number" class="text-primary" style="font-weight:500">@ticket.Title</a>
+                            <p class="text-muted" style="margin:2px 0 0;font-size:0.8125rem">#@ticket.Number &middot; @(ticket.IsOpen ? "open" : "closed") &middot; @ticket.Author &middot; @When(ticket.CreatedUtc) &middot; @(ticket.Thread.Count(t => t.Event is null) - 1) comments</p>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+</div>
