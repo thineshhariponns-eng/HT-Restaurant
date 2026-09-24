@@ -1,0 +1,169 @@
+@model DemoProject
+@{
+    var client = (DemoClient)ViewBag.Client;
+    ViewData["Title"] = $"{Model.Name} · {client.Name}";
+    var tickets = DemoWorkspaceStore.TicketsOf(client.Id, Model.Id);
+    var deployments = DemoWorkspaceStore.DeploymentsOf(Model.Id);
+    var changes = DemoWorkspaceStore.ChangesOf(client.Id, Model.Id);
+    var latest = deployments.FirstOrDefault();
+    var state = latest?.State ?? DeployState.NotDeployed;
+    var openCount = tickets.Count(t => t.IsOpen);
+    string StateDot(DeployState s) => s switch { DeployState.Live => "dot-done", DeployState.Failed => "dot-stopped", _ => "stage-dot-new" };
+    string When(DateTime utc) => utc.ToLocalTime().ToString("d MMM, HH:mm");
+}
+<div class="container admin-pad">
+    <p style="font-size:0.875rem">
+        <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id" class="text-muted">&larr; @client.Name @client.City</a>
+    </p>
+
+    <header class="page-heading" style="margin-top:12px">
+        <h1>@Model.Name</h1>
+        <span class="status-pill">
+            <span class="dot @StateDot(state)"></span>
+            @DemoWorkspaceStore.StateLabel(state)
+        </span>
+    </header>
+
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert-error" role="alert" style="margin-top:20px">@error</div>
+    }
+
+    <nav class="tree summary-panel" aria-label="Project workspace" style="margin-top:24px">
+        <p class="tree-root">@client.Name / @Model.Name</p>
+        <a class="tree-branch" href="#tickets"><span class="tree-name">Tickets</span><span class="tree-count">@tickets.Count<span class="text-muted"> &middot; @openCount open</span></span></a>
+        <a class="tree-branch" href="#deployments"><span class="tree-name">Deployments</span><span class="tree-count">@DemoWorkspaceStore.StateLabel(state).ToLowerInvariant()@(latest is null ? "" : " · " + latest.Version)</span></a>
+        <a class="tree-branch" href="#changes"><span class="tree-name">Changes</span><span class="tree-count">@changes.Count</span></a>
+    </nav>
+
+    <section id="tickets" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Tickets</h2>
+        @if (tickets.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">No tickets for this project yet.</p>
+        }
+        else
+        {
+            <ul class="feed">
+                @foreach (var ticket in tickets)
+                {
+                    <li>
+                        <span class="dot @(ticket.IsOpen ? "dot-done" : "stage-dot-review")" title="@(ticket.IsOpen ? "Open" : "Closed")"></span>
+                        <div style="flex:1;min-width:0">
+                            <a asp-area="Platform" asp-controller="Clients" asp-action="Ticket" asp-route-id="@client.Id" asp-route-number="@ticket.Number" class="text-primary" style="font-weight:500">@ticket.Title</a>
+                            <p class="text-muted" style="margin:2px 0 0;font-size:0.8125rem">#@ticket.Number &middot; @(ticket.IsOpen ? "open" : "closed") &middot; @ticket.Author@(ticket.Source.Length > 0 ? " via " + ticket.Source : "") &middot; @When(ticket.CreatedUtc) &middot; @(ticket.Thread.Count(t => t.Event is null) - 1) comments</p>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+
+        <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="RaiseTicket" asp-route-id="@client.Id" asp-route-projectId="@Model.Id" style="margin-top:24px">
+            <p class="label-caps" style="margin:0 0 12px">Raise a ticket</p>
+            <div class="field">
+                <label for="ticketTitle">Title</label>
+                <input id="ticketTitle" name="title" maxlength="@DemoWorkspaceStore.TitleMax" required />
+            </div>
+            <partial name="_Composer" model="@("body")" />
+            <div class="composer-actions">
+                <button type="submit" class="btn btn-primary">Raise ticket</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="deployments" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Deployments</h2>
+        <dl style="margin:16px 0 0">
+            <div class="summary-row"><dt>Status</dt><dd style="margin:0"><span class="status-inline text-primary"><span class="dot @StateDot(state)"></span>@DemoWorkspaceStore.StateLabel(state)</span></dd></div>
+            <div class="summary-row"><dt>Version</dt><dd class="tabular text-primary" style="margin:0">@(latest?.Version ?? "—")</dd></div>
+            <div class="summary-row"><dt>Last deployed</dt><dd class="tabular text-primary" style="margin:0">@(latest is null ? "—" : When(latest.DeployedUtc))</dd></div>
+        </dl>
+
+        @if (deployments.Count > 0)
+        {
+            <p class="label-caps" style="margin:20px 0 0">History</p>
+            <ul class="feed">
+                @foreach (var dep in deployments)
+                {
+                    <li>
+                        <span class="dot @StateDot(dep.State)"></span>
+                        <div style="flex:1;min-width:0">
+                            <span class="text-body" style="font-size:0.875rem"><strong class="text-primary tabular">@dep.Version</strong> &middot; @DemoWorkspaceStore.StateLabel(dep.State).ToLowerInvariant() &middot; @dep.By &middot; @When(dep.DeployedUtc)</span>
+                            @if (dep.Notes.Length > 0)
+                            {
+                                <p class="text-muted" style="margin:2px 0 0;font-size:0.8125rem">@dep.Notes</p>
+                            }
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+
+        <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="Deploy" asp-route-id="@client.Id" asp-route-projectId="@Model.Id" style="margin-top:24px">
+            <p class="label-caps" style="margin:0 0 12px">Record a deployment</p>
+            <div class="field">
+                <label for="depVersion">Version</label>
+                <input id="depVersion" name="version" maxlength="40" placeholder="v1.0.0" required />
+            </div>
+            <div class="field">
+                <label for="depOutcome">Outcome</label>
+                <select id="depOutcome" name="outcome">
+                    <option value="live">Live</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="depNotes">Notes <span class="text-muted">(optional)</span></label>
+                <input id="depNotes" name="notes" maxlength="500" />
+            </div>
+            <button type="submit" class="btn btn-secondary">Record deployment</button>
+        </form>
+    </section>
+
+    <section id="changes" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Changes</h2>
+        @if (changes.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">No changes logged yet.</p>
+        }
+        else
+        {
+            <div style="overflow-x:auto">
+            <table class="ruled" style="margin-top:16px;border:0;background:transparent;min-width:36rem">
+                <thead><tr><th>Change</th><th>Before</th><th>After</th><th>By</th><th>When</th></tr></thead>
+                <tbody>
+                @foreach (var change in changes)
+                {
+                    <tr>
+                        <td class="text-primary">@change.What</td>
+                        <td class="text-muted">@(change.Before.Length == 0 ? "—" : change.Before)</td>
+                        <td class="text-body">@(change.After.Length == 0 ? "—" : change.After)</td>
+                        <td class="text-body">@change.By</td>
+                        <td class="tabular text-muted">@When(change.ChangedUtc)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        }
+
+        <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="LogChange" asp-route-id="@client.Id" asp-route-projectId="@Model.Id" style="margin-top:24px">
+            <p class="label-caps" style="margin:0 0 12px">Log a change</p>
+            <div class="field">
+                <label for="chWhat">What changed</label>
+                <input id="chWhat" name="what" maxlength="120" placeholder="Header logo" required />
+            </div>
+            <div class="grid grid-2" style="gap:16px">
+                <div class="field">
+                    <label for="chBefore">Before</label>
+                    <input id="chBefore" name="before" maxlength="500" />
+                </div>
+                <div class="field">
+                    <label for="chAfter">After</label>
+                    <input id="chAfter" name="after" maxlength="500" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary">Log change</button>
+        </form>
+    </section>
+</div>

@@ -4,6 +4,8 @@
     var currentController = (string)ViewContext.RouteData.Values["controller"]!;
     bool IsActive(string controller) => string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
     var pendingCount = (await AdminOrderService.GetAdminListAsync(TeamOmnifield.Web.Models.OrderStatus.Pending, null)).Count;
+    var supportSite = TeamOmnifield.Web.Services.DemoWorkspaceStore.ProjectByName(TeamOmnifield.Web.Services.DemoWorkspaceStore.AdminPortalProject);
+    var openTickets = supportSite is null ? 0 : TeamOmnifield.Web.Services.DemoWorkspaceStore.TicketsOf(supportSite.ClientId, supportSite.Id).Count(t => t.IsOpen);
     var city = CityContext.Current;
 }
 <!doctype html>
@@ -35,6 +37,14 @@
                 </a>
                 <p class="label-caps group-label">Catalog</p>
                 <a href="/Admin/Products" class="admin-nav-link @(IsActive("Products") ? "active" : "")">Products</a>
+                <p class="label-caps group-label">Support</p>
+                <a href="/Admin/Tickets" class="admin-nav-link @(IsActive("Tickets") ? "active" : "")">
+                    Raise a ticket
+                    @if (openTickets > 0)
+                    {
+                        <span class="count">@openTickets</span>
+                    }
+                </a>
             </nav>
             <div class="admin-footnote">
                 <p style="margin:0 0 10px">Signed in as @(User.Identity!.Name ?? "admin"). Changes are saved live to the database.</p>
@@ -79,6 +89,8 @@
             <a href="/Admin/Orders" class="admin-nav-link @(IsActive("Orders") ? "active" : "")">Orders</a>
             <p class="label-caps group-label">Catalog</p>
             <a href="/Admin/Products" class="admin-nav-link @(IsActive("Products") ? "active" : "")">Products</a>
+            <p class="label-caps group-label">Support</p>
+            <a href="/Admin/Tickets" class="admin-nav-link @(IsActive("Tickets") ? "active" : "")">Raise a ticket</a>
         </nav>
         <div class="admin-footnote">
             <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
@@ -91,5 +103,6 @@
 @await RenderSectionAsync("Scripts", required: false)
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/admin.js" asp-append-version="true"></script>
+<script src="~/js/platform.js" asp-append-version="true"></script>
 </body>
 </html>

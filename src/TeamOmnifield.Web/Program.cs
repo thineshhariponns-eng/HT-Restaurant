@@ -36,6 +36,10 @@ builder.Services.AddHttpClient<TurnstileService>();
 
 var app = builder.Build();
 
+// The consultant demo data is seeded by DemoClientStore's static constructor. The admin portal only
+// reads the workspace store, so touch it once at startup rather than depend on which page is hit first.
+_ = DemoClientStore.All();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

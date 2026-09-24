@@ -4,6 +4,20 @@
     var stepsDone = DemoClientStore.StepsDone(Model.Stage);
     var configured = stepsDone >= 2;
     var activity = DemoClientStore.ActivityFor(Model.Name);
+
+    var projects = DemoWorkspaceStore.ProjectsOf(Model.Id);
+    var tickets = DemoWorkspaceStore.TicketsOf(Model.Id);
+    var changes = DemoWorkspaceStore.ChangesOf(Model.Id);
+    var latest = projects.ToDictionary(p => p.Id, p => DemoWorkspaceStore.LatestDeployment(p.Id));
+    var liveCount = latest.Values.Count(d => d?.State == DeployState.Live);
+    var openCount = tickets.Count(t => t.IsOpen);
+    var deployments = projects
+        .SelectMany(p => DemoWorkspaceStore.DeploymentsOf(p.Id).Select(d => (Project: p, Deploy: d)))
+        .OrderByDescending(x => x.Deploy.DeployedUtc)
+        .ToList();
+    string ProjectLabel(string projectId) => DemoWorkspaceStore.ProjectName(projectId);
+    string StateDot(DeployState? s) => s switch { DeployState.Live => "dot-done", DeployState.Failed => "dot-stopped", _ => "stage-dot-new" };
+    string When(DateTime utc) => utc.ToLocalTime().ToString("d MMM, HH:mm");
 }
 <div class="container admin-pad">
     <p style="font-size:0.875rem">
@@ -18,7 +32,145 @@
         </span>
     </header>
 
-    <div class="grid grid-2" style="align-items:start">
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert-error" role="alert" style="margin-top:20px">@error</div>
+    }
+
+    <nav class="tree summary-panel" aria-label="Client workspace" style="margin-top:24px">
+        <p class="tree-root">@Model.Name</p>
+        <a class="tree-branch" href="#projects"><span class="tree-name">Projects</span><span class="tree-count">@projects.Count</span></a>
+        <a class="tree-branch" href="#tickets"><span class="tree-name">Tickets</span><span class="tree-count">@tickets.Count<span class="text-muted"> &middot; @openCount open</span></span></a>
+        <a class="tree-branch" href="#deployments"><span class="tree-name">Deployments</span><span class="tree-count">@liveCount of @projects.Count live</span></a>
+        <a class="tree-branch" href="#changes"><span class="tree-name">Changes</span><span class="tree-count">@changes.Count</span></a>
+    </nav>
+
+    <section id="projects" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Projects</h2>
+        @if (projects.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">No projects yet. Add the first one below.</p>
+        }
+        else
+        {
+            <div style="overflow-x:auto">
+            <table class="ruled" style="margin-top:16px;border:0;background:transparent;min-width:32rem">
+                <thead><tr><th>Project</th><th>Deployment</th><th>Open tickets</th><th>Changes</th></tr></thead>
+                <tbody>
+                @foreach (var project in projects)
+                {
+                    var dep = latest[project.Id];
+                    <tr>
+                        <td class="text-primary"><a asp-area="Platform" asp-controller="Clients" asp-action="Project" asp-route-id="@Model.Id" asp-route-projectId="@project.Id">@project.Name</a></td>
+                        <td class="text-body"><span class="status-inline"><span class="dot @StateDot(dep?.State)"></span>@DemoWorkspaceStore.StateLabel(dep?.State ?? DeployState.NotDeployed)</span></td>
+                        <td class="tabular text-body">@tickets.Count(t => t.ProjectId == project.Id && t.IsOpen)</td>
+                        <td class="tabular text-body">@changes.Count(c => c.ProjectId == project.Id)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        }
+        <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="AddProject" asp-route-id="@Model.Id" class="inline-form">
+            <label for="newProject" class="sr-only">New project name</label>
+            <input id="newProject" name="name" maxlength="80" placeholder="New project name" required />
+            <button type="submit" class="btn btn-secondary btn-sm">Add project</button>
+        </form>
+    </section>
+
+    <section id="tickets" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Tickets</h2>
+        @if (tickets.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">No tickets raised yet. Open a project to raise one.</p>
+        }
+        else
+        {
+            <ul class="feed">
+                @foreach (var ticket in tickets)
+                {
+                    <li>
+                        <span class="dot @(ticket.IsOpen ? "dot-done" : "stage-dot-review")" title="@(ticket.IsOpen ? "Open" : "Closed")"></span>
+                        <div style="flex:1;min-width:0">
+                            <a asp-area="Platform" asp-controller="Clients" asp-action="Ticket" asp-route-id="@Model.Id" asp-route-number="@ticket.Number" class="text-primary" style="font-weight:500">@ticket.Title</a>
+                            <p class="text-muted" style="margin:2px 0 0;font-size:0.8125rem">#@ticket.Number &middot; @ProjectLabel(ticket.ProjectId) &middot; @(ticket.IsOpen ? "open" : "closed") &middot; @ticket.Author@(ticket.Source.Length > 0 ? " via " + ticket.Source : "") &middot; @When(ticket.CreatedUtc) &middot; @(ticket.Thread.Count(t => t.Event is null) - 1) comments</p>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <section id="deployments" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Deployments</h2>
+        @if (projects.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">Add a project to track its deployments.</p>
+        }
+        else
+        {
+            <div style="overflow-x:auto">
+            <table class="ruled" style="margin-top:16px;border:0;background:transparent;min-width:32rem">
+                <thead><tr><th>Project</th><th>Status</th><th>Version</th><th>Last deployed</th></tr></thead>
+                <tbody>
+                @foreach (var project in projects)
+                {
+                    var dep = latest[project.Id];
+                    <tr>
+                        <td class="text-primary">@project.Name</td>
+                        <td class="text-body"><span class="status-inline"><span class="dot @StateDot(dep?.State)"></span>@DemoWorkspaceStore.StateLabel(dep?.State ?? DeployState.NotDeployed)</span></td>
+                        <td class="tabular text-body">@(dep?.Version ?? "—")</td>
+                        <td class="tabular text-body">@(dep is null ? "—" : When(dep.DeployedUtc))</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+            @if (deployments.Count > 0)
+            {
+                <p class="label-caps" style="margin:20px 0 0">History</p>
+                <ul class="feed">
+                    @foreach (var (project, dep) in deployments.Take(8))
+                    {
+                        <li>
+                            <span class="dot @StateDot(dep.State)"></span>
+                            <span class="text-body" style="font-size:0.875rem"><strong class="text-primary">@project.Name</strong> &middot; @dep.Version &middot; @DemoWorkspaceStore.StateLabel(dep.State).ToLowerInvariant() &middot; @dep.By &middot; @When(dep.DeployedUtc)</span>
+                        </li>
+                    }
+                </ul>
+            }
+        }
+    </section>
+
+    <section id="changes" class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Changes</h2>
+        @if (changes.Count == 0)
+        {
+            <p class="text-muted" style="font-size:0.875rem;margin:16px 0 0">No changes logged yet. Log one from a project page.</p>
+        }
+        else
+        {
+            <div style="overflow-x:auto">
+            <table class="ruled" style="margin-top:16px;border:0;background:transparent;min-width:40rem">
+                <thead><tr><th>Project</th><th>Change</th><th>Before</th><th>After</th><th>When</th></tr></thead>
+                <tbody>
+                @foreach (var change in changes)
+                {
+                    <tr>
+                        <td class="text-primary">@ProjectLabel(change.ProjectId)</td>
+                        <td class="text-body">@change.What</td>
+                        <td class="text-muted">@(change.Before.Length == 0 ? "—" : change.Before)</td>
+                        <td class="text-body">@(change.After.Length == 0 ? "—" : change.After)</td>
+                        <td class="tabular text-muted">@When(change.ChangedUtc)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        }
+    </section>
+
+    <div class="grid grid-2" style="align-items:start;margin-top:24px">
         <section class="summary-panel">
             <h2 class="title" style="font-size:1rem">Client information</h2>
             <dl style="margin:16px 0 0">

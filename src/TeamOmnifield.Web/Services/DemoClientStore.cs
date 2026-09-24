@@ -41,6 +41,38 @@ public static class DemoClientStore
     public static readonly ClientStage[] Pipeline =
         [ClientStage.New, ClientStage.Onboarding, ClientStage.Development, ClientStage.Review, ClientStage.Production];
 
+    static DemoClientStore() => SeedSampleClients();
+
+    /// <summary>Three sample clients at different stages, with projects, tickets, deployments and changes, so the portal has something to show.</summary>
+    private static void SeedSampleClients()
+    {
+        (string Name, string City, string Contact, string Email, string Domain, string Admin, ClientStage Stage, int Progress, int DaysAgo)[] samples =
+        [
+            ("Urban Tandoor", "Bengaluru", "Meera Iyer", "meera@urbantandoor.in", "urbantandoor.local", "admin.urbantandoor.local", ClientStage.Onboarding, 35, 3),
+            ("Coastal Kitchen", "Kochi", "Arjun Nair", "arjun@coastalkitchen.in", "coastalkitchen.local", "admin.coastalkitchen.local", ClientStage.Development, 60, 12),
+            ("Spice Garden", "Chennai", "Priya Raman", "priya@spicegarden.in", "spicegarden.local", "admin.spicegarden.local", ClientStage.Production, 100, 40),
+            ("HT Restaurant", "Chennai & Hyderabad", "Harsha Robba", "harsha@htrestaurant.com", "htrestaurant.com", "admin.htrestaurant.com", ClientStage.Production, 100, 60),
+        ];
+
+        foreach (var s in samples)
+        {
+            var next = Clients.Count + 1;
+            var created = DateTime.UtcNow.AddDays(-s.DaysAgo);
+            Clients.Insert(0, new DemoClient
+            {
+                Id = $"c-{next}", Code = $"CL-{next:000}", Name = s.Name, City = s.City, Contact = s.Contact,
+                ContactEmail = s.Email, Domain = s.Domain, AdminDomain = s.Admin, Stage = s.Stage,
+                Progress = s.Progress, CreatedUtc = created, UpdatedUtc = DateTime.UtcNow.AddDays(-s.DaysAgo / 4.0),
+            });
+            Activity.Insert(0, new ActivityEntry(created.ToLocalTime().ToString("HH:mm"), s.Name, "Client created"));
+            Activity.Insert(0, new ActivityEntry(DateTime.Now.AddMinutes(-next * 17).ToString("HH:mm"), s.Name, $"Moved to {Label(s.Stage)}"));
+            // HT Restaurant runs one site per city instead of the two default projects.
+            if (s.Domain != "htrestaurant.com") DemoWorkspaceStore.SeedDefaults($"c-{next}");
+        }
+
+        DemoWorkspaceStore.SeedSampleWork();
+    }
+
     public static string Label(ClientStage stage) => stage switch
     {
         ClientStage.New => "New",
@@ -120,6 +152,7 @@ public static class DemoClientStore
             };
             Clients.Insert(0, client);
             Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), name, "Client created"));
+            DemoWorkspaceStore.SeedDefaults(client.Id);
             return client;
         }
     }
