@@ -1,6 +1,7 @@
 @model object
 @{
-    ViewData["Title"] = "HT Restaurant Erode";
+    var city = (CityInfo)ViewBag.City;
+    ViewData["Title"] = $"HT Restaurant {city.Name}";
     ViewData["BodyClass"] = "customer landing";
     var featured = ((IEnumerable<Product>)ViewBag.Featured).ToList();
     var heroImage = featured.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.ImageUrl));
@@ -29,14 +30,16 @@
         <div class="lp-hero__grid">
             <div class="lp-hero__copy">
                 <p class="lp-crumb" data-hero><span class="dot"></span>Open now &middot; Closes 10:30 PM</p>
-                <h1 data-split>HT Restaurant<br /><span>Erode</span></h1>
-                <p class="lp-hero__lede" data-hero>Today's kitchen card, straight from Perundurai Road &mdash; order for pickup, delivery or dine-in.</p>
+                <h1 data-split>HT Restaurant<br /><span>@city.Name</span></h1>
+                <p class="lp-hero__lede" data-hero>Today's kitchen card, straight from @city.Street &mdash; order for pickup, delivery or dine-in.</p>
                 <div class="lp-hero__cta" data-hero>
                     <a href="/Menu" class="lp-btn lp-btn--solid">Order now</a>
                     <a href="/Menu" class="lp-btn lp-btn--line">Explore menu</a>
                 </div>
                 <dl class="lp-facts" data-hero>
-                    <div><dt>Location</dt><dd>Perundurai Road, Erode</dd></div>
+                    <div>
+                        <dt>Location</dt><dd>@city.Address</dd>
+                 </div>
                     <div><dt>Today's hours</dt><dd class="tabular">11:00 AM &ndash; 10:30 PM</dd></div>
                 </dl>
             </div>
@@ -145,7 +148,7 @@
             <li class="lp-step">
                 <div class="lp-step__body" data-reveal>
                     <h3>Pickup</h3>
-                    <p>Pickup ready in 20 minutes. Order ahead, walk in, and collect from Perundurai Road.</p>
+                    <p>Pickup ready in 20 minutes. Order ahead, walk in, and collect from @city.Street.</p>
                     <a href="/Menu" class="lp-link">Order for pickup <span aria-hidden="true">&rarr;</span></a>
                 </div>
                 <span class="lp-step__no" aria-hidden="true">01</span>
@@ -153,7 +156,7 @@
             <li class="lp-step">
                 <div class="lp-step__body" data-reveal>
                     <h3>Delivery</h3>
-                    <p>Delivery within 5 km of Perundurai Road, brought to your door while it is hot.</p>
+                    <p>Delivery within 5 km of @city.Street, brought to your door while it is hot.</p>
                     <a href="/Menu" class="lp-link">Order for delivery <span aria-hidden="true">&rarr;</span></a>
                 </div>
                 <span class="lp-step__no" aria-hidden="true">02</span>
@@ -161,7 +164,7 @@
             <li class="lp-step">
                 <div class="lp-step__body" data-reveal>
                     <h3>Dine-in</h3>
-                    <p>Join us at 142, Perundurai Road for the full card, served the way our kitchen intends.</p>
+                    <p>Join us at @city.Address for the full card, served the way our kitchen intends.</p>
                     <a href="/Menu" class="lp-link">See the menu <span aria-hidden="true">&rarr;</span></a>
                 </div>
                 <span class="lp-step__no" aria-hidden="true">03</span>
@@ -173,8 +176,8 @@
 <section class="lp-paper lp-story">
     <div class="lp-wrap lp-story__grid">
         <div class="lp-story__copy">
-            <h2 class="lp-h2" data-split>About HT Restaurant Erode</h2>
-            <p data-reveal>HT Restaurant has been serving Erode with a menu built around the region's own turmeric and local produce. Our kitchen blends traditional Tamil Nadu cooking with a modern, considered plate &mdash; for dine-in, pickup and delivery alike.</p>
+            <h2 class="lp-h2" data-split>About HT Restaurant @city.Name</h2>
+            <p data-reveal>HT Restaurant has been serving @city.Name with a menu built around home-style Indian cooking and local produce. Our kitchen blends traditional recipes with a modern, considered plate &mdash; for dine-in, pickup and delivery alike.</p>
             <p data-reveal>Every dish is prepared fresh to order, using recipes developed by our kitchen team and ingredients sourced close to home.</p>
             <a href="/Menu" class="lp-link" data-reveal>View the menu <span aria-hidden="true">&rarr;</span></a>
         </div>
@@ -203,11 +206,11 @@
             </details>
             <details>
                 <summary>How long does pickup or delivery take?</summary>
-                <p>Pickup is ready in 20 minutes. We deliver within 5 km of Perundurai Road.</p>
+                <p>Pickup is ready in 20 minutes. We deliver within 5 km of @city.Street.</p>
             </details>
             <details>
                 <summary>Where are you and when are you open?</summary>
-                <p>142, Perundurai Road, Erode, Tamil Nadu 638011. Monday to Friday 11:00 AM &ndash; 10:30 PM, Saturday and Sunday 10:30 AM &ndash; 11:00 PM.</p>
+                <p>@city.Address. Monday to Friday 11:00 AM &ndash; 10:30 PM, Saturday and Sunday 10:30 AM &ndash; 11:00 PM.</p>
             </details>
             <details>
                 <summary>How do I check on an order I placed?</summary>
@@ -215,7 +218,7 @@
             </details>
             <details>
                 <summary>How can I reach the restaurant?</summary>
-                <p>Call <a href="tel:+919876543210">+91 98765 43210</a> or email <a href="mailto:hello@htrestauranterode.in">hello@htrestauranterode.in</a>.</p>
+                <p>Call <a href="tel:+919876543210">+91 98765 43210</a> or email <a href="mailto:@city.Email">@city.Email</a>.</p>
             </details>
         </div>
         <div class="lp-cta">

@@ -89,13 +89,13 @@ body.pt ul { margin: 0; padding: 0; list-style: none; }
   transition: background-color 180ms, color 180ms, border-color 180ms, transform 160ms var(--ease-out);
 }
 .pt-btn:active { transform: scale(.97); }
-.pt-btn--solid { background: var(--ink); color: var(--paper); }
+.pt-btn--solid {background: #ffb085;}
 .pt-btn--line { border-color: var(--ink); color: var(--ink); }
 .pt-btn--gold { background: var(--turmeric); color: var(--ink); }
 .pt-btn--ghost-light { border-color: rgba(255, 255, 255, .5); color: #fff; }
 @media (hover: hover) and (pointer: fine) {
-  .pt-btn--solid:hover { background: var(--chilli); }
-  .pt-btn--line:hover { background: var(--ink); color: var(--paper); }
+  .pt-btn--solid:hover {background: #e56142;}
+  .pt-btn--line:hover {background: #e56142;}
   .pt-btn--gold:hover { background: #f3c55e; }
   .pt-btn--ghost-light:hover { background: #fff; color: var(--ink); border-color: #fff; }
 }

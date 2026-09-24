@@ -1,4 +1,4 @@
-/* HT Restaurant Erode — "The Daily Card" design system.
+/* HT Restaurant Chennai — "The Daily Card" design system.
    Ink ground, turmeric signal colour, hairline rules, square corners, tabular figures.
    Ported from the team's Angular/Tailwind UI (ht-omnifield repo) into hand-written CSS
    since this project is server-rendered Razor with no Tailwind build step. */
@@ -218,6 +218,7 @@ table.ruled tbody tr:hover { background: var(--color-bg-base); }
 .mobile-nav { display: none; border-top: 1px solid var(--color-border-subtle); padding: 16px; background: var(--color-bg-surface); }
 .mobile-nav.open { display: block; }
 .mobile-nav a { display: block; padding: 10px 4px; color: var(--color-text-body); }
+.mobile-nav a.auth-link { display: flex; align-items: center; gap: 8px; }
 .cart-btn {
   position: relative; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--color-border-subtle);
   padding: 8px 12px; font-size: 0.875rem; font-weight: 500; color: var(--color-text-primary);

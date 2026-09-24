@@ -1,13 +1,15 @@
+@inject TeamOmnifield.Web.Services.CityContextService CityContext
 @{
     var currentController = (string)ViewContext.RouteData.Values["controller"]!;
     bool IsActive(string controller) => string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+    var city = CityContext.Current;
 }
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] &middot; HT Restaurant Platform</title>
+    <title>@ViewData["Title"] &middot; HT Restaurant @city.Name Platform</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
@@ -16,7 +18,7 @@
         <div class="admin-sidebar-inner">
             <a href="/Platform" class="admin-brand">
                 <span class="name">HT Restaurant</span>
-                <span class="place label-caps">Platform &middot; Consultant</span>
+                <span class="place label-caps">@city.Name &middot; Consultant</span>
             </a>
             <nav class="admin-nav" aria-label="Consultant">
                 <p class="label-caps group-label">Delivery</p>
@@ -58,7 +60,7 @@
     <div class="panel">
         <a href="/Platform" class="admin-brand">
             <span class="name">HT Restaurant</span>
-            <span class="place label-caps">Platform &middot; Consultant</span>
+            <span class="place label-caps">@city.Name &middot; Consultant</span>
         </a>
         <nav class="admin-nav" aria-label="Consultant mobile">
             <p class="label-caps group-label">Delivery</p>

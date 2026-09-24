@@ -36,6 +36,7 @@ public static class DbInitializer
         }
 
         await db.Database.ExecuteSqlRawAsync("""ALTER TABLE "Products" ADD COLUMN IF NOT EXISTS "ImageUrl" text NOT NULL DEFAULT ''""");
+        await db.Database.ExecuteSqlRawAsync("""CREATE UNIQUE INDEX IF NOT EXISTS "IX_Products_Name_Unique" ON "Products" (LOWER("Name"))""");
 
         {
             var categories = await db.Categories.ToDictionaryAsync(x => x.Name);
