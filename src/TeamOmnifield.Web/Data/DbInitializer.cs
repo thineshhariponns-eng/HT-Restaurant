@@ -60,7 +60,8 @@ public static class DbInitializer
                 await db.SaveChangesAsync();
             }
 
-            var unpictured = await db.Products.Where(x => x.ImageUrl == "").ToListAsync();
+            // loremflickr links are random and often fail to load; swap them for the curated photos.
+            var unpictured = await db.Products.Where(x => x.ImageUrl == "" || x.ImageUrl.Contains("loremflickr.com")).ToListAsync();
             foreach (var product in unpictured)
             {
                 product.ImageUrl = ProductImages.TryGetValue(product.Name, out var url) ? url : DefaultImage;
@@ -87,7 +88,7 @@ public static class DbInitializer
         if (added) await db.SaveChangesAsync();
     }
 
-    private const string DefaultImage = "https://loremflickr.com/640/480/indianfood,restaurant";
+    private const string DefaultImage = "https://images.pexels.com/photos/5410418/pexels-photo-5410418.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop";
 
     private sealed record ProductSeed(string CategoryName, string Name, string Description, decimal Price);
 
@@ -164,13 +165,17 @@ public static class DbInitializer
         ["Tea"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSck0R1QadchlbSdfFbDk0DsOEJKV8VuCD3ltycnyLbig&s",
         ["Coffee"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwc45iPOVXL-gxnCBA-XUX00HdDlhOix0RxwpzNRBzBw&s=10",
         ["Cold Coffee"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKCZvaMBWO4UTxeLmHt8YbmEwCvRItWcwQPtYaNLuH8g&s=10",
-        ["Orange Juice"] = "https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         ["Apple Juice"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlfuTQXtqrg7n5udBD81Wg8nhtKyp8b8IPrzp2-DYSNg&s=10",
         ["Mango Juice"] = "https://i.pinimg.com/474x/10/06/d9/1006d93ae757a062819c413b7af49805.jpg?nii=t",
         ["Pineapple Juice"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZQjzeZ9EWgOKX5E14bOyG0_MXGzoL0TvREiyLi-2M7A&s=10",
         ["Watermelon Juice"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzKIuyf1rSr8uW4nOxs0TsHMIadXbDt7t-YYgJS53Rdw&s",
         ["Pomegranate Juice"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG3Qy1PGX58O8tjUJBhcMQxKrHrkHi8plsL0MmBHOTfw&s=10",
 
+        ["Orange Juice"] = "https://images.unsplash.com/photo-1600271886742-f049cd451bba?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        ["Egg Meals"] = "https://images.pexels.com/photos/9110581/pexels-photo-9110581.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop",
+        ["Masala Chaas"] = "https://images.pexels.com/photos/8489749/pexels-photo-8489749.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop",
+        ["Fresh Orange Juice"] = "https://images.pexels.com/photos/14510445/pexels-photo-14510445.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop",
+        ["Double Ka Meetha"] = "https://images.pexels.com/photos/20446398/pexels-photo-20446398.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop",
         ["Gulab Jamun"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYpTSsKHP5fZfdx7qFP18Yf4bkFtkW2dc_wqdo2tpOOQ&s=10",
         ["Rasmalai"] = "https://i.pinimg.com/474x/48/54/af/4854af9296311829470f1c7494165f72.jpg",
         ["Kesari"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVq92hV6jILJktCh78jV3HK8znEpXyYmy48E1DyEaHnQ&s=10",

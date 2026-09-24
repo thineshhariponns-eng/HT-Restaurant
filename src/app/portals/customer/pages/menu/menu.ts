@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MenuItemCard } from '../../shared/menu-item-card/menu-item-card';
 import { CATEGORY_ORDER, CategoryName, MENU_DISHES, MenuDish, categorySlug } from '../../data/menu-data';
 import { CartService } from '../../services/cart';
+import { AuthService } from '../../services/auth';
 
 type CategoryFilter = 'All' | CategoryName;
 
@@ -14,6 +15,7 @@ type CategoryFilter = 'All' | CategoryName;
 })
 export class Menu {
   private readonly cart = inject(CartService);
+  private readonly auth = inject(AuthService);
 
   protected readonly filters: CategoryFilter[] = ['All', ...CATEGORY_ORDER];
 
@@ -51,6 +53,7 @@ export class Menu {
   }
 
   protected onAddToCart(dish: MenuDish): void {
+    if (!this.auth.requireLogin()) return;
     this.cart.addItem(dish);
   }
 }

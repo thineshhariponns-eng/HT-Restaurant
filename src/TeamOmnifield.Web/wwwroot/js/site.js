@@ -72,4 +72,34 @@
       if (modal) modal.classList.add('open');
     });
   });
+
+  // Native <dialog> helpers: [data-dialog-open="id"] opens, [data-dialog-close] closes,
+  // a click on the backdrop closes, and dialog[data-autoopen] opens on load.
+  document.querySelectorAll('[data-dialog-open]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var dlg = document.getElementById(btn.getAttribute('data-dialog-open'));
+      if (dlg && dlg.showModal) dlg.showModal();
+    });
+  });
+  document.querySelectorAll('dialog.dlg').forEach(function (dlg) {
+    var pressOnBackdrop = false;
+    dlg.addEventListener('pointerdown', function (e) { pressOnBackdrop = e.target === dlg; });
+    dlg.addEventListener('click', function (e) {
+      if (pressOnBackdrop && e.target === dlg) dlg.close();
+      pressOnBackdrop = false;
+    });
+    dlg.querySelectorAll('[data-dialog-close]').forEach(function (b) {
+      b.addEventListener('click', function () { dlg.close(); });
+    });
+    if (dlg.hasAttribute('data-autoopen') && dlg.showModal) dlg.showModal();
+  });
+
+  // Payment page (demo UI): show the panel for the selected method.
+  document.querySelectorAll('[data-pay-method]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      document.querySelectorAll('[data-pay-panel]').forEach(function (panel) {
+        panel.hidden = panel.getAttribute('data-pay-panel') !== radio.value;
+      });
+    });
+  });
 })();

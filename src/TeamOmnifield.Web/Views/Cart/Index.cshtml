@@ -52,11 +52,33 @@ else
                         <div class="summary-row"><span>Delivery</span><span class="tabular" style="color:var(--color-text-primary)">₹@Model.DeliveryFee.ToString("0.00")</span></div>
                     </div>
                     <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@Model.Total.ToString("0.00")</span></div>
-                    <a href="/Checkout" class="btn btn-primary btn-block" style="margin-top:24px">Proceed to Checkout</a>
+                    <button type="button" class="btn btn-primary btn-block" style="margin-top:24px" data-dialog-open="checkoutConfirm">Proceed to Checkout</button>
                 </div>
             </div>
         </div>
     </section>
+}
+
+@if (Model.Items.Any())
+{
+    <dialog id="checkoutConfirm" class="dlg" aria-labelledby="ccTitle" aria-describedby="ccDesc">
+        <div class="dlg-body">
+            <div class="dlg-head">
+                <h2 id="ccTitle" class="display">Ready to checkout?</h2>
+                <button type="button" class="dlg-close" data-dialog-close aria-label="Close and stay in cart">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                </button>
+            </div>
+            <p id="ccDesc" class="text-body" style="margin-top:12px">Are you sure you want to proceed?</p>
+            <div class="dlg-actions">
+                <a href="/Checkout" class="btn btn-primary btn-block" autofocus>Proceed to Checkout</a>
+                <a href="/Menu" class="btn btn-secondary btn-block">Add More Items</a>
+                <form asp-controller="Cart" asp-action="Clear" method="post">
+                    <button type="submit" class="btn btn-cancel btn-block">Cancel Checkout</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
 }
 <style>
   @@media (min-width: 1024px) { .cart-layout { grid-template-columns: 1fr 360px; align-items: start; } .cart-layout > div:last-child { position: sticky; top: 96px; } }
