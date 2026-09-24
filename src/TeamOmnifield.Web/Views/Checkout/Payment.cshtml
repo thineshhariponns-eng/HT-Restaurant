@@ -60,12 +60,16 @@
             <fieldset class="pay-methods">
                 <legend class="label-caps">Payment method</legend>
                 <label class="pay-method">
-                    <input type="radio" name="method" value="card" data-pay-method checked />
+                    <input type="radio" name="method" value="upi" data-pay-method checked />
+                    <span><strong>UPI</strong><small>Pay by any UPI app</small></span>
+                </label>
+                <label class="pay-method">
+                    <input type="radio" name="method" value="card" data-pay-method />
                     <span><strong>Credit / Debit Card</strong><small>Visa, Mastercard, RuPay</small></span>
                 </label>
                 <label class="pay-method">
-                    <input type="radio" name="method" value="upi" data-pay-method />
-                    <span><strong>UPI</strong><small>GPay, PhonePe, Paytm</small></span>
+                    <input type="radio" name="method" value="netbanking" data-pay-method />
+                    <span><strong>Net Banking</strong><small>All major banks</small></span>
                 </label>
                 <label class="pay-method">
                     <input type="radio" name="method" value="cash" data-pay-method />
@@ -74,7 +78,7 @@
             </fieldset>
 
             @* Demo inputs carry no name attribute, so nothing typed here is ever submitted. *@
-            <div data-pay-panel="card" style="margin-top:24px">
+            <div data-pay-panel="card" hidden style="margin-top:24px">
                 <div class="field">
                     <label for="payCardNumber">Card Number</label>
                     <input id="payCardNumber" type="text" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" />
@@ -94,12 +98,27 @@
                     </div>
                 </div>
             </div>
-            <div data-pay-panel="upi" hidden style="margin-top:24px">
+            <div data-pay-panel="upi" style="margin-top:24px">
                 <div class="field">
                     <label for="payUpi">UPI ID</label>
                     <input id="payUpi" type="text" autocomplete="off" placeholder="name@bank" />
                 </div>
                 <p class="hint">Or use "Show QR code" above to pay from any UPI app.</p>
+            </div>
+            <div data-pay-panel="netbanking" hidden style="margin-top:24px">
+                <div class="field">
+                    <label for="payBank">Select your bank</label>
+                    <select id="payBank">
+                        <option>State Bank of India</option>
+                        <option>HDFC Bank</option>
+                        <option>ICICI Bank</option>
+                        <option>Axis Bank</option>
+                        <option>Punjab National Bank</option>
+                        <option>Kotak Mahindra Bank</option>
+                        <option>Other banks</option>
+                    </select>
+                </div>
+                <p class="hint">You'll be redirected to your bank to complete payment.</p>
             </div>
             <div data-pay-panel="cash" hidden style="margin-top:24px">
                 <p class="text-body pay-note">Pay in cash to the delivery partner when your order arrives.</p>

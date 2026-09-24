@@ -47,13 +47,13 @@ public class CheckoutController(CartService cartService, OrderService orderServi
     }
 
     [HttpPost, ActionName("Payment"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> ConfirmPayment()
+    public async Task<IActionResult> ConfirmPayment(string method)
     {
         var pending = GetPending();
         if (pending is null) return RedirectToAction(nameof(Index));
         try
         {
-            var order = await orderService.CreateAsync(pending, cartService.Get());
+            var order = await orderService.CreateAsync(pending, cartService.Get(), method);
             cartService.Clear();
             HttpContext.Session.Remove(PendingKey);
             return RedirectToAction(nameof(Success), new { orderNumber = order.OrderNumber, paid = true });

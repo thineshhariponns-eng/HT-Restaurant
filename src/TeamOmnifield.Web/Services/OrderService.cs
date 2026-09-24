@@ -9,9 +9,18 @@ public class OrderService(AppDbContext db, IConfiguration configuration)
 {
     private decimal DeliveryFee => configuration.GetValue<decimal>("Restaurant:DeliveryFee", 40m);
 
-    public async Task<Order> CreateAsync(CheckoutViewModel checkout, IReadOnlyDictionary<int, int> cart)
+    public static readonly IReadOnlyDictionary<string, string> PaymentMethodLabels = new Dictionary<string, string>
+    {
+        ["upi"] = "UPI",
+        ["card"] = "Credit / Debit Card",
+        ["netbanking"] = "Net Banking",
+        ["cash"] = "Cash on delivery",
+    };
+
+    public async Task<Order> CreateAsync(CheckoutViewModel checkout, IReadOnlyDictionary<int, int> cart, string paymentMethod)
     {
         if (cart.Count == 0) throw new InvalidOperationException("Cart is empty.");
+        if (!PaymentMethodLabels.ContainsKey(paymentMethod)) throw new InvalidOperationException("Choose a valid payment method.");
 
         var ids = cart.Keys.ToList();
         var products = await db.Products.Where(x => ids.Contains(x.Id) && x.IsAvailable).ToListAsync();
@@ -24,6 +33,7 @@ public class OrderService(AppDbContext db, IConfiguration configuration)
             Phone = checkout.Phone.Trim(),
             DeliveryAddress = checkout.DeliveryAddress.Trim(),
             Notes = string.IsNullOrWhiteSpace(checkout.Notes) ? null : checkout.Notes.Trim(),
+            PaymentMethod = paymentMethod,
             DeliveryFee = DeliveryFee
         };
 

@@ -42,6 +42,7 @@ public class Order
     public string Phone { get; set; } = string.Empty;
     public string DeliveryAddress { get; set; } = string.Empty;
     public string? Notes { get; set; }
+    public string PaymentMethod { get; set; } = string.Empty;
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public decimal Subtotal { get; set; }
     public decimal DeliveryFee { get; set; }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TeamOmnifield.Web.Data;
@@ -33,6 +34,11 @@ builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<HostContextService>();
 builder.Services.AddScoped<CityContextService>();
 builder.Services.AddHttpClient<TurnstileService>();
+// Persist to the mounted volume (see docker-compose.yml) so a container rebuild/restart doesn't invalidate
+// every visitor's session, login and CSRF cookies - previously keys lived in the ephemeral container filesystem.
+builder.Services.AddDataProtection()
+    .SetApplicationName("TeamOmnifield.Web")
+    .PersistKeysToFileSystem(new DirectoryInfo("/root/.aspnet/DataProtection-Keys"));
 
 var app = builder.Build();
 

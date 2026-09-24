@@ -31,6 +31,8 @@ services:
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
     ports:
       - "8091:8080"
+    volumes:
+      - teamomnifield_dpkeys:/root/.aspnet/DataProtection-Keys
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,6 +53,7 @@ services:
 
 volumes:
   teamomnifield_pgdata:
+  teamomnifield_dpkeys:
 
 networks:
   teamomnifield:
