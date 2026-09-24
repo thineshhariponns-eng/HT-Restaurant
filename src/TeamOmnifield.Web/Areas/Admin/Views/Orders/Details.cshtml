@@ -83,6 +83,7 @@
                 <a href="tel:@Model.Phone" style="color:inherit">@Model.Phone</a>
             </p>
             <p class="text-body" style="margin-top:4px;font-size:0.875rem">@Model.DeliveryAddress</p>
+            <p class="text-muted" style="margin-top:8px;font-size:0.875rem">Paid via @OrderService.PaymentMethodLabels.GetValueOrDefault(Model.PaymentMethod, Model.PaymentMethod)</p>
             @if (!string.IsNullOrWhiteSpace(Model.Notes))
             {
                 <p style="margin-top:16px;border:1px solid var(--color-border-strong);background:var(--color-bg-sunken);padding:10px 12px;font-size:0.875rem;color:var(--color-text-primary)">@Model.Notes</p>

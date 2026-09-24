@@ -47,6 +47,7 @@
                 <div class="summary-row"><dt>Delivery</dt><dd class="tabular" style="color:var(--color-text-primary);margin:0">₹@Model.DeliveryFee.ToString("0.00")</dd></div>
             </dl>
             <div class="summary-total"><span class="title" style="font-size:1rem">Total</span><span class="amount tabular">₹@Model.Total.ToString("0.00")</span></div>
+            <p class="text-muted" style="margin-top:12px;font-size:0.875rem"><span class="text-body">Paid via:</span> @OrderService.PaymentMethodLabels.GetValueOrDefault(Model.PaymentMethod, Model.PaymentMethod)</p>
             @if (!string.IsNullOrWhiteSpace(Model.Notes))
             {
                 <p class="text-muted" style="margin-top:20px;font-size:0.875rem"><span class="text-body">Note:</span> @Model.Notes</p>
