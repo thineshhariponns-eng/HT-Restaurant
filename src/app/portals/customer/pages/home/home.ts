@@ -4,6 +4,7 @@ import { DishCard } from '../../shared/dish-card/dish-card';
 import { CategoryTile } from '../../shared/category-tile/category-tile';
 import { CATEGORY_ORDER, MENU_DISHES, MenuDish, categorySlug } from '../../data/menu-data';
 import { CartService } from '../../services/cart';
+import { AuthService } from '../../services/auth';
 
 interface DayHours {
   /** Minutes after midnight. */
@@ -35,6 +36,7 @@ function formatMinutes(minutes: number): string {
 export class Home {
   private readonly destroyRef = inject(DestroyRef);
   private readonly cart = inject(CartService);
+  private readonly auth = inject(AuthService);
 
   protected readonly dishes = MENU_DISHES;
 
@@ -91,6 +93,7 @@ export class Home {
   }
 
   protected onAddToCart(dish: MenuDish): void {
+    if (!this.auth.requireLogin()) return;
     this.cart.addItem(dish);
   }
 }

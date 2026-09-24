@@ -5,6 +5,7 @@ import { MenuItemCard } from '../../shared/menu-item-card/menu-item-card';
 import { QuantitySelector } from '../../shared/quantity-selector/quantity-selector';
 import { MENU_DISHES } from '../../data/menu-data';
 import { CartService } from '../../services/cart';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-menu-item-detail',
@@ -15,6 +16,7 @@ import { CartService } from '../../services/cart';
 export class MenuItemDetail {
   private readonly route = inject(ActivatedRoute);
   private readonly cart = inject(CartService);
+  private readonly auth = inject(AuthService);
   private readonly paramMap = toSignal(this.route.paramMap, { requireSync: true });
 
   protected readonly dish = computed(() => {
@@ -48,13 +50,13 @@ export class MenuItemDetail {
 
   protected onAddToCart(): void {
     const current = this.dish();
-    if (!current) return;
+    if (!current || !this.auth.requireLogin()) return;
     this.cart.addItem(current, this.quantity());
   }
 
   protected onRelatedAddToCart(slug: string): void {
     const related = MENU_DISHES.find((d) => d.slug === slug);
-    if (related) {
+    if (related && this.auth.requireLogin()) {
       this.cart.addItem(related);
     }
   }

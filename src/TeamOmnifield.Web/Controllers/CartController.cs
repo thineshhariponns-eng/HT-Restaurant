@@ -49,4 +49,11 @@ public class CartController(AppDbContext db, CartService cartService, IConfigura
         cartService.Save(cart);
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public IActionResult Clear()
+    {
+        cartService.Clear();
+        return Redirect("/Menu");
+    }
 }

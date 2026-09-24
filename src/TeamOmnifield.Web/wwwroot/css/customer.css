@@ -1,4 +1,4 @@
-/* HT Restaurant Erode — customer storefront theme ("Open Kitchen").
+/* HT Restaurant Chennai — customer storefront theme ("Open Kitchen").
    Loaded by Views/Shared/_Layout for customer pages only (Home, Menu, Cart, Checkout, Orders).
    Account (admin login) and Team pages opt out, and the Admin / Platform areas use their own layouts.
    Design only: it re-skins the existing site.css classes by re-pointing their design tokens under
@@ -248,3 +248,54 @@ body.customer .site-footer {
   .confirm-mark path { animation: none; }
 }
 @keyframes confirm-fade { from { opacity: 0; } }
+
+
+/* =====================================================================
+   Dialogs (cart checkout confirm, payment QR, paid-order ticket) and the demo payment page.
+   ===================================================================== */
+.customer dialog.dlg {
+  width: min(32rem, calc(100% - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0;
+  border: 1px solid var(--lp-ink); border-radius: 0; background: #fff; color: var(--lp-ink); overflow-y: auto;
+}
+.customer dialog.dlg-narrow { width: min(24rem, calc(100% - 32px)); }
+.customer dialog.dlg::backdrop { background: rgb(16 13 9 / .7); }
+.customer .dlg-body { padding: 28px clamp(20px, 5vw, 32px) 28px; }
+.customer .dlg-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.customer .dlg-head .display { margin: 0; font-size: 1.5rem; }
+.customer .dlg-close { display: inline-flex; width: 36px; height: 36px; margin: -6px -8px 0 0; align-items: center; justify-content: center; color: var(--color-text-muted); }
+.customer .dlg-close:hover { color: var(--lp-ink); }
+.customer .dlg-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+.customer .btn-block { display: inline-flex; align-items: center; justify-content: center; width: 100%; }
+.customer .btn-cancel { background: transparent; color: var(--lp-ink); border: 1px solid var(--lp-rust); }
+.customer .btn-cancel:hover { background: var(--lp-rust); border-color: var(--lp-rust); color: #fff; }
+.customer .ticket { margin-top: 24px; padding: 20px; border: 1px dashed rgba(16, 13, 9, .45); background: var(--lp-paper); }
+
+.customer .pay-shell { display: grid; border: 1px solid var(--color-border-strong); }
+.customer .pay-visual { position: relative; display: none; min-height: 32rem; overflow: hidden; background: var(--lp-ink); perspective: 1200px; }
+.customer .pay-card { position: absolute; inset-inline: 12%; aspect-ratio: 1.586; border: 1px solid rgb(255 255 255 / .25); transform: rotateX(58deg) rotateZ(-38deg); }
+.customer .pay-card--top { top: 8%; background: linear-gradient(135deg, rgb(255 255 255 / .18), rgb(255 255 255 / .04)); }
+.customer .pay-card--mid { top: 30%; background: linear-gradient(135deg, rgb(232 179 60 / .35), rgb(232 179 60 / .08)); }
+.customer .pay-card--bottom { top: 52%; background: linear-gradient(135deg, #e8b33c, #8a5a17); border-color: rgb(242 197 104 / .6); }
+.customer .pay-form { padding: clamp(20px, 4vw, 32px); background: #fff; }
+.customer .pay-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.customer .pay-head h2 { margin: 0; font-size: 1.5rem; }
+.customer .pay-methods { display: grid; gap: 12px; margin: 24px 0 0; padding: 0; border: 0; }
+.customer .pay-methods legend { margin-bottom: 12px; padding: 0; }
+.customer .pay-method { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1px solid var(--color-border-strong); cursor: pointer; transition: border-color 160ms, background-color 160ms; }
+.customer .pay-method:hover { border-color: var(--lp-ink); }
+.customer .pay-method:has(input:checked) { border-color: var(--lp-ink); background: var(--lp-paper-deep); }
+.customer .pay-method input { margin-top: 4px; accent-color: var(--lp-ink); }
+.customer .pay-method strong { display: block; font-size: .875rem; }
+.customer .pay-method small { display: block; margin-top: 2px; font-size: .75rem; color: var(--color-text-muted); }
+.customer .pay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.customer .pay-note { padding: 16px; border: 1px solid var(--color-border-subtle); background: var(--lp-paper); font-size: .875rem; }
+.customer .pay-total { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--color-border-strong); }
+.customer .pay-total .amount { font-size: 1.5rem; font-weight: 700; }
+.customer .pay-qr { display: block; width: 14rem; height: 14rem; margin: 20px auto 0; border: 12px solid #fff; outline: 1px solid var(--color-border-subtle); }
+@media (min-width: 1024px) {
+  .customer .pay-shell { grid-template-columns: 5fr 6fr; }
+  .customer .pay-visual { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .customer .pay-method { transition: none; }
+}

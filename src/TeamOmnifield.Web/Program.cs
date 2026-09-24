@@ -31,9 +31,14 @@ builder.Services.AddScoped<IPasswordHasher<AdminUser>, PasswordHasher<AdminUser>
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<HostContextService>();
+builder.Services.AddScoped<CityContextService>();
 builder.Services.AddHttpClient<TurnstileService>();
 
 var app = builder.Build();
+
+// The consultant demo data is seeded by DemoClientStore's static constructor. The admin portal only
+// reads the workspace store, so touch it once at startup rather than depend on which page is hit first.
+_ = DemoClientStore.All();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -43,6 +48,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseExceptionHandler("/Home/Error");
+// Skip /api and /health: they must keep returning plain JSON/empty 404s, not an HTML page, for API callers.
+app.UseWhen(
+    ctx => !ctx.Request.Path.StartsWithSegments("/api") && !ctx.Request.Path.StartsWithSegments("/health"),
+    branch => branch.UseStatusCodePagesWithReExecute("/error/{0}"));
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();

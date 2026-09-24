@@ -1,0 +1,128 @@
+@{
+    // About page: full-bleed banner with an overlapping headline card, intro + feature grid, fact badges, a photo band,
+    // a values grid and a closing call to action. Copy is draft brand copy for the owners to review.
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "About | HT Restaurant";
+    ViewData["Description"] = "HT Restaurant is a contemporary Indian kitchen serving home-style cooking, ready for pickup or delivery.";
+    ViewData["Current"] = "about";
+    const string orderUrl = "/chennai";
+
+    // Photo provenance: Unsplash (Unsplash License), hotlinked; stand-in food photography, not pictures of an HT kitchen.
+    const string thali = "1585937421612-70a008356fbe";       // curries and rice in copper bowls
+    const string tandoori = "1626074353765-517a681e40be";    // tandoori chicken
+
+    string Img(string id, int w, int h) => $"https://images.unsplash.com/photo-{id}?auto=format&fit=crop&w={w}&h={h}&q=70";
+}
+
+<!-- 1. Banner -->
+<section class="pt-banner" aria-labelledby="ptAboutTitle">
+    <div class="pt-banner__photo">
+        <img src="@Img(thali, 1920, 720)" srcset="@Img(thali, 960, 600) 960w, @Img(thali, 1920, 720) 1920w, @Img(thali, 2880, 1080) 2880w" sizes="100vw" width="1920" height="720" alt="Curries and steamed rice served in copper bowls" fetchpriority="high" decoding="async" />
+    </div>
+    <div class="pt-wrap">
+        <div class="pt-banner__card">
+            <h1 id="ptAboutTitle" data-split>Home-style Indian cooking, made fresh every day.</h1>
+        </div>
+    </div>
+</section>
+
+<!-- 2. Intro + features -->
+<section class="pt-section pt-intro" aria-label="About HT Restaurant">
+    <div class="pt-wrap pt-intro__grid">
+        <div class="pt-intro__lead" data-reveal>
+            <p>HT Restaurant is a contemporary Indian kitchen built around home-style cooking. We serve biryani, starters, meals, beverages and desserts, prepared fresh each day.</p>
+            <p>Order from your city's kitchen for pickup or delivery, and follow your order from confirmation to your table.</p>
+        </div>
+        <ul class="pt-features" role="list" data-stagger>
+            <li class="pt-feature">
+                <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" /></svg>Authentic flavours</h2>
+                <p>Whole spices, slow heat and recipes rooted in home cooking.</p>
+            </li>
+            <li class="pt-feature">
+                <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" /></svg>Cooked fresh</h2>
+                <p>Dishes are prepared fresh each day, then packed for you to enjoy at home.</p>
+            </li>
+            <li class="pt-feature">
+                <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" /></svg>Wide variety</h2>
+                <p>Biryani, starters, meals, beverages and desserts, all on one menu.</p>
+            </li>
+            <li class="pt-feature">
+                <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z" /></svg>Order your way</h2>
+                <p>Choose pickup or delivery and follow your order online.</p>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- 3. Facts -->
+<section class="pt-section" aria-label="HT Restaurant at a glance">
+    <div class="pt-wrap">
+        <ul class="pt-badges" role="list" data-stagger>
+            <li class="pt-badge"><span class="pt-badge__ring"><strong>5</strong><span>Menu<br />categories</span></span></li>
+            <li class="pt-badge"><span class="pt-badge__ring"><strong>2</strong><span>Ways to order<br />pickup &amp; delivery</span></span></li>
+            <li class="pt-badge"><span class="pt-badge__ring"><strong>Daily</strong><span>Fresh from<br />the kitchen</span></span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- 4. Photo band -->
+<section class="pt-section" aria-labelledby="ptAboutBandTitle">
+    <div class="pt-wrap">
+        <div class="pt-band pt-band--ink" data-reveal>
+            <div class="pt-band__media">
+                <img src="@Img(tandoori, 900, 700)" srcset="@Img(tandoori, 900, 700) 1x, @Img(tandoori, 1600, 1244) 2x" width="900" height="700" alt="Charred tandoori chicken" loading="lazy" decoding="async" />
+            </div>
+            <div class="pt-band__body">
+                <p class="pt-kicker">Our kitchen</p>
+                <h2 id="ptAboutBandTitle" data-split>A taste of tradition, plated for today.</h2>
+                <p data-reveal>Every dish starts the way it always has: whole spices, slow heat and recipes handed down, cooked fresh each day and sent to your table without shortcuts.</p>
+                <div class="pt-actions" data-reveal>
+                    <a class="pt-btn pt-btn--gold" href="@orderUrl">Order now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Values -->
+<section class="pt-section pt-values" aria-labelledby="ptValuesTitle">
+    <div class="pt-wrap">
+        <h2 id="ptValuesTitle" class="pt-values__title" data-split>Built on flavour. Driven by values.</h2>
+        <ul class="pt-values__grid" role="list" data-stagger>
+            <li class="pt-value">
+                <h3>Vision</h3>
+                <p>To make every meal feel like it came from a family kitchen: warm, generous and unhurried, wherever you order from.</p>
+            </li>
+            <li class="pt-value">
+                <h3>Mission</h3>
+                <p>To cook honest Indian food from whole ingredients and time-tested recipes, and to make ordering it simple, with a clear menu, an easy cart and your choice of pickup or delivery.</p>
+            </li>
+            <li class="pt-value">
+                <h3>Values</h3>
+                <p>We are a kitchen first. Care for the guest, respect for the ingredient and pride in every plate guide the decisions we make.</p>
+            </li>
+            <li class="pt-value">
+                <h3>Indian culture</h3>
+                <p>Our menu draws on the range of Indian cooking, from slow-cooked biryani and tandoor-fired starters to everyday meals, cooling drinks and sweets.</p>
+            </li>
+            <li class="pt-value">
+                <h3>Quality</h3>
+                <p>Each dish is prepared fresh and looked over before it leaves the kitchen, so the plate that reaches you tastes the way it should.</p>
+            </li>
+            <li class="pt-value">
+                <h3>Integrity</h3>
+                <p>Clear prices, honest descriptions and orders handled as promised. If something is not right, we make it right.</p>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- 6. Closing actions -->
+<section class="pt-section pt-close" aria-label="Get started">
+    <div class="pt-wrap">
+        <div class="pt-actions pt-actions--center" data-reveal>
+            <button type="button" class="pt-btn pt-btn--line" data-locations-open aria-haspopup="dialog">Find a kitchen</button>
+            <a class="pt-btn pt-btn--solid" href="@orderUrl">Order now</a>
+        </div>
+    </div>
+</section>
