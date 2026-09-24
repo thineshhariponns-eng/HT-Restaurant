@@ -1,0 +1,140 @@
+@model CheckoutViewModel
+@using System.Text
+@using Microsoft.EntityFrameworkCore
+@inject TeamOmnifield.Web.Services.CartService CartServiceInstance
+@inject TeamOmnifield.Web.Data.AppDbContext Db
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Payment";
+    var cart = CartServiceInstance.Get();
+    var products = await Db.Products.Where(x => cart.Keys.Contains(x.Id)).ToListAsync();
+    var subtotal = products.Sum(p => p.Price * cart[p.Id]);
+    var total = subtotal + Configuration.GetValue<decimal>("Restaurant:DeliveryFee", 40m);
+
+    // Dummy QR: fixed pseudo-random modules plus three finder squares. Not a real payment code.
+    const int qrSize = 25;
+    var seed = 20260923L;
+    var modules = new StringBuilder();
+    for (var y = 0; y < qrSize; y++)
+    {
+        for (var x = 0; x < qrSize; x++)
+        {
+            seed = (seed * 1664525 + 1013904223) % 4294967296;
+            var inFinder = (x < 8 && y < 8) || (x >= qrSize - 8 && y < 8) || (x < 8 && y >= qrSize - 8);
+            if (!inFinder && seed / 4294967296.0 > 0.52) modules.Append($"M{x} {y}h1v1h-1z");
+        }
+    }
+    var finders = new[] { (0, 0), (qrSize - 7, 0), (0, qrSize - 7) };
+}
+<section class="band band-strong">
+    <div class="container">
+        <h1 class="display" style="font-size:clamp(1.875rem,3vw,2.25rem)">Payment</h1>
+        <a href="/Checkout" class="text-muted" style="margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-size:0.875rem;font-weight:500">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+            Back to Checkout
+        </a>
+    </div>
+</section>
+
+<section class="container band" style="border-bottom:0">
+    @if (TempData["PaymentError"] is string paymentError)
+    {
+        <div class="alert-error">@paymentError</div>
+    }
+    <div class="pay-shell">
+        <div class="pay-visual" aria-hidden="true">
+            <div class="pay-card pay-card--top"></div>
+            <div class="pay-card pay-card--mid"></div>
+            <div class="pay-card pay-card--bottom"></div>
+        </div>
+
+        <form asp-action="Payment" method="post" class="pay-form">
+            <div class="pay-head">
+                <h2>Payment details</h2>
+                <button type="button" class="btn btn-secondary btn-sm" data-dialog-open="qrDialog">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:8px"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z" /></svg>
+                    Show QR code
+                </button>
+            </div>
+
+            <fieldset class="pay-methods">
+                <legend class="label-caps">Payment method</legend>
+                <label class="pay-method">
+                    <input type="radio" name="method" value="card" data-pay-method checked />
+                    <span><strong>Credit / Debit Card</strong><small>Visa, Mastercard, RuPay</small></span>
+                </label>
+                <label class="pay-method">
+                    <input type="radio" name="method" value="upi" data-pay-method />
+                    <span><strong>UPI</strong><small>GPay, PhonePe, Paytm</small></span>
+                </label>
+                <label class="pay-method">
+                    <input type="radio" name="method" value="cash" data-pay-method />
+                    <span><strong>Cash</strong><small>Pay on delivery</small></span>
+                </label>
+            </fieldset>
+
+            @* Demo inputs carry no name attribute, so nothing typed here is ever submitted. *@
+            <div data-pay-panel="card" style="margin-top:24px">
+                <div class="field">
+                    <label for="payCardNumber">Card Number</label>
+                    <input id="payCardNumber" type="text" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" />
+                </div>
+                <div class="field">
+                    <label for="payCardHolder">Card Holder Name</label>
+                    <input id="payCardHolder" type="text" autocomplete="off" placeholder="Name on card" />
+                </div>
+                <div class="pay-row">
+                    <div class="field">
+                        <label for="payExpiry">Expiry Date</label>
+                        <input id="payExpiry" type="text" autocomplete="off" placeholder="MM / YY" />
+                    </div>
+                    <div class="field">
+                        <label for="payCvv">CVV / CVV2</label>
+                        <input id="payCvv" type="text" inputmode="numeric" autocomplete="off" placeholder="123" />
+                    </div>
+                </div>
+            </div>
+            <div data-pay-panel="upi" hidden style="margin-top:24px">
+                <div class="field">
+                    <label for="payUpi">UPI ID</label>
+                    <input id="payUpi" type="text" autocomplete="off" placeholder="name@bank" />
+                </div>
+                <p class="hint">Or use "Show QR code" above to pay from any UPI app.</p>
+            </div>
+            <div data-pay-panel="cash" hidden style="margin-top:24px">
+                <p class="text-body pay-note">Pay in cash to the delivery partner when your order arrives.</p>
+            </div>
+
+            <div class="pay-total">
+                <span class="text-muted">Total Amount</span>
+                <span class="amount tabular">₹@total.ToString("0.00")</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px">Confirm Payment</button>
+            <p class="hint" style="margin-top:12px;text-align:center">Demo only — no payment is taken.</p>
+        </form>
+    </div>
+</section>
+
+<dialog id="qrDialog" class="dlg dlg-narrow" aria-labelledby="qrTitle">
+    <div class="dlg-body" style="text-align:center">
+        <div class="dlg-head">
+            <h2 id="qrTitle" class="display">Scan to pay</h2>
+            <button type="button" class="dlg-close" data-dialog-close aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            </button>
+        </div>
+        <p class="text-muted" style="margin-top:8px;font-size:0.875rem">Sample QR code — not a real payment link.</p>
+        <svg class="pay-qr" viewBox="0 0 @qrSize @qrSize" shape-rendering="crispEdges" role="img" aria-label="Dummy payment QR code">
+            <rect width="@qrSize" height="@qrSize" fill="#fff" />
+            <path d="@modules.ToString()" fill="#100d09" />
+            @foreach (var (fx, fy) in finders)
+            {
+                <rect x="@fx" y="@fy" width="7" height="7" fill="#100d09" />
+                <rect x="@(fx + 1)" y="@(fy + 1)" width="5" height="5" fill="#fff" />
+                <rect x="@(fx + 2)" y="@(fy + 2)" width="3" height="3" fill="#100d09" />
+            }
+        </svg>
+        <p class="tabular" style="margin:16px 0 0;font-weight:700;font-size:1.25rem">₹@total.ToString("0.00")</p>
+        <button type="button" class="btn btn-secondary btn-block" style="margin-top:20px" data-dialog-close>Close</button>
+    </div>
+</dialog>

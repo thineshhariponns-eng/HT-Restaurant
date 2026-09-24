@@ -1,0 +1,18 @@
+@{ ViewData["Title"] = "Page not found"; }
+<div class="empty-state" style="padding-top:96px;padding-bottom:96px">
+    <svg width="160" height="160" viewBox="0 0 160 160" fill="none" aria-hidden="true" style="margin:0 auto">
+        <circle cx="80" cy="86" r="54" stroke="var(--color-border-strong)" stroke-width="2" />
+        <circle cx="80" cy="86" r="38" stroke="var(--color-border-subtle)" stroke-width="2" />
+        <path d="M50 56v22a6 6 0 0 0 6 6v34M50 56v-6M56 56v-6M62 56v-6M62 56v22a6 6 0 0 1-6 6" stroke="var(--color-text-muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M108 50c-8 0-14 8-14 20s6 20 14 20v28" stroke="var(--color-text-muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="98" cy="42" r="22" fill="var(--color-bg-base)" stroke="var(--color-primary-600)" stroke-width="3" />
+        <path d="M91 34a7 7 0 1 1 7.9 6.95c-.9.13-1.9.9-1.9 2.05v.5" stroke="var(--color-primary-600)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="97" cy="48.5" r="1.6" fill="var(--color-primary-600)" />
+    </svg>
+    <p class="title" style="font-size:1.5rem">Page not found</p>
+    <p class="hint text-muted">The address you typed doesn't match anything here. Double-check the link, or head back to a page that exists.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
+        <a href="/" class="btn btn-primary">Back to home</a>
+        <a href="/Menu" class="btn btn-secondary">Browse the menu</a>
+    </div>
+</div>

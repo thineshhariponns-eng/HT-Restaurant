@@ -1,4 +1,4 @@
-/* HT Restaurant Erode — landing page motion.
+/* HT Restaurant Chennai — landing page motion.
    Stack: GSAP + ScrollTrigger (animation), Lenis (the only smooth-scroll engine), vendored in /lib.
    Everything here is progressive: without JS, or under prefers-reduced-motion, the page renders in its final
    state (the .js-motion class that hides pre-animation states is never applied or is removed). */

@@ -1,0 +1,8 @@
+:host {
+  display: contents;
+}
+
+/* Ink Ground at 70% — the system's overlay scrim. No blur. */
+dialog::backdrop {
+  background-color: rgb(20 17 13 / 0.7);
+}

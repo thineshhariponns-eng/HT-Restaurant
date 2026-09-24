@@ -31,6 +31,7 @@ builder.Services.AddScoped<IPasswordHasher<AdminUser>, PasswordHasher<AdminUser>
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<HostContextService>();
+builder.Services.AddScoped<CityContextService>();
 builder.Services.AddHttpClient<TurnstileService>();
 
 var app = builder.Build();
@@ -47,6 +48,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseExceptionHandler("/Home/Error");
+// Skip /api and /health: they must keep returning plain JSON/empty 404s, not an HTML page, for API callers.
+app.UseWhen(
+    ctx => !ctx.Request.Path.StartsWithSegments("/api") && !ctx.Request.Path.StartsWithSegments("/health"),
+    branch => branch.UseStatusCodePagesWithReExecute("/error/{0}"));
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
