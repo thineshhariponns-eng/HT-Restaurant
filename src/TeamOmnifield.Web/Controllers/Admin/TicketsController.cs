@@ -5,14 +5,23 @@ using TeamOmnifield.Web.Services;
 namespace TeamOmnifield.Web.Controllers.Admin;
 
 /// <summary>
-/// Support tickets from the restaurant admin to the consultant. They land in the
-/// <see cref="DemoWorkspaceStore.AdminPortalProject"/> project of the consultant portal,
-/// and this controller never reaches tickets of any other project.
+/// Support tickets from the restaurant admin to the consultant. Each ticket lands in the consultant
+/// portal's project for whichever city is currently selected (see <see cref="CityContextService"/>) -
+/// a ticket raised while Chennai is selected shows up only under the Chennai project in the developer
+/// portal, never under Hyderabad's or Kolkata's.
 /// </summary>
 [Area("Admin"), Authorize(Roles = "Admin")]
-public class TicketsController : Controller
+public class TicketsController(CityContextService cityContext) : Controller
 {
-    private static DemoProject? Site => DemoWorkspaceStore.ProjectByName(DemoWorkspaceStore.AdminPortalProject);
+    private DemoProject? Site
+    {
+        get
+        {
+            var slug = cityContext.Current.Slug;
+            if (!DemoWorkspaceStore.Cities.Contains(slug)) slug = "chennai"; // before a city has ever been picked
+            return DemoWorkspaceStore.ProjectByName(DemoWorkspaceStore.AdminPortalProject(slug));
+        }
+    }
 
     private string Who() => User.Identity?.Name ?? "admin";
 
@@ -37,6 +46,7 @@ public class TicketsController : Controller
         else
         {
             var ticket = DemoWorkspaceStore.RaiseTicket(site.ClientId, site.Id, title, body, Who(), DemoWorkspaceStore.AdminPortalSource);
+            DemoClientStore.LogActivity(site.ClientId, $"Ticket raised on {site.Name}: {title}");
             return RedirectToAction(nameof(Details), new { number = ticket!.Number });
         }
         return RedirectToAction(nameof(Index));

@@ -183,4 +183,11 @@ public class DeploymentsController : Controller
         DemoClientStore.MoveTo(id, stage);
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public IActionResult MoveTicket(string clientId, int number, ClientStage stage)
+    {
+        DemoWorkspaceStore.MoveTicket(clientId, number, stage);
+        return RedirectToAction(nameof(Index));
+    }
 }

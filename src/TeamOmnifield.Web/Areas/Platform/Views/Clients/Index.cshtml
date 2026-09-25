@@ -50,11 +50,13 @@
                 <th>Customer domain</th>
                 <th>Admin domain</th>
                 <th>Status</th>
+                <th style="text-align:right">Open tickets</th>
             </tr>
             </thead>
             <tbody>
             @foreach (var client in clients)
             {
+                var openTickets = DemoWorkspaceStore.TicketsOf(client.Id).Count(t => t.IsOpen);
                 <tr>
                     <td class="text-primary">
                         <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
@@ -62,6 +64,7 @@
                     <td class="text-body">@client.Domain</td>
                     <td class="text-body">@client.ResolvedAdminDomain</td>
                     <td><span class="label-caps stage-@client.Stage.ToString().ToLowerInvariant()">@Code(client.Stage)</span></td>
+                    <td class="tabular text-body" style="text-align:right">@openTickets</td>
                 </tr>
             }
             </tbody>
