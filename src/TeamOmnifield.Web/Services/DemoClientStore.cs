@@ -41,36 +41,27 @@ public static class DemoClientStore
     public static readonly ClientStage[] Pipeline =
         [ClientStage.New, ClientStage.Onboarding, ClientStage.Development, ClientStage.Review, ClientStage.Production];
 
-    static DemoClientStore() => SeedSampleClients();
+    static DemoClientStore() => SeedRealClient();
 
-    /// <summary>Three sample clients at different stages, with projects, tickets, deployments and changes, so the portal has something to show.</summary>
-    private static void SeedSampleClients()
+    /// <summary>
+    /// This portal manages one real client: HT Restaurant itself. No fictional sample clients,
+    /// tickets, deployments or changes are seeded - everything else in the portal is built from
+    /// real activity (tickets raised from the admin portal, deployments and changes logged here).
+    /// </summary>
+    private static void SeedRealClient()
     {
-        (string Name, string City, string Contact, string Email, string Domain, string Admin, ClientStage Stage, int Progress, int DaysAgo)[] samples =
-        [
-            ("Urban Tandoor", "Bengaluru", "Meera Iyer", "meera@urbantandoor.in", "urbantandoor.local", "admin.urbantandoor.local", ClientStage.Onboarding, 35, 3),
-            ("Coastal Kitchen", "Kochi", "Arjun Nair", "arjun@coastalkitchen.in", "coastalkitchen.local", "admin.coastalkitchen.local", ClientStage.Development, 60, 12),
-            ("Spice Garden", "Chennai", "Priya Raman", "priya@spicegarden.in", "spicegarden.local", "admin.spicegarden.local", ClientStage.Production, 100, 40),
-            ("HT Restaurant", "Chennai & Hyderabad", "Harsha Robba", "harsha@htrestaurant.com", "htrestaurant.com", "admin.htrestaurant.com", ClientStage.Production, 100, 60),
-        ];
-
-        foreach (var s in samples)
+        var client = new DemoClient
         {
-            var next = Clients.Count + 1;
-            var created = DateTime.UtcNow.AddDays(-s.DaysAgo);
-            Clients.Insert(0, new DemoClient
-            {
-                Id = $"c-{next}", Code = $"CL-{next:000}", Name = s.Name, City = s.City, Contact = s.Contact,
-                ContactEmail = s.Email, Domain = s.Domain, AdminDomain = s.Admin, Stage = s.Stage,
-                Progress = s.Progress, CreatedUtc = created, UpdatedUtc = DateTime.UtcNow.AddDays(-s.DaysAgo / 4.0),
-            });
-            Activity.Insert(0, new ActivityEntry(created.ToLocalTime().ToString("HH:mm"), s.Name, "Client created"));
-            Activity.Insert(0, new ActivityEntry(DateTime.Now.AddMinutes(-next * 17).ToString("HH:mm"), s.Name, $"Moved to {Label(s.Stage)}"));
-            // HT Restaurant runs one site per city instead of the two default projects.
-            if (s.Domain != "htrestaurant.com") DemoWorkspaceStore.SeedDefaults($"c-{next}");
-        }
-
-        DemoWorkspaceStore.SeedSampleWork();
+            Id = "c-1", Code = "CL-001", Name = "HT Restaurant", City = "Chennai, Hyderabad & Kolkata",
+            Contact = "Harsha Robba", ContactEmail = "harsha@htrestaurant.com",
+            Domain = "htrestaurant.com", AdminDomain = "admin.htrestaurant.com",
+            Stage = ClientStage.Production, Progress = 100,
+        };
+        Clients.Add(client);
+        // One project per city; tickets raised from the admin portal route to the selected city's project.
+        DemoWorkspaceStore.AddProject(client.Id, "htrestaurant.chennai.com");
+        DemoWorkspaceStore.AddProject(client.Id, "htrestaurant.hyderabad.com");
+        DemoWorkspaceStore.AddProject(client.Id, "htrestaurant.kolkata.com");
     }
 
     public static string Label(ClientStage stage) => stage switch
@@ -90,6 +81,16 @@ public static class DemoClientStore
         ClientStage.Development => 3,
         ClientStage.Review => 5,
         _ => 6,
+    };
+
+    /// <summary>A ticket has no progress number of its own, so its stage stands in for one on the Dashboard.</summary>
+    public static int StageProgress(ClientStage stage) => stage switch
+    {
+        ClientStage.New => 0,
+        ClientStage.Onboarding => 25,
+        ClientStage.Development => 50,
+        ClientStage.Review => 75,
+        _ => 100,
     };
 
     public static readonly string[] Steps =
@@ -129,6 +130,17 @@ public static class DemoClientStore
             client.Stage = stage;
             client.UpdatedUtc = DateTime.UtcNow;
             Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), client.Name, $"Moved to {Label(stage)}"));
+        }
+    }
+
+    /// <summary>Drops an entry into "Recent activity" on the Dashboard, e.g. when a ticket is raised.</summary>
+    public static void LogActivity(string clientId, string eventText)
+    {
+        lock (Gate)
+        {
+            var client = Clients.SingleOrDefault(x => x.Id == clientId);
+            if (client is null) return;
+            Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), client.Name, eventText));
         }
     }
 

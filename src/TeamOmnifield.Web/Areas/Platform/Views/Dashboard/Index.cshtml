@@ -3,6 +3,13 @@
     var clients = DemoClientStore.All();
     var activity = DemoClientStore.RecentActivity();
     var recent = clients.OrderByDescending(x => x.UpdatedUtc).ToList();
+    var openTickets = clients.Sum(c => DemoWorkspaceStore.TicketsOf(c.Id).Count(t => t.IsOpen));
+    var recentTickets = DemoWorkspaceStore.RecentTickets(5);
+    // Every open ticket carries its own pipeline Stage (movable on the Deployments board), and counts
+    // toward that stage here too - Client overview, Onboarding progress and Deployments all agree.
+    var openTicketCards = DemoWorkspaceStore.AllOpenTickets();
+    var pipelineTotal = clients.Count + openTicketCards.Count;
+    string When(DateTime utc) => utc.ToLocalTime().ToString("d MMM, HH:mm");
 }
 <div class="container admin-pad">
     <header class="page-heading">
@@ -15,12 +22,46 @@
         <div class="metric-card"><span>Onboarding</span><strong class="tabular">@DemoClientStore.CountOf(ClientStage.Onboarding).ToString("00")</strong></div>
         <div class="metric-card"><span>Development</span><strong class="tabular">@DemoClientStore.CountOf(ClientStage.Development).ToString("00")</strong></div>
         <div class="metric-card"><span>Live</span><strong class="tabular">@DemoClientStore.CountOf(ClientStage.Production).ToString("00")</strong></div>
+        <div class="metric-card"><span>Open tickets</span><strong class="tabular">@openTickets.ToString("00")</strong></div>
     </div>
+
+    <section class="summary-panel" style="margin-top:24px">
+        <h2 class="title" style="font-size:1rem">Recent tickets</h2>
+        @if (recentTickets.Count == 0)
+        {
+            <div class="empty-state" style="margin-top:16px">
+                <p class="title">No tickets yet</p>
+                <p class="hint text-muted">Tickets raised from a client's admin portal will show up here.</p>
+            </div>
+        }
+        else
+        {
+            <ul style="list-style:none;margin:16px 0 0;padding:0">
+                @foreach (var ts in recentTickets)
+                {
+                    var clientName = DemoClientStore.ById(ts.ClientId)?.Name ?? "Unknown client";
+                    <li style="display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle);flex-wrap:wrap">
+                        <span class="dot @(ts.Ticket.IsOpen ? "dot-done" : "stage-dot-review")" title="@(ts.Ticket.IsOpen ? "Open" : "Closed")"></span>
+                        <div style="flex:1;min-width:0">
+                            <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                                <a asp-area="Platform" asp-controller="Clients" asp-action="Ticket" asp-route-id="@ts.ClientId" asp-route-number="@ts.Ticket.Number" class="text-primary" style="font-weight:500">@ts.Ticket.Title</a>
+                                @if (ts.Ticket.CreatedUtc >= DateTime.UtcNow.AddHours(-24))
+                                {
+                                    <span class="badge" style="border-color:var(--color-primary-600);color:var(--color-primary-600);padding:2px 8px">New</span>
+                                }
+                            </span>
+                            <p class="text-muted" style="margin:2px 0 0;font-size:0.8125rem">#@ts.Ticket.Number &middot; @clientName &middot; @DemoWorkspaceStore.ProjectName(ts.ProjectId) &middot; @(ts.Ticket.IsOpen ? "open" : "closed") &middot; @ts.Ticket.Author@(ts.Ticket.Source.Length > 0 ? " via " + ts.Ticket.Source : "") &middot; @When(ts.Ticket.CreatedUtc)</p>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
 
     <div class="grid grid-2" style="align-items:start">
         <section class="summary-panel">
             <h2 class="title" style="font-size:1rem">Client overview</h2>
-            @if (recent.Count == 0)
+            @if (recent.Count == 0 && openTicketCards.Count == 0)
             {
                 <div class="empty-state" style="margin-top:16px">
                     <p class="title">No clients yet</p>
@@ -35,6 +76,24 @@
                     <tr><th>Client</th><th>Status</th><th style="text-align:right">Progress</th></tr>
                     </thead>
                     <tbody>
+                    @foreach (var ts in openTicketCards)
+                    {
+                        var clientName = DemoClientStore.ById(ts.ClientId)?.Name ?? "Unknown client";
+                        var ticketProgress = DemoClientStore.StageProgress(ts.Ticket.Stage);
+                        <tr class="tone-@ts.Ticket.Stage.ToString().ToLowerInvariant()">
+                            <td class="text-primary">
+                                <a asp-area="Platform" asp-controller="Clients" asp-action="Ticket" asp-route-id="@ts.ClientId" asp-route-number="@ts.Ticket.Number">@ts.Ticket.Title</a>
+                                <span class="text-muted" style="display:block;font-size:0.75rem;margin-top:2px">Ticket &middot; @clientName</span>
+                            </td>
+                            <td class="tone-text" style="font-weight:500">@DemoClientStore.Label(ts.Ticket.Stage)</td>
+                            <td style="text-align:right">
+                                <span style="display:inline-flex;align-items:center;gap:10px;justify-content:flex-end">
+                                    <span class="meter" role="img" aria-label="@ticketProgress percent complete"><span style="width:@(ticketProgress)%"></span></span>
+                                    <span class="tabular text-body">@ticketProgress%</span>
+                                </span>
+                            </td>
+                        </tr>
+                    }
                     @foreach (var client in recent)
                     {
                         <tr class="tone-@client.Stage.ToString().ToLowerInvariant()">
@@ -61,8 +120,8 @@
             <ul style="list-style:none;margin:16px 0 0;padding:0">
                 @foreach (var stage in DemoClientStore.Pipeline)
                 {
-                    var count = DemoClientStore.CountOf(stage);
-                    var share = clients.Count == 0 ? 0 : (int)Math.Round(count * 100.0 / clients.Count);
+                    var count = DemoClientStore.CountOf(stage) + openTicketCards.Count(t => t.Ticket.Stage == stage);
+                    var share = pipelineTotal == 0 ? 0 : (int)Math.Round(count * 100.0 / pipelineTotal);
                     <li class="tone-@stage.ToString().ToLowerInvariant()" style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle)">
                         <span class="dot stage-dot-@stage.ToString().ToLowerInvariant()"></span>
                         <span class="tone-text" style="flex:1;font-size:0.875rem;font-weight:500">@DemoClientStore.Label(stage)</span>

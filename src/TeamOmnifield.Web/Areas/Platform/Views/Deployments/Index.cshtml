@@ -2,6 +2,11 @@
     ViewData["Title"] = "Deployments";
     var clients = DemoClientStore.All();
     var pipeline = DemoClientStore.Pipeline;
+    var recentTickets = DemoWorkspaceStore.RecentTickets(5);
+    // Every open ticket shows as its own card in whichever column matches its Stage, draggable between
+    // columns exactly like a client card - moving it here does not open or close the ticket itself.
+    var openTicketCards = DemoWorkspaceStore.AllOpenTickets();
+    string When(DateTime utc) => utc.ToLocalTime().ToString("d MMM, HH:mm");
 }
 <div class="container admin-pad">
     <header class="page-heading">
@@ -9,19 +14,84 @@
         <p class="text-muted" style="font-size:0.875rem">Kanban. Drag a card between columns, or use its arrows.</p>
     </header>
 
+    @if (recentTickets.Count > 0)
+    {
+        <section class="summary-panel" style="margin-bottom:24px">
+            <h2 class="title" style="font-size:1rem">Recent tickets</h2>
+            <ul style="list-style:none;margin:16px 0 0;padding:0">
+                @foreach (var ts in recentTickets)
+                {
+                    var clientName = DemoClientStore.ById(ts.ClientId)?.Name ?? "Unknown client";
+                    <li style="display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-subtle);flex-wrap:wrap">
+                        <span class="dot @(ts.Ticket.IsOpen ? "dot-done" : "stage-dot-review")" title="@(ts.Ticket.IsOpen ? "Open" : "Closed")"></span>
+                        <div style="flex:1;min-width:0">
+                            <span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                                <a asp-area="Platform" asp-controller="Clients" asp-action="Ticket" asp-route-id="@ts.ClientId" asp-route-number="@ts.Ticket.Number" class="text-primary" style="font-weight:500">@ts.Ticket.Title</a>
+                                @if (ts.Ticket.CreatedUtc >= DateTime.UtcNow.AddHours(-24))
+                                {
+                                    <span class="badge" style="border-color:var(--color-primary-600);color:var(--color-primary-600);padding:2px 8px">New</span>
+                                }
+                            </span>
+                            <p class="text-muted" style="margin:2px 0 0;font-size:0.8125rem">#@ts.Ticket.Number &middot; @clientName &middot; @DemoWorkspaceStore.ProjectName(ts.ProjectId) &middot; @(ts.Ticket.IsOpen ? "open" : "closed") &middot; @When(ts.Ticket.CreatedUtc)</p>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     <div class="kanban">
         @foreach (var stage in pipeline)
         {
             var column = clients.Where(x => x.Stage == stage).ToList();
+            var ticketsHere = openTicketCards.Where(t => t.Ticket.Stage == stage).ToList();
             <section class="kanban-col tone-@stage.ToString().ToLowerInvariant()" data-stage="@stage" aria-label="@DemoClientStore.Label(stage)">
                 <header>
                     <p class="label-caps" style="display:flex;align-items:center;gap:8px">
                         <span class="dot stage-dot-@stage.ToString().ToLowerInvariant()"></span>
                         @DemoClientStore.Label(stage)
                     </p>
-                    <p class="count tabular">@column.Count.ToString("00")</p>
+                    <p class="count tabular">@((column.Count + ticketsHere.Count).ToString("00"))</p>
                 </header>
                 <ul class="kanban-list" data-stage="@stage">
+                    @foreach (var ts in ticketsHere)
+                    {
+                        var clientName = DemoClientStore.ById(ts.ClientId)?.Name ?? "Unknown client";
+                        var ticketIndex = Array.IndexOf(pipeline, ts.Ticket.Stage);
+                        var ticketProgress = DemoClientStore.StageProgress(ts.Ticket.Stage);
+                        <li class="kanban-card" draggable="true" data-ticket-client="@ts.ClientId" data-ticket-number="@ts.Ticket.Number">
+                            <div class="row">
+                                <a asp-area="Platform" asp-controller="Clients" asp-action="Ticket" asp-route-id="@ts.ClientId" asp-route-number="@ts.Ticket.Number">@ts.Ticket.Title</a>
+                                <span class="nudge">
+                                    @if (ticketIndex > 0)
+                                    {
+                                        <form method="post" asp-area="Platform" asp-controller="Deployments" asp-action="MoveTicket">
+                                            <input type="hidden" name="clientId" value="@ts.ClientId" />
+                                            <input type="hidden" name="number" value="@ts.Ticket.Number" />
+                                            <input type="hidden" name="stage" value="@pipeline[ticketIndex - 1]" />
+                                            <button type="submit" aria-label="Move @ts.Ticket.Title left">&lsaquo;</button>
+                                        </form>
+                                    }
+                                    @if (ticketIndex < pipeline.Length - 1)
+                                    {
+                                        <form method="post" asp-area="Platform" asp-controller="Deployments" asp-action="MoveTicket">
+                                            <input type="hidden" name="clientId" value="@ts.ClientId" />
+                                            <input type="hidden" name="number" value="@ts.Ticket.Number" />
+                                            <input type="hidden" name="stage" value="@pipeline[ticketIndex + 1]" />
+                                            <button type="submit" aria-label="Move @ts.Ticket.Title right">&rsaquo;</button>
+                                        </form>
+                                    }
+                                </span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
+                                <span class="tabular text-body" style="font-size:0.75rem">@ticketProgress%</span>
+                                <span class="meter" style="flex:1" aria-hidden="true"><span style="width:@(ticketProgress)%"></span></span>
+                            </div>
+                            <p class="host text-body">Ticket &middot; @clientName</p>
+                            <p class="host text-muted">@DemoWorkspaceStore.ProjectName(ts.ProjectId)</p>
+                            <p class="text-muted tabular" style="font-size:0.75rem;margin:8px 0 0">Raised: @When(ts.Ticket.CreatedUtc)</p>
+                        </li>
+                    }
                     @foreach (var client in column)
                     {
                         var index = Array.IndexOf(pipeline, client.Stage);
@@ -53,10 +123,15 @@
                             </div>
                             <p class="host text-body">@client.Domain</p>
                             <p class="host text-muted">@client.ResolvedAdminDomain</p>
+                            @{ var openTickets = DemoWorkspaceStore.TicketsOf(client.Id).Count(t => t.IsOpen); }
+                            @if (openTickets > 0)
+                            {
+                                <p class="text-muted tabular" style="font-size:0.75rem;margin:4px 0 0">@openTickets open ticket@(openTickets == 1 ? "" : "s")</p>
+                            }
                             <p class="text-muted tabular" style="font-size:0.75rem;margin:8px 0 0">Updated: @client.UpdatedUtc.ToString("d MMM")</p>
                         </li>
                     }
-                    @if (column.Count == 0)
+                    @if (column.Count == 0 && ticketsHere.Count == 0)
                     {
                         <li class="kanban-empty text-muted">Nothing in @DemoClientStore.Label(stage).</li>
                     }
@@ -69,19 +144,25 @@
         <input type="hidden" name="id" id="moveId" />
         <input type="hidden" name="stage" id="moveStage" />
     </form>
+    <form id="moveTicketForm" method="post" asp-area="Platform" asp-controller="Deployments" asp-action="MoveTicket" style="display:none">
+        <input type="hidden" name="clientId" id="moveTicketClientId" />
+        <input type="hidden" name="number" id="moveTicketNumber" />
+        <input type="hidden" name="stage" id="moveTicketStage" />
+    </form>
 </div>
 
 @section Scripts {
 <script>
 (function () {
   var dragged = null;
-  var form = document.getElementById('moveForm');
+  var clientForm = document.getElementById('moveForm');
+  var ticketForm = document.getElementById('moveTicketForm');
 
-  document.querySelectorAll('.kanban-card').forEach(function (card) {
+  document.querySelectorAll('.kanban-card[draggable="true"]').forEach(function (card) {
     card.addEventListener('dragstart', function (e) {
       dragged = card;
       card.classList.add('dragging');
-      if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', card.dataset.client); }
+      if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'drag'); }
     });
     card.addEventListener('dragend', function () {
       card.classList.remove('dragging');
@@ -95,14 +176,21 @@
     list.addEventListener('drop', function (e) {
       e.preventDefault();
       list.classList.remove('over');
-      var id = (e.dataTransfer && e.dataTransfer.getData('text/plain')) || (dragged && dragged.dataset.client);
-      if (!id) return;
+      if (!dragged) return;
       var target = list.dataset.stage;
-      var from = dragged ? dragged.closest('.kanban-list').dataset.stage : null;
+      var from = dragged.closest('.kanban-list').dataset.stage;
       if (from === target) return;
-      document.getElementById('moveId').value = id;
-      document.getElementById('moveStage').value = target;
-      form.submit();
+
+      if (dragged.dataset.client) {
+        document.getElementById('moveId').value = dragged.dataset.client;
+        document.getElementById('moveStage').value = target;
+        clientForm.submit();
+      } else if (dragged.dataset.ticketClient) {
+        document.getElementById('moveTicketClientId').value = dragged.dataset.ticketClient;
+        document.getElementById('moveTicketNumber').value = dragged.dataset.ticketNumber;
+        document.getElementById('moveTicketStage').value = target;
+        ticketForm.submit();
+      }
     });
   });
 })();

@@ -4,9 +4,10 @@
     var currentController = (string)ViewContext.RouteData.Values["controller"]!;
     bool IsActive(string controller) => string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
     var pendingCount = (await AdminOrderService.GetAdminListAsync(TeamOmnifield.Web.Models.OrderStatus.Pending, null)).Count;
-    var supportSite = TeamOmnifield.Web.Services.DemoWorkspaceStore.ProjectByName(TeamOmnifield.Web.Services.DemoWorkspaceStore.AdminPortalProject);
-    var openTickets = supportSite is null ? 0 : TeamOmnifield.Web.Services.DemoWorkspaceStore.TicketsOf(supportSite.ClientId, supportSite.Id).Count(t => t.IsOpen);
     var city = CityContext.Current;
+    var supportSiteSlug = TeamOmnifield.Web.Services.DemoWorkspaceStore.Cities.Contains(city.Slug) ? city.Slug : "chennai";
+    var supportSite = TeamOmnifield.Web.Services.DemoWorkspaceStore.ProjectByName(TeamOmnifield.Web.Services.DemoWorkspaceStore.AdminPortalProject(supportSiteSlug));
+    var openTickets = supportSite is null ? 0 : TeamOmnifield.Web.Services.DemoWorkspaceStore.TicketsOf(supportSite.ClientId, supportSite.Id).Count(t => t.IsOpen);
 }
 <!doctype html>
 <html lang="en">
