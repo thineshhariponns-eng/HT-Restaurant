@@ -1,0 +1,12 @@
+# src/index.html references href="favicon.ico"; Angular copies public/ to the
+# build output root (see angular.json assets), so the file exists as
+# public/favicon.ico in the source tree and as /favicon.ico in production.
+# Lychee resolves it against src/ and reports a false "file not found".
+file:///.*src/favicon\.ico
+
+# Private LAN deployment URLs (hosts-file entries set up by setup-hosts.ps1).
+# They are only reachable on the local network where the app is deployed,
+# never from CI runners, so connection failures here are expected.
+http://htrestaurant\.com:8080/
+http://admin\.htrestaurant\.com:8080/
+http://teamomnifield\.ai:8080/

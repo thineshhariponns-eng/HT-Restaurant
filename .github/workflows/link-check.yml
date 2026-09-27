@@ -20,4 +20,4 @@ jobs:
     uses: seolith-llc/seolith-dev-standards/.github/workflows/link-check.yml@main
     with:
       scan-path: "."
-      # fail-on-error: true            # flip to enforce
+      fail-on-error: true
