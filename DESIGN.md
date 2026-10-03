@@ -73,7 +73,7 @@ Deliberate themed exceptions — do not "fix" these into the base scale:
 
 ## Components
 
-- **Buttons.** MVC: `.btn` + variant (`btn-primary` solid turmeric, `btn-secondary` hairline outline, `btn-ghost` borderless, `btn-danger` rust outline, `btn-cancel` customer-theme rust) + size (`btn-sm`, `btn-block`). Angular: `hlmBtn` (`primary`/`outline`/`ghost`/`destructive`, sizes `xs`–`lg`, `icon*`) for portals; customer marketing pages use the hand-rolled primary-link pattern `bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700` — copy it verbatim for new primary CTAs there.
+- **Buttons.** MVC: `.btn` + variant (`btn-primary` solid turmeric, `btn-secondary` hairline outline, `btn-ghost` borderless, `btn-danger` rust outline, `btn-cancel` customer-theme rust) + size (`btn-sm`, `btn-block`). Angular: `hlmBtn` (`primary`/`outline`/`ghost`/`destructive`, sizes `xs`–`lg`, `icon*`) for portals; customer marketing pages use the hand-rolled primary-link pattern `bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700 active:translate-y-px` — copy it verbatim for new primary CTAs there.
 - **Inputs.** MVC: `.field` wrapper, 1px `--color-border-input` stroke, square, focus = 1px turmeric ring. Angular: `hlmInput` (h-8, matching `hlmBtn` sizes).
 - **Cards.** MVC: `.card` (surface + subtle hairline, turmeric border on hover when linkable). Angular: surface + `border-border-subtle` hairlines; drag previews outlined in turmeric.
 - **Emphasis.** Restraint is the system: one signal colour, hairlines over shadows, emphasis via `text-primary` + weight, never via new colours or extra borders.

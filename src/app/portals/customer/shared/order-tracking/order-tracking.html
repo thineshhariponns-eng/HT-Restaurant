@@ -37,7 +37,7 @@
           </p>
           <a
             routerLink="/menu"
-            class="mt-3 inline-block bg-primary-600 px-5 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+            class="mt-3 inline-block bg-primary-600 px-5 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700 active:translate-y-px"
           >
             Order Again
           </a>
@@ -46,7 +46,7 @@
         @if (isRejected()) {
           <a
             [href]="contact.phoneHref"
-            class="inline-block bg-primary-600 px-5 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+            class="inline-block bg-primary-600 px-5 py-2.5 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700 active:translate-y-px"
           >
             Call the Restaurant
           </a>

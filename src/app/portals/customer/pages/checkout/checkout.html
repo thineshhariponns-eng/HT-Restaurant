@@ -9,7 +9,7 @@
     <p class="mt-2 text-sm text-text-muted">Order reference #{{ orderReference() }} — we'll have it ready soon.</p>
     <a
       routerLink="/menu"
-      class="mt-6 inline-block bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+      class="mt-6 inline-block bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700 active:translate-y-px"
     >
       Back to Menu
     </a>
@@ -20,7 +20,7 @@
     <p class="mt-2 text-sm text-text-muted">Browse our menu and add something delicious.</p>
     <a
       routerLink="/menu"
-      class="mt-6 inline-block bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700"
+      class="mt-6 inline-block bg-primary-600 px-6 py-3 text-sm font-semibold text-text-inverse transition-colors duration-150 hover:bg-primary-700 active:translate-y-px"
     >
       Explore Menu
     </a>
@@ -130,7 +130,7 @@
       type="button"
       [attr.aria-disabled]="checkoutForm.invalid"
       (click)="onPlaceOrder()"
-      class="px-5 py-2.5 text-sm font-semibold transition-colors duration-150"
+      class="px-5 py-2.5 text-sm font-semibold transition-colors duration-150 active:translate-y-px"
       [class.bg-primary-600]="!checkoutForm.invalid"
       [class.text-text-inverse]="!checkoutForm.invalid"
       [class.hover:bg-primary-700]="!checkoutForm.invalid"

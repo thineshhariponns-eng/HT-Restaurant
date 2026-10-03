@@ -7,6 +7,18 @@ dialog::backdrop {
   background-color: rgb(20 17 13 / 0.7);
 }
 
+/* Subtle entry: fade + small rise (reduced-motion is handled globally in styles.css). */
+dialog[open] {
+  animation: dlg-in 200ms ease-out;
+}
+
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 .sheet-body {
   scrollbar-color: var(--color-border-strong) transparent;
   scrollbar-width: thin;
