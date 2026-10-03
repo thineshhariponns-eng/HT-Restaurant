@@ -13,7 +13,9 @@
         routerLinkActive="border-primary-600 text-primary-600"
         [routerLinkActiveOptions]="{ exact: link.exact }"
         (click)="onLinkClick()"
-        class="block border-b-2 border-transparent px-3 py-2 text-text-body transition-colors duration-150 hover:border-primary-600 hover:text-text-primary"
+        class="block border-b-2 border-transparent px-3 text-text-body transition-colors duration-150 hover:border-primary-600 hover:text-text-primary"
+        [class.py-2]="variant() === 'horizontal'"
+        [class.py-3]="variant() === 'stacked'"
       >
         {{ link.label }}
       </a>

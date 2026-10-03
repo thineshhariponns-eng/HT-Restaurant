@@ -190,10 +190,10 @@ table.ruled tbody tr:hover { background: var(--color-bg-base); }
 
 /* ---------- quantity stepper ---------- */
 .qty-stepper { display: inline-flex; align-items: center; border: 1px solid var(--color-border-subtle); }
-.qty-stepper button { width: 40px; height: 40px; border: 0; background: transparent; color: var(--color-text-primary); cursor: pointer; font-size: 1rem; }
+.qty-stepper button { width: 44px; height: 44px; border: 0; background: transparent; color: var(--color-text-primary); cursor: pointer; font-size: 1rem; }
 .qty-stepper button:hover:not(:disabled) { color: var(--color-primary-600); }
 .qty-stepper button:disabled { color: var(--color-text-muted); opacity: 0.5; cursor: not-allowed; }
-.qty-stepper span, .qty-stepper input { width: 40px; text-align: center; color: var(--color-text-primary); border: 0; background: transparent; }
+.qty-stepper span, .qty-stepper input { width: 44px; text-align: center; color: var(--color-text-primary); border: 0; background: transparent; }
 
 /* ---------- summary panel ---------- */
 .summary-panel { background: var(--color-bg-surface); border: 1px solid var(--color-border-subtle); padding: 24px; }
@@ -214,10 +214,10 @@ table.ruled tbody tr:hover { background: var(--color-bg-base); }
 .primary-nav a.active { color: var(--color-primary-600); border-color: var(--color-primary-600); }
 @media (min-width: 1024px) { .primary-nav { display: flex; } .nav-toggle { display: none; } }
 .header-actions { display: flex; align-items: center; gap: 8px; }
-.nav-toggle { width: 36px; height: 36px; border: 1px solid var(--color-border-subtle); background: transparent; color: var(--color-text-primary); cursor: pointer; }
+.nav-toggle { width: 44px; height: 44px; border: 1px solid var(--color-border-subtle); background: transparent; color: var(--color-text-primary); cursor: pointer; }
 .mobile-nav { display: none; border-top: 1px solid var(--color-border-subtle); padding: 16px; background: var(--color-bg-surface); }
 .mobile-nav.open { display: block; }
-.mobile-nav a { display: block; padding: 10px 4px; color: var(--color-text-body); }
+.mobile-nav a { display: block; padding: 12px 4px; color: var(--color-text-body); }
 .mobile-nav a.auth-link { display: flex; align-items: center; gap: 8px; }
 .cart-btn {
   position: relative; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--color-border-subtle);

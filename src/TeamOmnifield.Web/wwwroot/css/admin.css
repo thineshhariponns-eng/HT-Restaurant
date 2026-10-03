@@ -112,7 +112,7 @@ body.admin .admin-topbar {
 @media (min-width: 640px) { body.admin .admin-topbar { padding: 0 32px; } }
 body.admin .admin-breadcrumb { font-weight: 600; }
 body.admin .admin-clock { padding: 8px 16px; border-radius: 999px; background: var(--mg-glass); border: 1px solid var(--mg-line); }
-body.admin .admin-drawer-toggle { width: 40px; height: 40px; border-radius: 50%; border-color: var(--mg-line-strong); background: var(--mg-glass); }
+body.admin .admin-drawer-toggle { width: 44px; height: 44px; border-radius: 50%; border-color: var(--mg-line-strong); background: var(--mg-glass); }
 body.admin .admin-mobile-sidebar .scrim { background: rgba(6, 12, 11, .72); }
 body.admin .admin-mobile-sidebar .panel {
   background: rgba(16, 26, 24, .94); border-right: 1px solid var(--mg-line);
