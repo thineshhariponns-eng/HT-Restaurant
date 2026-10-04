@@ -8,6 +8,8 @@
     // ViewBag.City wins when this very request just chose one (the cookie isn't visible until the next request);
     // otherwise fall back to the cookie, and to the default HQ branding until a city has ever been picked.
     var city = ViewBag.City as CityInfo ?? CityContext.Current;
+    var description = ViewData["Description"] as string
+        ?? $"HT Restaurant {city.Name} — order home-style Indian cooking for pickup, delivery or dine-in.";
 }
 <!doctype html>
 <html lang="en">
@@ -15,6 +17,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - HT Restaurant @city.Name</title>
+    <meta name="description" content="@description" />
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @if (bodyClass.Contains("customer"))
     {
