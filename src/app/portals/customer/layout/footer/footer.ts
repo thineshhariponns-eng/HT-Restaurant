@@ -7,11 +7,6 @@ interface FooterLink {
   path: string;
 }
 
-interface SocialLink {
-  label: string;
-  href: string;
-}
-
 @Component({
   selector: 'app-footer',
   imports: [RouterLink],
@@ -24,20 +19,11 @@ export class Footer {
 
   protected readonly quickLinks: FooterLink[] = [
     { label: 'Home', path: '/' },
-    { label: 'Menu', path: '/menu' },
-    { label: 'About', path: '/about' },
-    { label: 'Contact', path: '/contact' }
+    { label: 'Menu', path: '/menu' }
   ];
 
   protected readonly hours = [
     { day: 'Monday – Friday', time: '11:00 AM – 10:30 PM' },
     { day: 'Saturday – Sunday', time: '10:30 AM – 11:00 PM' }
-  ];
-
-  /** Placeholder handles until real social accounts are confirmed. */
-  protected readonly socialLinks: SocialLink[] = [
-    { label: 'Instagram', href: '#' },
-    { label: 'Facebook', href: '#' },
-    { label: 'WhatsApp', href: '#' }
   ];
 }

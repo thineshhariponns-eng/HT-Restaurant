@@ -24,8 +24,6 @@ export class CustomerNav {
     { label: 'Home', path: '/', exact: true },
     { label: 'Menu', path: '/menu', exact: false },
     { label: 'My Orders', path: '/orders', exact: false },
-    { label: 'About', path: '/about', exact: false },
-    { label: 'Contact', path: '/contact', exact: false },
     { label: 'Admin', path: '/admin', exact: false, staff: true },
     { label: 'Developer', path: '/developer', exact: false, staff: true }
   ];
