@@ -1,4 +1,13 @@
 (function () {
+  // Location switcher: close on outside click or Escape.
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('[data-loc-switch][open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('[data-loc-switch][open]').forEach(function (d) { d.removeAttribute('open'); d.querySelector('summary').focus(); });
+  });
+
   document.querySelectorAll('[data-nav-toggle]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.querySelector(btn.getAttribute('data-nav-toggle'));

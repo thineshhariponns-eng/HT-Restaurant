@@ -8,6 +8,8 @@
     // ViewBag.City wins when this very request just chose one (the cookie isn't visible until the next request);
     // otherwise fall back to the cookie, and to the default HQ branding until a city has ever been picked.
     var city = ViewBag.City as CityInfo ?? CityContext.Current;
+    // Home links stay on the visitor's own city (the default city has no page of its own, so it falls back to Chennai).
+    var homeUrl = TeamOmnifield.Web.Services.CityContextService.Cities.ContainsKey(city.Slug) ? "/" + city.Slug : "/chennai";
 }
 <!doctype html>
 <html lang="en">
@@ -25,12 +27,12 @@
 <body class="@bodyClass">
 <header class="site-header">
     <div class="container bar">
-        <a href="/chennai" class="brand-mark">
+        <a href="@homeUrl" class="brand-mark">
             <span class="name">HT Restaurant</span>
             <span class="place">@city.Name</span>
         </a>
         <nav class="primary-nav" aria-label="Primary">
-            <a href="/chennai">Home</a>
+            <a href="@homeUrl">Home</a>
             <a href="/Menu">Menu</a>
             <a href="/Orders">My Orders</a>
             <a href="/Cart">Cart</a>
@@ -40,6 +42,21 @@
             }
         </nav>
         <div class="header-actions">
+            <details class="loc-switch" data-loc-switch>
+                <summary aria-label="Change location, currently @city.Name">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                    <span>@city.Name</span>
+                    <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                </summary>
+                <div class="loc-menu" role="menu">
+                    <p class="loc-title">Choose your city</p>
+                    @foreach (var c in TeamOmnifield.Web.Services.CityContextService.Cities.Values)
+                    {
+                        <a href="/@c.Slug" role="menuitem" class="@(c.Slug == city.Slug ? "current" : "")" @(c.Slug == city.Slug ? "aria-current=true" : "")>@c.Name</a>
+                    }
+                    <a href="/" role="menuitem" class="all">All locations</a>
+                </div>
+            </details>
             <a href="/Cart" class="cart-btn" aria-label="View cart">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" /></svg>
                 <span class="hint" style="display:none" data-cart-label>Cart</span>
@@ -61,7 +78,14 @@
         </div>
     </div>
     <nav id="mobileNav" class="mobile-nav" aria-label="Primary mobile">
-        <a href="/chennai">Home</a>
+        <p class="loc-title">Location: @city.Name</p>
+        <div class="loc-chips">
+            @foreach (var c in TeamOmnifield.Web.Services.CityContextService.Cities.Values)
+            {
+                <a href="/@c.Slug" class="@(c.Slug == city.Slug ? "current" : "")">@c.Name</a>
+            }
+        </div>
+        <a href="@homeUrl">Home</a>
         <a href="/Menu">Menu</a>
         <a href="/Orders">My Orders</a>
         <a href="/Cart">Cart</a>
@@ -90,10 +114,11 @@
         <nav aria-label="Footer">
             <h2>Explore</h2>
             <ul>
-                <li><a href="/chennai">Home</a></li>
+                <li><a href="@homeUrl">Home</a></li>
                 <li><a href="/Menu">Menu</a></li>
                 <li><a href="/Orders">My Orders</a></li>
                 <li><a href="/Cart">Cart</a></li>
+                <li><a href="/">Change location</a></li>
             </ul>
         </nav>
         <div>
