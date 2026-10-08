@@ -1,4 +1,23 @@
 (function () {
+  // Phone fields that take digits only (max length comes from the input's maxlength).
+  document.querySelectorAll('[data-digits-only]').forEach(function (input) {
+    input.addEventListener('input', function () {
+      var digits = input.value.replace(/[^0-9]/g, '');
+      var max = input.maxLength > 0 ? input.maxLength : digits.length;
+      if (digits.length > max) digits = digits.slice(0, max);
+      if (digits !== input.value) input.value = digits;
+    });
+  });
+
+  // Location switcher: close on outside click or Escape.
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('[data-loc-switch][open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('[data-loc-switch][open]').forEach(function (d) { d.removeAttribute('open'); d.querySelector('summary').focus(); });
+  });
+
   document.querySelectorAll('[data-nav-toggle]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.querySelector(btn.getAttribute('data-nav-toggle'));

@@ -5,7 +5,8 @@
     ViewData["Title"] = "HT Restaurant | Where Indian cuisine meets tradition";
     ViewData["Description"] = "HT Restaurant serves home-style Indian cooking, from slow-cooked biryani to crisp dosa. Find your nearest kitchen and order for pickup or delivery.";
     ViewData["Current"] = "home";
-    const string orderUrl = "/chennai";
+    // Ordering needs a city: these links open the Locations pop-up (href is the no-JS fallback).
+    const string orderUrl = "/";
 
     // Photo provenance: all photographs are from Unsplash (Unsplash License, free to use, hotlinked from images.unsplash.com).
     // They are stand-in food photography, not pictures of an HT kitchen; swap for the restaurant's own shots when available.
@@ -34,7 +35,7 @@
                     <h1 id="ptHeroTitle" data-split>HT Restaurant. Where Indian cuisine <em>meets tradition.</em></h1>
                     <p class="pt-lede" data-hero>From slow-cooked biryani to crisp dosa and tandoor-fired favourites, HT Restaurant brings home-style Indian cooking to your table, ready for pickup or delivery.</p>
                     <div class="pt-actions" data-hero>
-                        <a class="pt-btn pt-btn--solid" href="@orderUrl">Order online</a>
+                        <a class="pt-btn pt-btn--solid" href="@orderUrl" data-locations-open aria-haspopup="dialog">Order online</a>
                         <button type="button" class="pt-btn pt-btn--line" data-locations-open aria-haspopup="dialog">Find a kitchen</button>
                     </div>
                 </div>
@@ -80,7 +81,7 @@
                         <h2 id="ptTraditionTitle" data-split>A taste of tradition, plated for today.</h2>
                         <p data-reveal>Every dish starts the way it always has: whole spices, slow heat and recipes handed down, cooked fresh each day and sent to your table without shortcuts.</p>
                         <div class="pt-actions" data-reveal>
-                            <a class="pt-btn pt-btn--gold" href="@orderUrl">Order now</a>
+                            <a class="pt-btn pt-btn--gold" href="@orderUrl" data-locations-open aria-haspopup="dialog">Order now</a>
                             <a class="pt-btn pt-btn--ghost-light" href="/about">Learn more</a>
                         </div>
                     </div>

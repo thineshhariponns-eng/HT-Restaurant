@@ -35,7 +35,7 @@
                 </div>
                 <div class="field">
                     <label asp-for="Phone">Phone <span class="req">*</span></label>
-                    <input asp-for="Phone" placeholder="10-digit mobile number" />
+                    <input asp-for="Phone" placeholder="10-digit mobile number" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" title="Enter exactly 10 digits" autocomplete="tel-national" data-digits-only />
                     <span asp-validation-for="Phone" class="field-error-text"></span>
                 </div>
             </fieldset>

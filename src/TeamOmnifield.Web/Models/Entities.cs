@@ -43,6 +43,8 @@ public class Order
     public string DeliveryAddress { get; set; } = string.Empty;
     public string? Notes { get; set; }
     public string PaymentMethod { get; set; } = string.Empty;
+    // Slug of the location (kitchen) the order was placed at; admin counts and order history are scoped by it.
+    public string City { get; set; } = string.Empty;
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public decimal Subtotal { get; set; }
     public decimal DeliveryFee { get; set; }

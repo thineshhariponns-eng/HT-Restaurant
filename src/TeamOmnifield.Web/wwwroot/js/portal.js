@@ -48,7 +48,10 @@
   }
   if (dialog) {
     Array.prototype.slice.call(document.querySelectorAll('[data-locations-open]')).forEach(function (btn) {
-      listen(btn, 'click', openLocations);
+      listen(btn, 'click', function (e) {
+        if (btn.tagName === 'A') e.preventDefault();
+        openLocations();
+      });
     });
     Array.prototype.slice.call(dialog.querySelectorAll('[data-locations-close]')).forEach(function (btn) {
       listen(btn, 'click', function () { dialog.close(); });

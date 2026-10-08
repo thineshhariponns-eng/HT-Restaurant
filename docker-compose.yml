@@ -1,3 +1,6 @@
+# Fixed project name: volumes are named <project>_<volume>, so without this a different folder name/copy gets a fresh, empty database.
+name: ht-omnifield
+
 services:
   postgres:
     image: postgres:18-alpine
@@ -9,7 +12,7 @@ services:
     volumes:
       - teamomnifield_pgdata:/var/lib/postgresql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U teamomnifield -d teamomnifield"]
       interval: 5s
@@ -52,7 +55,11 @@ services:
       - teamomnifield
 
 volumes:
+  # External on purpose: `docker compose down -v` never deletes external volumes, so your database survives it.
+  # Create once on a new machine with: docker volume create ht-omnifield_teamomnifield_pgdata
   teamomnifield_pgdata:
+    external: true
+    name: ht-omnifield_teamomnifield_pgdata
   teamomnifield_dpkeys:
 
 networks:

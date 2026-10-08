@@ -5,7 +5,7 @@ using TeamOmnifield.Web.ViewModels;
 
 namespace TeamOmnifield.Web.Controllers;
 
-public class CheckoutController(CartService cartService, OrderService orderService, TurnstileService turnstile) : Controller
+public class CheckoutController(CartService cartService, OrderService orderService, TurnstileService turnstile, CityContextService cityContext) : Controller
 {
     private const string PendingKey = "TEAMOMNIFIELD_PENDING_CHECKOUT";
 
@@ -53,7 +53,7 @@ public class CheckoutController(CartService cartService, OrderService orderServi
         if (pending is null) return RedirectToAction(nameof(Index));
         try
         {
-            var order = await orderService.CreateAsync(pending, cartService.Get(), method);
+            var order = await orderService.CreateAsync(pending, cartService.Get(), method, cityContext.Current.Slug);
             cartService.Clear();
             HttpContext.Session.Remove(PendingKey);
             return RedirectToAction(nameof(Success), new { orderNumber = order.OrderNumber, paid = true });
