@@ -6,14 +6,14 @@ using TeamOmnifield.Web.Services;
 namespace TeamOmnifield.Web.Controllers.Admin;
 
 [Area("Admin"), Authorize(Roles = "Admin")]
-public class OrdersController(OrderService orders) : Controller
+public class OrdersController(OrderService orders, CityContextService cityContext) : Controller
 {
-    public async Task<IActionResult> Index(OrderStatus? status, string? search) => View(await orders.GetAdminListAsync(status, search));
+    public async Task<IActionResult> Index(OrderStatus? status, string? search) => View(await orders.GetAdminListAsync(status, search, cityContext.Current.Slug));
 
     public async Task<IActionResult> Details(int id)
     {
         var order = await orders.GetByIdAsync(id);
-        return order is null ? NotFound() : View(order);
+        return order is null || order.City != cityContext.Current.Slug ? NotFound() : View(order);
     }
 
     [HttpPost, ValidateAntiForgeryToken]

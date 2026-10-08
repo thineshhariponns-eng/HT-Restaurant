@@ -3,8 +3,9 @@
 @{
     var currentController = (string)ViewContext.RouteData.Values["controller"]!;
     bool IsActive(string controller) => string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
-    var pendingCount = (await AdminOrderService.GetAdminListAsync(TeamOmnifield.Web.Models.OrderStatus.Pending, null)).Count;
     var city = CityContext.Current;
+    // Pending badge counts only the selected location's orders.
+    var pendingCount = (await AdminOrderService.GetAdminListAsync(TeamOmnifield.Web.Models.OrderStatus.Pending, null, city.Slug)).Count;
     var supportSiteSlug = TeamOmnifield.Web.Services.DemoWorkspaceStore.Cities.Contains(city.Slug) ? city.Slug : "chennai";
     var supportSite = TeamOmnifield.Web.Services.DemoWorkspaceStore.ProjectByName(TeamOmnifield.Web.Services.DemoWorkspaceStore.AdminPortalProject(supportSiteSlug));
     var openTickets = supportSite is null ? 0 : TeamOmnifield.Web.Services.DemoWorkspaceStore.TicketsOf(supportSite.ClientId, supportSite.Id).Count(t => t.IsOpen);
@@ -64,6 +65,21 @@
             <nav aria-label="Breadcrumb" class="admin-breadcrumb">
                 <span class="text-muted">Admin</span><span class="sep">/</span>@ViewData["Title"]
             </nav>
+            <details class="loc-switch" data-loc-switch>
+                <summary aria-label="Change location, currently @city.Name">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>
+                    <span>@city.Name</span>
+                    <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                </summary>
+                <form asp-area="Admin" asp-controller="Location" asp-action="Set" method="post" class="loc-menu">
+                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    <p class="loc-title">Working location</p>
+                    @foreach (var c in TeamOmnifield.Web.Services.CityContextService.Cities.Values)
+                    {
+                        <button type="submit" name="slug" value="@c.Slug" class="@(c.Slug == city.Slug ? "current" : "")">@c.Name</button>
+                    }
+                </form>
+            </details>
             <a href="http://localhost:8091/" class="btn btn-ghost btn-sm">Home</a>
             <p class="admin-clock"><time class="time tabular" data-admin-clock></time></p>
         </header>

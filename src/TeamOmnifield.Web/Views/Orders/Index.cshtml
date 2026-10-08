@@ -26,7 +26,7 @@
         <form method="get" asp-controller="Orders" asp-action="Index" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
             <div class="field" style="flex:1;min-width:220px;max-width:360px">
                 <label for="phone">Phone number</label>
-                <input type="tel" id="phone" name="phone" value="@Model.Phone" placeholder="+91 98765 43210" autocomplete="tel" />
+                <input type="tel" id="phone" name="phone" value="@Model.Phone" placeholder="10-digit mobile number" autocomplete="tel" />
             </div>
             <button type="submit" class="btn btn-primary">Find my orders</button>
         </form>

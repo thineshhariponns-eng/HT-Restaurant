@@ -5,7 +5,8 @@
     ViewData["Title"] = "About | HT Restaurant";
     ViewData["Description"] = "HT Restaurant is a contemporary Indian kitchen serving home-style cooking, ready for pickup or delivery.";
     ViewData["Current"] = "about";
-    const string orderUrl = "/chennai";
+    // Ordering needs a city: these links open the Locations pop-up (href is the no-JS fallback).
+    const string orderUrl = "/";
 
     // Photo provenance: Unsplash (Unsplash License), hotlinked; stand-in food photography, not pictures of an HT kitchen.
     const string thali = "1585937421612-70a008356fbe";       // curries and rice in copper bowls
@@ -77,7 +78,7 @@
                 <h2 id="ptAboutBandTitle" data-split>A taste of tradition, plated for today.</h2>
                 <p data-reveal>Every dish starts the way it always has: whole spices, slow heat and recipes handed down, cooked fresh each day and sent to your table without shortcuts.</p>
                 <div class="pt-actions" data-reveal>
-                    <a class="pt-btn pt-btn--gold" href="@orderUrl">Order now</a>
+                    <a class="pt-btn pt-btn--gold" href="@orderUrl" data-locations-open aria-haspopup="dialog">Order now</a>
                 </div>
             </div>
         </div>
@@ -122,7 +123,7 @@
     <div class="pt-wrap">
         <div class="pt-actions pt-actions--center" data-reveal>
             <button type="button" class="pt-btn pt-btn--line" data-locations-open aria-haspopup="dialog">Find a kitchen</button>
-            <a class="pt-btn pt-btn--solid" href="@orderUrl">Order now</a>
+            <a class="pt-btn pt-btn--solid" href="@orderUrl" data-locations-open aria-haspopup="dialog">Order now</a>
         </div>
     </div>
 </section>

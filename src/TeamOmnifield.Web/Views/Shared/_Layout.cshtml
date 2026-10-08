@@ -8,8 +8,8 @@
     // ViewBag.City wins when this very request just chose one (the cookie isn't visible until the next request);
     // otherwise fall back to the cookie, and to the default HQ branding until a city has ever been picked.
     var city = ViewBag.City as CityInfo ?? CityContext.Current;
-    // Home links stay on the visitor's own city (the default city has no page of its own, so it falls back to Chennai).
-    var homeUrl = TeamOmnifield.Web.Services.CityContextService.Cities.ContainsKey(city.Slug) ? "/" + city.Slug : "/chennai";
+    // Home links stay on the visitor's own city (before a city is picked it goes to the welcome page, which asks for one).
+    var homeUrl = TeamOmnifield.Web.Services.CityContextService.Cities.ContainsKey(city.Slug) ? "/" + city.Slug : "/";
 }
 <!doctype html>
 <html lang="en">

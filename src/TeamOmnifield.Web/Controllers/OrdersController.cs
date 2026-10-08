@@ -10,7 +10,7 @@ namespace TeamOmnifield.Web.Controllers;
 /// Customer-facing order history. Read-only: a diner looks up the orders placed
 /// from their phone number, then opens one to see where it has got to.
 /// </summary>
-public class OrdersController(AppDbContext db, OrderService orders) : Controller
+public class OrdersController(AppDbContext db, OrderService orders, CityContextService cityContext) : Controller
 {
     public async Task<IActionResult> Index(string? phone)
     {
@@ -19,9 +19,10 @@ public class OrdersController(AppDbContext db, OrderService orders) : Controller
         if (!string.IsNullOrWhiteSpace(phone))
         {
             var trimmed = phone.Trim();
+            var city = cityContext.Current.Slug; // only this location's orders
             model.Searched = true;
             model.Orders = await db.Orders.AsNoTracking()
-                .Where(x => x.Phone == trimmed)
+                .Where(x => x.Phone == trimmed && x.City == city)
                 .OrderByDescending(x => x.CreatedUtc)
                 .Select(x => new OrderListItemViewModel
                 {

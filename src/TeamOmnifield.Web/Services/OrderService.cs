@@ -17,7 +17,7 @@ public class OrderService(AppDbContext db, IConfiguration configuration)
         ["cash"] = "Cash on delivery",
     };
 
-    public async Task<Order> CreateAsync(CheckoutViewModel checkout, IReadOnlyDictionary<int, int> cart, string paymentMethod)
+    public async Task<Order> CreateAsync(CheckoutViewModel checkout, IReadOnlyDictionary<int, int> cart, string paymentMethod, string city = "")
     {
         if (cart.Count == 0) throw new InvalidOperationException("Cart is empty.");
         if (!PaymentMethodLabels.ContainsKey(paymentMethod)) throw new InvalidOperationException("Choose a valid payment method.");
@@ -34,6 +34,7 @@ public class OrderService(AppDbContext db, IConfiguration configuration)
             DeliveryAddress = checkout.DeliveryAddress.Trim(),
             Notes = string.IsNullOrWhiteSpace(checkout.Notes) ? null : checkout.Notes.Trim(),
             PaymentMethod = paymentMethod,
+            City = city,
             DeliveryFee = DeliveryFee
         };
 
@@ -61,9 +62,10 @@ public class OrderService(AppDbContext db, IConfiguration configuration)
     public async Task<Order?> GetByOrderNumberAsync(string orderNumber) =>
         await db.Orders.Include(x => x.Items).SingleOrDefaultAsync(x => x.OrderNumber == orderNumber);
 
-    public async Task<List<OrderListItemViewModel>> GetAdminListAsync(OrderStatus? status, string? search)
+    public async Task<List<OrderListItemViewModel>> GetAdminListAsync(OrderStatus? status, string? search, string? city = null)
     {
         var query = db.Orders.AsNoTracking().AsQueryable();
+        if (city is not null) query = query.Where(x => x.City == city);
         if (status.HasValue) query = query.Where(x => x.Status == status.Value);
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -99,10 +101,12 @@ public class OrderService(AppDbContext db, IConfiguration configuration)
         _ => false
     };
 
-    public async Task<DashboardViewModel> GetDashboardAsync()
+    public async Task<DashboardViewModel> GetDashboardAsync(string? city = null)
     {
         var today = DateTime.UtcNow.Date;
-        var orders = await db.Orders.AsNoTracking().Where(x => x.CreatedUtc >= today).ToListAsync();
+        var todays = db.Orders.AsNoTracking().Where(x => x.CreatedUtc >= today);
+        if (city is not null) todays = todays.Where(x => x.City == city);
+        var orders = await todays.ToListAsync();
         var highlights = await db.Products.AsNoTracking().Where(x => x.IsAvailable)
             .OrderBy(x => x.Category!.DisplayOrder).ThenBy(x => x.Name).Take(6)
             .Select(x => new MenuHighlightViewModel { Name = x.Name, ImageUrl = x.ImageUrl }).ToListAsync();

@@ -1,7 +1,8 @@
 @{
     // Shared shell for the brand pages served on htrestaurant.com ("/" and "/about"): navbar, footer,
     // the Locations pop-up and the motion scripts. The ordering storefront keeps its own _Layout.
-    const string orderUrl = "/chennai";
+    // Ordering needs a city: these links open the Locations pop-up (href is the no-JS fallback).
+    const string orderUrl = "/";
     var current = ViewData["Current"] as string ?? "";
     var title = ViewData["Title"] as string ?? "HT Restaurant";
     var description = ViewData["Description"] as string ?? "HT Restaurant serves home-style Indian cooking. Find your nearest kitchen and order for pickup or delivery.";
@@ -72,7 +73,7 @@
             <a href="/" data-nav-link>Home</a>
             <a href="/about" data-nav-link>About</a>
             <button type="button" data-locations-open aria-haspopup="dialog">Locations</button>
-            <a href="@orderUrl">Order online</a>
+            <a href="@orderUrl" data-locations-open aria-haspopup="dialog">Order online</a>
         </nav>
     </div>
     <div class="pt-wrap pt-footer__legal">&copy; @DateTime.Now.Year HT Restaurant &middot; Powered by TeamOmnifield</div>
