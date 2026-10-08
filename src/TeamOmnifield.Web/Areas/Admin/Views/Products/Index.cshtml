@@ -7,6 +7,16 @@
     </div>
 </header>
 <div class="admin-pad">
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <p class="title">No products yet</p>
+            <p class="hint text-muted">Add your first product to build the menu.</p>
+            <a class="btn btn-primary" href="/Admin/Products/Create">Add product</a>
+        </div>
+    }
+    else
+    {
     <div style="overflow-x:auto">
         <table class="ruled">
             <thead><tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Available</th><th></th></tr></thead>
@@ -36,4 +46,5 @@
             </tbody>
         </table>
     </div>
+    }
 </div>

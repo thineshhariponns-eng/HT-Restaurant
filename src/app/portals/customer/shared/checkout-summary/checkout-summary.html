@@ -39,7 +39,7 @@
     type="button"
     [attr.aria-disabled]="submitDisabled()"
     (click)="onPlaceOrder()"
-    class="mt-6 w-full px-5 py-3 text-sm font-semibold transition-colors duration-150"
+    class="mt-6 w-full px-5 py-3 text-sm font-semibold transition-colors duration-150 active:translate-y-px"
     [class.bg-primary-600]="!submitDisabled()"
     [class.text-text-inverse]="!submitDisabled()"
     [class.hover:bg-primary-700]="!submitDisabled()"

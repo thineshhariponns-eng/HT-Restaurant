@@ -27,6 +27,17 @@
     });
   });
 
+  // Escape closes an open mobile nav and returns focus to its toggle.
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('[data-nav-toggle][aria-expanded="true"]').forEach(function (btn) {
+      var target = document.querySelector(btn.getAttribute('data-nav-toggle'));
+      if (target) target.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.focus();
+    });
+  });
+
   document.querySelectorAll('[data-drawer-open]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.querySelector(btn.getAttribute('data-drawer-open'));

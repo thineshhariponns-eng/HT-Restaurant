@@ -244,6 +244,7 @@ body.customer .site-footer {
   .customer .mobile-nav { transform: none; transition: opacity 120ms var(--ease-out), display 120ms allow-discrete; }
   .customer .card.is-entering { animation: none; }
   .customer .lifecycle li.done .rail, .customer .lifecycle li.current .marker span { animation: none; }
+  .customer dialog.dlg[open] { animation: none; }
   .confirm-mark, .confirm-rise { animation: confirm-fade 150ms ease backwards; animation-delay: 0ms; }
   .confirm-mark path { animation: none; }
 }
@@ -259,6 +260,8 @@ body.customer .site-footer {
 }
 .customer dialog.dlg-narrow { width: min(24rem, calc(100% - 32px)); }
 .customer dialog.dlg::backdrop { background: rgb(16 13 9 / .7); }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(10px); } }
+.customer dialog.dlg[open] { animation: dlg-in 200ms var(--ease-out); }
 .customer .dlg-body { padding: 28px clamp(20px, 5vw, 32px) 28px; }
 .customer .dlg-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .customer .dlg-head .display { margin: 0; font-size: 1.5rem; }
