@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - HT Restaurant</title>
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+    <link rel="stylesheet" href="~/css/customer-auth.css" asp-append-version="true" />
+</head>
+<body class="ca-body">
+<div class="ca-shell">
+    <div class="ca-split">
+        <aside class="ca-visual" aria-label="HT Restaurant">
+            <div class="ca-brand">
+                <svg class="ca-hat" width="46" height="40" viewBox="0 0 46 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 22a8 8 0 0 1 1-15.9A9 9 0 0 1 31 5a8 8 0 0 1 2 17Z" /><path d="M13 22v10h20V22" /></svg>
+                <span class="ca-mono">HT</span>
+                <span class="ca-word">RESTAURANT</span>
+            </div>
+            <p class="ca-tagline">HT Restaurant.<br />Where Indian cuisine<br />meets tradition.</p>
+        </aside>
+        <main class="ca-panel">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="ca-footer">
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg> Fresh Food &nbsp;|&nbsp; Great Taste &nbsp;|&nbsp; Your Restaurant</span>
+        <span>Powered by <strong>TeamOmnifield</strong></span>
+    </footer>
+</div>
+<script>
+    document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = btn.closest('.ca-input').querySelector('input');
+            var shown = input.type === 'text';
+            input.type = shown ? 'password' : 'text';
+            btn.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+        });
+    });
+</script>
+</body>
+</html>

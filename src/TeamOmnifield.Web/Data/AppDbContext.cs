@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<Customer> Customers => Set<Customer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,5 +23,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<OrderItem>().Property(x => x.UnitPrice).HasPrecision(12, 2);
         modelBuilder.Entity<OrderItem>().Property(x => x.LineTotal).HasPrecision(12, 2);
         modelBuilder.Entity<AdminUser>().HasIndex(x => x.Email).IsUnique();
+        modelBuilder.Entity<Customer>().HasIndex(x => x.Email).IsUnique();
     }
 }

@@ -38,9 +38,47 @@ public class LoginViewModel
 
     [Required(ErrorMessage = "Enter your password.")]
     [DataType(DataType.Password)]
-    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
+    [RegularExpression(@"^(?=.*[^a-zA-Z0-9]).{8,}$", ErrorMessage = "Password must have at least 8 characters long with one special character.")]
+    public string Password { get; set; } = string.Empty;
+}
+
+public class CustomerLoginViewModel
+{
+    [Required(ErrorMessage = "Enter your email address.")]
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Enter your password.")]
+    [DataType(DataType.Password)]
+    [RegularExpression(@"^(?=.*[^a-zA-Z0-9]).{8,}$", ErrorMessage = "Password must have at least 8 characters long with one special character.")]
+    public string Password { get; set; } = string.Empty;
+
+    public bool RememberMe { get; set; }
+}
+
+public class CustomerRegisterViewModel
+{
+    [Required(ErrorMessage = "Enter your full name."), StringLength(100)]
+    public string FullName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Enter your email address."), StringLength(160)]
+    [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Enter your 10-digit mobile number.")]
+    [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Phone number must be exactly 10 digits.")]
+    public string Phone { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Create a password.")]
+    [DataType(DataType.Password)]
+    [MinLength(8, ErrorMessage = "Password must have at least 8 characters long with one special character.")]
     [RegularExpression(@"^(?=.*[^a-zA-Z0-9]).+$", ErrorMessage = "Password must include at least one special character.")]
     public string Password { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Confirm your password.")]
+    [DataType(DataType.Password)]
+    [Compare(nameof(Password), ErrorMessage = "The two passwords do not match.")]
+    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class ResetPasswordViewModel
@@ -51,8 +89,8 @@ public class ResetPasswordViewModel
 
     [Required(ErrorMessage = "Enter a new password.")]
     [DataType(DataType.Password)]
-    [MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
-    [RegularExpression(@"^(?=.*[^a-zA-Z0-9]).+$", ErrorMessage = "Password must include at least one special character.")]
+    [MinLength(8, ErrorMessage = "Password must have at least 8 characters long with one special character.")]
+    [RegularExpression(@"^(?=.*[^a-zA-Z0-9]).+$")]
     public string NewPassword { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Confirm your new password.")]
