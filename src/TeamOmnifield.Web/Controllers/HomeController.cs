@@ -8,10 +8,29 @@ namespace TeamOmnifield.Web.Controllers;
 public class HomeController(AppDbContext db, HostContextService host) : Controller
 {
     // "/" is the brand welcome page; the ordering storefront home lives at "/chennai".
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         if (host.Current == SiteHost.Admin) return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
         if (host.Current == SiteHost.TeamOmnifield) return RedirectToAction("Index", "Team");
+        var availableMenuItems = await db.Products.AsNoTracking()
+            .Where(x => x.IsAvailable && x.ImageUrl != "" && x.Category != null && x.Category.IsActive)
+            .Include(x => x.Category)
+            .OrderBy(x => x.Category!.DisplayOrder)
+            .ThenBy(x => x.Id)
+            .ToListAsync();
+        var menuItemsByCategory = availableMenuItems.GroupBy(x => x.CategoryId).ToList();
+        ViewBag.MenuItems = menuItemsByCategory.Select(group => group.First())
+            .Concat(menuItemsByCategory.SelectMany(group => group.Skip(1)))
+            .Take(6)
+            .ToList();
+        var showcaseNames = new[]
+        {
+            "Grill Chicken", "Chilli Chicken", "Paneer Tikka",
+            "Gobi Manchurian", "Vanilla Ice Cream", "Masala Lassi"
+        };
+        ViewBag.MenuShowcase = await db.Products.AsNoTracking()
+            .Where(x => showcaseNames.Contains(x.Name) && x.IsAvailable && x.ImageUrl != "")
+            .ToListAsync();
         return View("Portal");
     }
 

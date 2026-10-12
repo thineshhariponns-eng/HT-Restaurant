@@ -40,6 +40,14 @@
   /* ---------- Locations pop-up (native <dialog>; content comes later) ---------- */
   var dialog = document.querySelector('[data-locations]');
   var lenis = null;
+  if (dialog) {
+    listen(window, 'pagehide', function () {
+      if (dialog.open) dialog.close();
+    });
+    listen(window, 'pageshow', function (e) {
+      if (e.persisted && dialog.open) dialog.close();
+    });
+  }
   function openLocations() {
     if (!dialog || dialog.open) return;
     setMenu(false);

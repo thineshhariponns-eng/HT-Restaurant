@@ -4,7 +4,7 @@ using TeamOmnifield.Web.Services;
 
 namespace TeamOmnifield.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Developer")]
 public class TeamController(OrderService orders) : Controller
 {
     public async Task<IActionResult> Index() => View(await orders.GetDashboardAsync());

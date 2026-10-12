@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Authentication
+@using TeamOmnifield.Web.Services
 @inject TeamOmnifield.Web.Services.CityContextService CityContext
 @{
     // Customer pages get the storefront theme; the admin login (Account) and the TeamOmnifield page keep the original look.
@@ -10,6 +12,9 @@
     var city = ViewBag.City as CityInfo ?? CityContext.Current;
     // Home links stay on the visitor's own city (before a city is picked they go to the welcome page, which asks for one).
     var homeUrl = TeamOmnifield.Web.Services.CityContextService.Cities.ContainsKey(city.Slug) ? "/" + city.Slug : "/";
+    var customerAuth = await Context.AuthenticateAsync(CustomerAuth.Scheme);
+    var customerName = customerAuth.Succeeded ? customerAuth.Principal!.Identity!.Name : null;
+    var staffSignedIn = User.Identity?.IsAuthenticated == true && !User.IsInRole(CustomerAuth.Role);
     var description = ViewData["Description"] as string
         ?? $"HT Restaurant {city.Name} — order home-style Indian cooking for pickup, delivery or dine-in.";
 }
@@ -40,7 +45,7 @@
             <a href="/Menu">Menu</a>
             <a href="/Orders">My Orders</a>
             <a href="/Cart">Cart</a>
-            @if (User.Identity?.IsAuthenticated == true)
+            @if (staffSignedIn)
             {
                 <a href="/Admin">Admin</a>
             }
@@ -65,9 +70,16 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1" /><circle cx="18" cy="20" r="1" /><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6" /></svg>
                 <span class="hint" style="display:none" data-cart-label>Cart</span>
             </a>
-            @if (User.Identity?.IsAuthenticated == true)
+            @if (staffSignedIn)
             {
                 <form asp-controller="Account" asp-action="Logout" method="post" class="inline"><button class="btn btn-ghost" type="submit">Logout</button></form>
+            }
+            else if (customerName is not null)
+            {
+                <form action="/Customer/Logout" method="post" class="inline">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-ghost" type="submit" title="Signed in as @customerName">Logout</button>
+                </form>
             }
             else
             {
@@ -93,7 +105,7 @@
         <a href="/Menu">Menu</a>
         <a href="/Orders">My Orders</a>
         <a href="/Cart">Cart</a>
-        @if (User.Identity?.IsAuthenticated == true) { <a href="/Admin">Admin</a> }
+        @if (staffSignedIn) { <a href="/Admin">Admin</a> }
         else
         {
             <a href="/Account/Login" class="auth-link" hidden>

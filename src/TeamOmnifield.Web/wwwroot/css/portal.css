@@ -120,25 +120,21 @@ body.pt ul { margin: 0; padding: 0; list-style: none; }
 .pt-chips li { padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper-soft); font-size: .875rem; font-weight: 600; letter-spacing: .02em; }
 .pt-chips + .pt-actions { margin-top: 28px; }
 
-/* Arched-window mosaic */
-.pt-mosaic { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); height: clamp(420px, 62vw, 700px); overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 84%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 84%, transparent 100%); }
-@media (min-width: 960px) { .pt-mosaic { height: min(78vh, 720px); margin-right: calc(var(--gutter) * -1); } }
-.pt-col { display: flex; flex-direction: column; gap: clamp(10px, 1.4vw, 18px); will-change: transform; }
-.pt-col--a { padding-top: 4%; }
-.pt-col--b { padding-top: 26%; }
-.pt-col--c { padding-top: 12%; }
-.pt-tile { position: relative; margin: 0; overflow: hidden; background: var(--paper-deep); }
-.pt-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease-out); }
-.pt-tile--arch { aspect-ratio: 3 / 4; border-radius: 999px 999px 20px 20px; }
-.pt-tile--round { aspect-ratio: 1; border-radius: 22px; }
-@media (hover: hover) and (pointer: fine) { .pt-tile:hover img { transform: scale(1.06); } }
+/* Menu item photos */
+.pt-menu-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); width: 100%; max-width: 620px; margin: 0 auto; padding: 0; list-style: none; }
+.pt-menu-gallery__item { aspect-ratio: 4 / 5; overflow: hidden; border-radius: 8px; background: var(--paper-deep); }
+.pt-menu-gallery__item img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .pt-menu-gallery__item:hover img { transform: scale(1.05); } }
 
 /* ---------- Sections and bands ---------- */
 .pt-section { padding-top: clamp(28px, 4vw, 56px); }
 .pt-band { display: grid; grid-template-columns: 1fr; overflow: hidden; border-radius: clamp(22px, 3vw, 36px); }
 .pt-band__media { position: relative; min-height: 260px; background: var(--paper-deep); overflow: hidden; }
 .pt-band__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pt-band__media--menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 8px; }
+.pt-band__menu-item { position: relative; min-width: 0; margin: 0; overflow: hidden; border-radius: 12px; background: var(--ink); }
+.pt-band__media--menu .pt-band__menu-item img { transition: transform 700ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .pt-band__menu-item:hover img { transform: scale(1.05); } }
 .pt-band__body { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 20px; padding: clamp(28px, 5vw, 72px); }
 @media (min-width: 860px) {
   .pt-band { grid-template-columns: 1fr 1fr; min-height: 440px; }

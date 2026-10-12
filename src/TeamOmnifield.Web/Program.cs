@@ -26,9 +26,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "TeamOmnifield.Admin";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
+    })
+    // Diners sign in under their own scheme/cookie so a customer session can never reach the Admin or Platform areas.
+    .AddCookie(CustomerAuth.Scheme, options =>
+    {
+        options.LoginPath = "/Customer/Login";
+        options.AccessDeniedPath = "/Customer/Login";
+        options.Cookie.Name = "TeamOmnifield.Customer";
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        options.SlidingExpiration = true;
     });
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPasswordHasher<AdminUser>, PasswordHasher<AdminUser>>();
+builder.Services.AddScoped<IPasswordHasher<Customer>, PasswordHasher<Customer>>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<HostContextService>();
@@ -62,6 +72,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
+app.Use(CustomerAuth.ApplyCustomerUser);
 app.UseAuthorization();
 
 app.MapGet("/health", async (AppDbContext db) =>

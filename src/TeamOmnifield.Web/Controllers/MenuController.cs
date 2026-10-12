@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeamOmnifield.Web.Data;
+using TeamOmnifield.Web.Services;
 
 namespace TeamOmnifield.Web.Controllers;
 
+// Diners must sign in (or create an account) before they can browse the menu and order.
+[CustomerOnly]
 public class MenuController(AppDbContext db) : Controller
 {
     public async Task<IActionResult> Index()

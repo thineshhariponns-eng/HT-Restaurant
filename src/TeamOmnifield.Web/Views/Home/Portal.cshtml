@@ -8,22 +8,15 @@
     // Ordering needs a city: these links open the Locations pop-up (href is the no-JS fallback).
     const string orderUrl = "/";
 
-    // Photo provenance: all photographs are from Unsplash (Unsplash License, free to use, hotlinked from images.unsplash.com).
-    // They are stand-in food photography, not pictures of an HT kitchen; swap for the restaurant's own shots when available.
-    const string biryani = "1589302168068-964664d93dc0";      // biryani with cucumber and mint
-    const string dosa = "1668236543090-82eba5ee5976";          // masala dosa with chutneys
-    const string biryaniBowl = "1631515243349-e0cb75fb8d3a";   // biryani bowl with a bone-in piece
-    const string tandoori = "1626074353765-517a681e40be";      // tandoori chicken
-    const string thali = "1585937421612-70a008356fbe";         // curries and rice
-    const string samosa = "1601050690597-df0568f70950";        // samosas with green chilli
-    const string curryNaan = "1565557623262-b51c2513a641";     // curry with naan
     const string butterChicken = "1603894584373-5ac82b2ae398"; // creamy curry
-    const string paneerTikka = "1567188040759-fb8a883dc6d8";   // paneer tikka on a sizzler
-    const string pavBhaji = "1606491956689-2ea866880c84";      // pav bhaji
-    const string herbCurry = "1574653853027-5382a3d23a15";     // curry with fresh herbs
-    const string corianderCurry = "1596797038530-2c107229654b";// curry finished with coriander
 
     string Img(string id, int w, int h) => $"https://images.unsplash.com/photo-{id}?auto=format&fit=crop&w={w}&h={h}&q=70";
+    var menuItems = ((IEnumerable<Product>)ViewBag.MenuItems).ToList();
+    var menuShowcase = ((IEnumerable<Product>)ViewBag.MenuShowcase)
+        .GroupBy(product => product.Name)
+        .ToDictionary(group => group.Key, group => group.First());
+    var kitchenDishNames = new[] { "Grill Chicken", "Chilli Chicken" };
+    var trendingDishNames = new[] { "Paneer Tikka", "Gobi Manchurian", "Vanilla Ice Cream", "Masala Lassi" };
 }
 <div>
 
@@ -40,32 +33,14 @@
                     </div>
                 </div>
 
-                <div class="pt-mosaic" role="group" aria-label="Signature dishes" data-mosaic>
-                    <div class="pt-col pt-col--a" data-col="-70">
-                        <figure class="pt-tile pt-tile--arch" data-tile>
-                            <img src="@Img(biryani, 480, 640)" srcset="@Img(biryani, 480, 640) 1x, @Img(biryani, 960, 1280) 2x" width="480" height="640" alt="Biryani served with cucumber and mint" fetchpriority="high" decoding="async" />
-                        </figure>
-                        <figure class="pt-tile pt-tile--round" data-tile>
-                            <img src="@Img(samosa, 480, 480)" srcset="@Img(samosa, 480, 480) 1x, @Img(samosa, 960, 960) 2x" width="480" height="480" alt="Golden samosas with a green chilli" loading="lazy" decoding="async" />
-                        </figure>
-                    </div>
-                    <div class="pt-col pt-col--b" data-col="60">
-                        <figure class="pt-tile pt-tile--round" data-tile>
-                            <img src="@Img(dosa, 480, 480)" srcset="@Img(dosa, 480, 480) 1x, @Img(dosa, 960, 960) 2x" width="480" height="480" alt="Masala dosa with a tray of chutneys" fetchpriority="high" decoding="async" />
-                        </figure>
-                        <figure class="pt-tile pt-tile--arch" data-tile>
-                            <img src="@Img(biryaniBowl, 480, 640)" srcset="@Img(biryaniBowl, 480, 640) 1x, @Img(biryaniBowl, 960, 1280) 2x" width="480" height="640" alt="A bowl of biryani topped with a bone-in piece" loading="lazy" decoding="async" />
-                        </figure>
-                    </div>
-                    <div class="pt-col pt-col--c" data-col="-40">
-                        <figure class="pt-tile pt-tile--arch" data-tile>
-                            <img src="@Img(tandoori, 480, 640)" srcset="@Img(tandoori, 480, 640) 1x, @Img(tandoori, 960, 1280) 2x" width="480" height="640" alt="Charred tandoori chicken" fetchpriority="high" decoding="async" />
-                        </figure>
-                        <figure class="pt-tile pt-tile--round" data-tile>
-                            <img src="@Img(thali, 480, 480)" srcset="@Img(thali, 480, 480) 1x, @Img(thali, 960, 960) 2x" width="480" height="480" alt="Curries and steamed rice in copper bowls" loading="lazy" decoding="async" />
-                        </figure>
-                    </div>
-                </div>
+                <ul class="pt-menu-gallery" aria-label="Photos of menu items">
+                        @foreach (Product product in menuItems)
+                        {
+                            <li class="pt-menu-gallery__item">
+                                <img src="@product.ImageUrl" alt="@product.Name" decoding="async" />
+                            </li>
+                        }
+                </ul>
             </div>
         </section>
 
@@ -73,8 +48,16 @@
         <section class="pt-section" aria-labelledby="ptTraditionTitle">
             <div class="pt-wrap">
                 <div class="pt-band pt-band--ink" data-reveal>
-                    <div class="pt-band__media">
-                        <img src="@Img(curryNaan, 900, 700)" srcset="@Img(curryNaan, 900, 700) 1x, @Img(curryNaan, 1600, 1244) 2x" width="900" height="700" alt="A rich curry served with warm naan" loading="lazy" decoding="async" />
+                    <div class="pt-band__media pt-band__media--menu" aria-label="Grill Chicken and Chilli Chicken">
+                        @foreach (var dishName in kitchenDishNames)
+                        {
+                            if (menuShowcase.TryGetValue(dishName, out var product))
+                            {
+                                <figure class="pt-band__menu-item">
+                                    <img src="@product.ImageUrl" alt="@product.Name" loading="lazy" decoding="async" />
+                                </figure>
+                            }
+                        }
                     </div>
                     <div class="pt-band__body">
                         <p class="pt-kicker">Our kitchen</p>
@@ -116,18 +99,15 @@
                     <p data-reveal>Bold curries, tandoor-fired starters and street-food favourites, the plates our guests keep coming back for.</p>
                 </div>
                 <ul class="pt-gallery" role="list">
-                    <li class="pt-gallery__item" data-gallery-item>
-                        <img src="@Img(paneerTikka, 480, 600)" srcset="@Img(paneerTikka, 480, 600) 1x, @Img(paneerTikka, 960, 1200) 2x" width="480" height="600" alt="Paneer tikka on a sizzling platter" loading="lazy" decoding="async" />
-                    </li>
-                    <li class="pt-gallery__item" data-gallery-item>
-                        <img src="@Img(pavBhaji, 480, 600)" srcset="@Img(pavBhaji, 480, 600) 1x, @Img(pavBhaji, 960, 1200) 2x" width="480" height="600" alt="Buttered pav with bhaji" loading="lazy" decoding="async" />
-                    </li>
-                    <li class="pt-gallery__item" data-gallery-item>
-                        <img src="@Img(herbCurry, 480, 600)" srcset="@Img(herbCurry, 480, 600) 1x, @Img(herbCurry, 960, 1200) 2x" width="480" height="600" alt="A curry finished with fresh herbs" loading="lazy" decoding="async" />
-                    </li>
-                    <li class="pt-gallery__item" data-gallery-item>
-                        <img src="@Img(corianderCurry, 480, 600)" srcset="@Img(corianderCurry, 480, 600) 1x, @Img(corianderCurry, 960, 1200) 2x" width="480" height="600" alt="A slow-cooked curry topped with coriander" loading="lazy" decoding="async" />
-                    </li>
+                    @foreach (var dishName in trendingDishNames)
+                    {
+                        if (menuShowcase.TryGetValue(dishName, out var product))
+                        {
+                            <li class="pt-gallery__item" data-gallery-item>
+                                <img src="@product.ImageUrl" alt="@product.Name" loading="lazy" decoding="async" />
+                            </li>
+                        }
+                    }
                 </ul>
             </div>
         </section>
