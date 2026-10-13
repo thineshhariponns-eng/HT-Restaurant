@@ -43,6 +43,7 @@ builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<HostContextService>();
 builder.Services.AddScoped<CityContextService>();
+builder.Services.AddScoped<ClientDirectory>();
 builder.Services.AddHttpClient<TurnstileService>();
 // Persist to the mounted volume (see docker-compose.yml) so a container rebuild/restart doesn't invalidate
 // every visitor's session, login and CSRF cookies - previously keys lived in the ephemeral container filesystem.
@@ -52,15 +53,13 @@ builder.Services.AddDataProtection()
 
 var app = builder.Build();
 
-// The consultant demo data is seeded by DemoClientStore's static constructor. The admin portal only
-// reads the workspace store, so touch it once at startup rather than depend on which page is hit first.
-_ = DemoClientStore.All();
-
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<AdminUser>>();
     await DbInitializer.InitializeAsync(db, hasher);
+    // Platform clients live in the database; the portal reads them through DemoClientStore's in-memory copy.
+    await ClientDirectory.LoadAsync(db);
 }
 
 app.UseExceptionHandler("/Home/Error");

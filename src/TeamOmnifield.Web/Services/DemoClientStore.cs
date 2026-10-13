@@ -13,6 +13,10 @@ public class DemoClient
     public string Domain { get; set; } = string.Empty;
     public string? AdminDomain { get; set; }
     public ClientStage Stage { get; set; } = ClientStage.New;
+    /// <summary>False while the workspace is suspended.</summary>
+    public bool IsActive { get; set; } = true;
+    /// <summary>The client this application itself serves. It cannot be deleted.</summary>
+    public bool IsBuiltIn { get; set; }
     public int Progress { get; set; }
     public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
@@ -25,9 +29,9 @@ public class DemoClient
 public record ActivityEntry(string Time, string Client, string Event);
 
 /// <summary>
-/// Demo data for the consultant portal. Held in memory on purpose: this portal
-/// tracks delivery work, not restaurant data, so it touches no database table.
-/// Everything resets when the process restarts.
+/// The platform portal's in-memory view of its clients. The records themselves are stored in the
+/// database and written through <see cref="ClientDirectory"/>; this copy is what the views read.
+/// Activity entries are not stored, so they reset when the process restarts.
 /// </summary>
 public static class DemoClientStore
 {
@@ -40,29 +44,6 @@ public static class DemoClientStore
     /// <summary>The delivery pipeline, in order. Drives the board and the checklist.</summary>
     public static readonly ClientStage[] Pipeline =
         [ClientStage.New, ClientStage.Onboarding, ClientStage.Development, ClientStage.Review, ClientStage.Production];
-
-    static DemoClientStore() => SeedRealClient();
-
-    /// <summary>
-    /// This portal manages one real client: HT Restaurant itself. No fictional sample clients,
-    /// tickets, deployments or changes are seeded - everything else in the portal is built from
-    /// real activity (tickets raised from the admin portal, deployments and changes logged here).
-    /// </summary>
-    private static void SeedRealClient()
-    {
-        var client = new DemoClient
-        {
-            Id = "c-1", Code = "CL-001", Name = "HT Restaurant", City = "Chennai, Hyderabad & Kolkata",
-            Contact = "Harsha Robba", ContactEmail = "harsha@htrestaurant.com",
-            Domain = "htrestaurant.com", AdminDomain = "admin.htrestaurant.com",
-            Stage = ClientStage.Production, Progress = 100,
-        };
-        Clients.Add(client);
-        // One project per city; tickets raised from the admin portal route to the selected city's project.
-        DemoWorkspaceStore.AddProject(client.Id, "htrestaurant.chennai.com");
-        DemoWorkspaceStore.AddProject(client.Id, "htrestaurant.hyderabad.com");
-        DemoWorkspaceStore.AddProject(client.Id, "htrestaurant.kolkata.com");
-    }
 
     public static string Label(ClientStage stage) => stage switch
     {
@@ -121,18 +102,6 @@ public static class DemoClientStore
         lock (Gate) return [.. Activity.Where(x => x.Client == clientName)];
     }
 
-    public static void MoveTo(string id, ClientStage stage)
-    {
-        lock (Gate)
-        {
-            var client = Clients.SingleOrDefault(x => x.Id == id);
-            if (client is null) return;
-            client.Stage = stage;
-            client.UpdatedUtc = DateTime.UtcNow;
-            Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), client.Name, $"Moved to {Label(stage)}"));
-        }
-    }
-
     /// <summary>Drops an entry into "Recent activity" on the Dashboard, e.g. when a ticket is raised.</summary>
     public static void LogActivity(string clientId, string eventText)
     {
@@ -144,28 +113,39 @@ public static class DemoClientStore
         }
     }
 
-    public static DemoClient Add(string name, string city, string contact, string contactEmail, string domain, string adminDomain)
+    /// <summary>A client's progress follows its stage; a brand new client still shows a sliver.</summary>
+    public static int ProgressOf(ClientStage stage) => Math.Max(10, StageProgress(stage));
+
+    /// <summary>Replaces the whole list with what the database holds. Called once at startup.</summary>
+    public static void Hydrate(IEnumerable<DemoClient> clients)
     {
         lock (Gate)
         {
-            var next = Clients.Count + 1;
-            var client = new DemoClient
-            {
-                Id = $"c-{next}",
-                Code = $"CL-{next:000}",
-                Name = name,
-                City = city,
-                Contact = contact,
-                ContactEmail = contactEmail,
-                Domain = domain,
-                AdminDomain = adminDomain,
-                Stage = ClientStage.New,
-                Progress = 10,
-            };
-            Clients.Insert(0, client);
-            Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), name, "Client created"));
-            DemoWorkspaceStore.SeedDefaults(client.Id);
-            return client;
+            Clients.Clear();
+            Clients.AddRange(clients);
+        }
+    }
+
+    /// <summary>Adds a client, or swaps in its updated record, and notes what happened in "Recent activity".</summary>
+    public static void Put(DemoClient client, string eventText)
+    {
+        lock (Gate)
+        {
+            var index = Clients.FindIndex(x => x.Id == client.Id);
+            if (index < 0) Clients.Insert(0, client);
+            else Clients[index] = client;
+            Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), client.Name, eventText));
+        }
+    }
+
+    public static void Remove(string id)
+    {
+        lock (Gate)
+        {
+            var client = Clients.SingleOrDefault(x => x.Id == id);
+            if (client is null) return;
+            Clients.Remove(client);
+            Activity.Insert(0, new ActivityEntry(DateTime.Now.ToString("HH:mm"), client.Name, "Client deleted"));
         }
     }
 }

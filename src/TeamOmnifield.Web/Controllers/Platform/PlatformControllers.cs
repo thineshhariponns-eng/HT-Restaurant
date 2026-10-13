@@ -6,8 +6,9 @@ using TeamOmnifield.Web.ViewModels;
 namespace TeamOmnifield.Web.Controllers.Platform;
 
 /// <summary>
-/// Consultant portal: the delivery pipeline for restaurant clients. Uses the
-/// in-memory demo store, so nothing here reads or writes the restaurant database.
+/// Omnifield platform portal: where clients are created, managed and tracked through delivery.
+/// Client records are saved through <see cref="ClientDirectory"/>; each client's projects,
+/// tickets, deployments and changes are still held in memory.
 /// </summary>
 [Area("Platform"), Authorize(Roles = "Developer")]
 public class DashboardController : Controller
@@ -16,9 +17,9 @@ public class DashboardController : Controller
 }
 
 [Area("Platform"), Authorize(Roles = "Developer")]
-public class ClientsController : Controller
+public class ClientsController(ClientDirectory directory) : Controller
 {
-    public IActionResult Index(string? q) 
+    public IActionResult Index(string? q)
     {
         ViewBag.Query = q ?? string.Empty;
         return View();
@@ -28,6 +29,68 @@ public class ClientsController : Controller
     {
         var client = DemoClientStore.ById(id);
         return client is null ? NotFound() : View(client);
+    }
+
+    [HttpGet]
+    public IActionResult Edit(string id)
+    {
+        var client = DemoClientStore.ById(id);
+        if (client is null) return NotFound();
+        return View(new EditClientViewModel
+        {
+            Id = client.Id, Name = client.Name, City = client.City, Contact = client.Contact,
+            ContactEmail = client.ContactEmail, Domain = client.Domain, AdminDomain = client.ResolvedAdminDomain,
+        });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(EditClientViewModel model)
+    {
+        if (DemoClientStore.ById(model.Id) is null) return NotFound();
+        if (!ModelState.IsValid) return View(model);
+
+        var domain = model.Domain.Trim().ToLowerInvariant();
+        var adminDomain = model.AdminDomain.Trim().ToLowerInvariant();
+        if (await directory.HostInUseAsync(domain, model.Id)) ModelState.AddModelError(nameof(model.Domain), "Another client already uses this hostname.");
+        if (await directory.HostInUseAsync(adminDomain, model.Id)) ModelState.AddModelError(nameof(model.AdminDomain), "Another client already uses this hostname.");
+        if (domain == adminDomain) ModelState.AddModelError(nameof(model.AdminDomain), "The admin hostname must differ from the customer hostname.");
+        if (!ModelState.IsValid) return View(model);
+
+        await directory.UpdateAsync(model.Id, model.Name.Trim(), (model.City ?? string.Empty).Trim(),
+            model.Contact.Trim(), model.ContactEmail.Trim(), domain, adminDomain);
+        TempData["Notice"] = "Client details saved.";
+        return RedirectToAction(nameof(Details), new { id = model.Id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SetStage(string id, ClientStage stage)
+    {
+        if (!Enum.IsDefined(stage)) return BadRequest();
+        if (!await directory.SetStageAsync(id, stage)) return NotFound();
+        TempData["Notice"] = $"Moved to {DemoClientStore.Label(stage)}.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SetStatus(string id, bool active)
+    {
+        if (!await directory.SetActiveAsync(id, active)) return NotFound();
+        TempData["Notice"] = active ? "Workspace reactivated." : "Workspace suspended.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var client = DemoClientStore.ById(id);
+        if (client is null) return NotFound();
+        if (!await directory.DeleteAsync(id))
+        {
+            Fail($"{client.Name} is this application's own client and cannot be deleted.");
+            return RedirectToAction(nameof(Details), new { id });
+        }
+        TempData["Notice"] = $"{client.Name} was deleted.";
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
@@ -132,36 +195,33 @@ public class ClientsController : Controller
 }
 
 [Area("Platform"), Authorize(Roles = "Developer")]
-public class OnboardingController : Controller
+public class OnboardingController(ClientDirectory directory) : Controller
 {
     [HttpGet]
     public IActionResult Index() => View(new NewClientViewModel());
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult Index(NewClientViewModel model)
+    public async Task<IActionResult> Index(NewClientViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
 
         var domain = model.Domain.Trim().ToLowerInvariant();
         var adminDomain = model.AdminDomain.Trim().ToLowerInvariant();
-        var clients = DemoClientStore.All();
 
-        bool InUse(string host) => clients.Any(x =>
-            x.Domain.Equals(host, StringComparison.OrdinalIgnoreCase) ||
-            x.ResolvedAdminDomain.Equals(host, StringComparison.OrdinalIgnoreCase));
-
-        if (InUse(domain)) ModelState.AddModelError(nameof(model.Domain), "This name already exist please enter different name");
-        if (InUse(adminDomain)) ModelState.AddModelError(nameof(model.AdminDomain), "This name already exist please enter different name");
+        if (await directory.HostInUseAsync(domain)) ModelState.AddModelError(nameof(model.Domain), "This name already exist please enter different name");
+        if (await directory.HostInUseAsync(adminDomain)) ModelState.AddModelError(nameof(model.AdminDomain), "This name already exist please enter different name");
+        if (domain == adminDomain) ModelState.AddModelError(nameof(model.AdminDomain), "The admin hostname must differ from the customer hostname.");
         if (!ModelState.IsValid) return View(model);
 
-        var client = DemoClientStore.Add(
+        var client = await directory.CreateAsync(
             model.Name.Trim(),
             (model.City ?? string.Empty).Trim(),
             model.Contact.Trim(),
             model.ContactEmail.Trim(),
-            model.Domain.Trim().ToLowerInvariant(),
-            model.AdminDomain.Trim().ToLowerInvariant());
+            domain,
+            adminDomain);
 
+        TempData["Notice"] = $"{client.Name} was created.";
         return RedirectToAction("Details", "Clients", new { area = "Platform", id = client.Id });
     }
 }
@@ -173,14 +233,14 @@ public class DomainsController : Controller
 }
 
 [Area("Platform"), Authorize(Roles = "Developer")]
-public class DeploymentsController : Controller
+public class DeploymentsController(ClientDirectory directory) : Controller
 {
     public IActionResult Index() => View();
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult Move(string id, ClientStage stage)
+    public async Task<IActionResult> Move(string id, ClientStage stage)
     {
-        DemoClientStore.MoveTo(id, stage);
+        if (Enum.IsDefined(stage)) await directory.SetStageAsync(id, stage);
         return RedirectToAction(nameof(Index));
     }
 

@@ -1,4 +1,25 @@
+using TeamOmnifield.Web.Services;
+
 namespace TeamOmnifield.Web.Models;
+
+/// <summary>A client workspace managed from the Omnifield platform portal. One row per client; its customer host is unique.</summary>
+public class PlatformClient
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string Contact { get; set; } = string.Empty;
+    public string ContactEmail { get; set; } = string.Empty;
+    public string Domain { get; set; } = string.Empty;
+    public string AdminDomain { get; set; } = string.Empty;
+    public ClientStage Stage { get; set; } = ClientStage.New;
+    /// <summary>False while the workspace is suspended.</summary>
+    public bool IsActive { get; set; } = true;
+    /// <summary>The client this application itself serves (HT Restaurant). It cannot be deleted.</summary>
+    public bool IsBuiltIn { get; set; }
+    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
+}
 
 public enum OrderStatus
 {
