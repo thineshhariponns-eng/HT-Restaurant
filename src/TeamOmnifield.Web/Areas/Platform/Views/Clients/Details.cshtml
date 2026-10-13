@@ -24,18 +24,72 @@
         <a asp-area="Platform" asp-controller="Clients" asp-action="Index" class="text-muted">&larr; Clients</a>
     </p>
 
-    <header class="page-heading" style="margin-top:12px">
-        <h1>@Model.Name @Model.City</h1>
-        <span class="status-pill">
-            <span class="dot stage-dot-@Model.Stage.ToString().ToLowerInvariant()"></span>
-            @DemoClientStore.Label(Model.Stage)
-        </span>
+    <header class="page-heading heading-row" style="margin-top:12px">
+        <div>
+            <h1>@Model.Name @Model.City</h1>
+            <p style="display:flex;align-items:center;gap:12px;margin:8px 0 0;flex-wrap:wrap">
+                <span class="status-pill">
+                    <span class="dot stage-dot-@Model.Stage.ToString().ToLowerInvariant()"></span>
+                    @DemoClientStore.Label(Model.Stage)
+                </span>
+                <span class="state-chip @(Model.IsActive ? "is-active" : "is-suspended")">@(Model.IsActive ? "Active" : "Suspended")</span>
+            </p>
+        </div>
+        <a class="btn btn-primary" asp-area="Platform" asp-controller="Clients" asp-action="Edit" asp-route-id="@Model.Id">Edit client</a>
     </header>
 
+    @if (TempData["Notice"] is string notice)
+    {
+        <div class="alert-success" role="status" style="margin-top:20px">@notice</div>
+    }
     @if (TempData["Error"] is string error)
     {
         <div class="alert-error" role="alert" style="margin-top:20px">@error</div>
     }
+
+    <section class="summary-panel" style="margin-top:24px" aria-labelledby="manageTitle">
+        <h2 id="manageTitle" class="title" style="font-size:1rem">Manage workspace</h2>
+        <div class="manage-grid">
+            <div>
+                <h3>Delivery stage</h3>
+                <p>Where this client sits in the pipeline.</p>
+                <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="SetStage" asp-route-id="@Model.Id" class="inline-form">
+                    <label for="clientStage" class="sr-only">Delivery stage</label>
+                    <select id="clientStage" name="stage">
+                        @foreach (var stage in DemoClientStore.Pipeline)
+                        {
+                            <option value="@stage" selected="@(stage == Model.Stage)">@DemoClientStore.Label(stage)</option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+                </form>
+            </div>
+            <div>
+                <h3>Workspace status</h3>
+                <p>@(Model.IsActive ? "Suspend to pause work on this client. Nothing is deleted." : "This workspace is suspended. Reactivate it to resume work.")</p>
+                <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="SetStatus" asp-route-id="@Model.Id">
+                    <input type="hidden" name="active" value="@(Model.IsActive ? "false" : "true")" />
+                    <button type="submit" class="btn btn-secondary btn-sm">@(Model.IsActive ? "Suspend workspace" : "Reactivate workspace")</button>
+                </form>
+            </div>
+            <div>
+                <h3>Delete client</h3>
+                @if (Model.IsBuiltIn)
+                {
+                    <p>This is the application's own client, so it cannot be deleted.</p>
+                }
+                else
+                {
+                    <p>Removes the client with its projects, tickets, deployments and changes. This cannot be undone.</p>
+                    <form method="post" asp-area="Platform" asp-controller="Clients" asp-action="Delete" asp-route-id="@Model.Id"
+                          data-confirm="Delete @Model.Name and everything in its workspace? This cannot be undone."
+                          onsubmit="return confirm(this.dataset.confirm);">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete client</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </section>
 
     <nav class="tree summary-panel" aria-label="Client workspace" style="margin-top:24px">
         <p class="tree-root">@Model.Name</p>
@@ -177,6 +231,7 @@
                 <div class="summary-row"><dt>Client ID</dt><dd class="tabular text-primary" style="margin:0">@Model.Code</dd></div>
                 <div class="summary-row"><dt>Name</dt><dd class="text-primary" style="margin:0">@Model.Name</dd></div>
                 <div class="summary-row"><dt>Contact</dt><dd class="text-primary" style="margin:0">@Model.Contact</dd></div>
+                <div class="summary-row"><dt>Email</dt><dd class="text-primary" style="margin:0">@Model.ContactEmail</dd></div>
                 <div class="summary-row"><dt>Created</dt><dd class="tabular text-primary" style="margin:0">@Model.CreatedUtc.ToString("d MMM yyyy")</dd></div>
                 <div class="summary-row"><dt>Updated</dt><dd class="tabular text-primary" style="margin:0">@Model.UpdatedUtc.ToString("d MMM yyyy")</dd></div>
             </dl>

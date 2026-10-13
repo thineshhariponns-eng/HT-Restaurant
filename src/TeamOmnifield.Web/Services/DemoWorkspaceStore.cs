@@ -121,6 +121,19 @@ public static class DemoWorkspaceStore
         lock (Gate) return Projects.SingleOrDefault(x => x.Id == projectId)?.Name ?? "Unknown project";
     }
 
+    /// <summary>Drops everything a deleted client owned: its projects and their tickets, deployments and changes.</summary>
+    public static void RemoveClient(string clientId)
+    {
+        lock (Gate)
+        {
+            var ids = Projects.Where(x => x.ClientId == clientId).Select(x => x.Id).ToHashSet();
+            Projects.RemoveAll(x => x.ClientId == clientId);
+            Tickets.RemoveAll(x => ids.Contains(x.ProjectId));
+            Deployments.RemoveAll(x => ids.Contains(x.ProjectId));
+            Changes.RemoveAll(x => ids.Contains(x.ProjectId));
+        }
+    }
+
     // ----- tickets -----
 
     /// <summary>Newest first.</summary>

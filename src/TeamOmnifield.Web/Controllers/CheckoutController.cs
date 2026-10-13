@@ -16,6 +16,7 @@ public class CheckoutController(CartService cartService, OrderService orderServi
     }
 
     [HttpGet]
+    [CustomerOnly]
     public IActionResult Index()
     {
         if (cartService.Get().Count == 0) return RedirectToAction("Index", "Cart");
@@ -23,6 +24,7 @@ public class CheckoutController(CartService cartService, OrderService orderServi
     }
 
     [HttpPost, ValidateAntiForgeryToken]
+    [CustomerOnly]
     public async Task<IActionResult> Index(CheckoutViewModel model)
     {
         if (!await turnstile.VerifyAsync(Request.Form["cf-turnstile-response"], HttpContext.Connection.RemoteIpAddress?.ToString()))
@@ -38,6 +40,7 @@ public class CheckoutController(CartService cartService, OrderService orderServi
 
     // Demo payment step: UI only, nothing is charged. The order is created when payment is confirmed.
     [HttpGet]
+    [CustomerOnly]
     public IActionResult Payment()
     {
         if (cartService.Get().Count == 0) return RedirectToAction("Index", "Cart");
@@ -47,6 +50,7 @@ public class CheckoutController(CartService cartService, OrderService orderServi
     }
 
     [HttpPost, ActionName("Payment"), ValidateAntiForgeryToken]
+    [CustomerOnly]
     public async Task<IActionResult> ConfirmPayment(string method)
     {
         var pending = GetPending();

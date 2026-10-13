@@ -1,37 +1,35 @@
-@inject TeamOmnifield.Web.Services.CityContextService CityContext
 @{
     var currentController = (string)ViewContext.RouteData.Values["controller"]!;
     bool IsActive(string controller) => string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
-    var city = CityContext.Current;
 }
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] &middot; HT Restaurant @city.Name Platform</title>
+    <title>@ViewData["Title"] &middot; Omnifield</title>
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/omnifield.css" asp-append-version="true" />
 </head>
-<body>
+<body class="omnifield">
 <div class="admin-shell">
     <aside class="admin-sidebar" aria-label="Sidebar">
         <div class="admin-sidebar-inner">
             <a href="/Platform" class="admin-brand">
-                <span class="name">HT Restaurant</span>
-                <span class="place label-caps">@city.Name &middot; Consultant</span>
+                <span class="brand-mark" aria-hidden="true">O</span>
+                <span><span class="name">Omnifield</span><span class="place label-caps">Client command center</span></span>
             </a>
-            <nav class="admin-nav" aria-label="Consultant">
-                <p class="label-caps group-label">Delivery</p>
-                <a href="/Platform" class="admin-nav-link @(IsActive("Dashboard") ? "active" : "")">Dashboard</a>
+            <nav class="admin-nav" aria-label="Platform">
+                <p class="label-caps group-label">Clients</p>
+                <a href="/Platform" class="admin-nav-link @(IsActive("Dashboard") ? "active" : "")">Platform overview</a>
                 <a href="/Platform/Clients" class="admin-nav-link @(IsActive("Clients") ? "active" : "")">Clients</a>
-                <a href="/Platform/Onboarding" class="admin-nav-link @(IsActive("Onboarding") ? "active" : "")">Onboarding</a>
                 <p class="label-caps group-label">Infrastructure</p>
                 <a href="/Platform/Domains" class="admin-nav-link @(IsActive("Domains") ? "active" : "")">Domains</a>
                 <a href="/Platform/Deployments" class="admin-nav-link @(IsActive("Deployments") ? "active" : "")">Deployments</a>
             </nav>
             <div class="admin-footnote">
-                <p style="margin:0 0 10px">Signed in as @(User.Identity!.Name ?? "consultant"). Client records live in memory and reset when the app restarts.</p>
+                <p style="margin:0 0 10px">Signed in as @(User.Identity!.Name ?? "consultant").</p>
                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
                     <button type="submit" class="btn btn-secondary btn-sm btn-block">Logout</button>
                 </form>
@@ -45,7 +43,7 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
             </button>
             <nav aria-label="Breadcrumb" class="admin-breadcrumb">
-                <span class="text-muted">Platform</span><span class="sep">/</span>@ViewData["Title"]
+                <span class="text-muted">Omnifield</span><span class="sep">/</span>@ViewData["Title"]
             </nav>
             <a href="http://localhost:8091/" class="btn btn-ghost btn-sm">Home</a>
             <p class="admin-clock"><time class="time tabular" data-admin-clock></time></p>
@@ -60,14 +58,13 @@
     <div class="scrim" data-drawer-close></div>
     <div class="panel">
         <a href="/Platform" class="admin-brand">
-            <span class="name">HT Restaurant</span>
-            <span class="place label-caps">@city.Name &middot; Consultant</span>
+            <span class="brand-mark" aria-hidden="true">O</span>
+            <span><span class="name">Omnifield</span><span class="place label-caps">Client command center</span></span>
         </a>
-        <nav class="admin-nav" aria-label="Consultant mobile">
-            <p class="label-caps group-label">Delivery</p>
-            <a href="/Platform" class="admin-nav-link @(IsActive("Dashboard") ? "active" : "")">Dashboard</a>
+        <nav class="admin-nav" aria-label="Platform mobile">
+            <p class="label-caps group-label">Clients</p>
+            <a href="/Platform" class="admin-nav-link @(IsActive("Dashboard") ? "active" : "")">Platform overview</a>
             <a href="/Platform/Clients" class="admin-nav-link @(IsActive("Clients") ? "active" : "")">Clients</a>
-            <a href="/Platform/Onboarding" class="admin-nav-link @(IsActive("Onboarding") ? "active" : "")">Onboarding</a>
             <p class="label-caps group-label">Infrastructure</p>
             <a href="/Platform/Domains" class="admin-nav-link @(IsActive("Domains") ? "active" : "")">Domains</a>
             <a href="/Platform/Deployments" class="admin-nav-link @(IsActive("Deployments") ? "active" : "")">Deployments</a>

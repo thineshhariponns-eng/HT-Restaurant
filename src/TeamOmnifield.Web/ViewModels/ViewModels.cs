@@ -160,3 +160,8 @@ public class NewClientViewModel
     [RegularExpression(@"^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$", ErrorMessage = "Use a hostname such as admin.spicegarden.local — lowercase, no protocol.")]
     public string AdminDomain { get; set; } = string.Empty;
 }
+
+public class EditClientViewModel : NewClientViewModel
+{
+    [Required] public string Id { get; set; } = string.Empty;
+}

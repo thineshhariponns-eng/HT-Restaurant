@@ -1,7 +1,8 @@
 @{
     ViewData["Title"] = "Clients";
     var query = ((string)ViewBag.Query ?? string.Empty).Trim();
-    var clients = DemoClientStore.All();
+    var all = DemoClientStore.All();
+    var clients = all;
     if (query.Length > 0)
     {
         clients = clients.Where(x =>
@@ -17,7 +18,13 @@
 <div class="container admin-pad">
     <header class="page-heading">
         <h1>Clients</h1>
+        <p class="text-muted" style="font-size:0.875rem">@all.Count(x => x.IsActive) active &middot; @all.Count(x => !x.IsActive) suspended</p>
     </header>
+
+    @if (TempData["Notice"] is string notice)
+    {
+        <div class="alert-success" role="status" style="margin-bottom:16px">@notice</div>
+    }
 
     <div class="toolbar">
         <a class="btn btn-primary" asp-area="Platform" asp-controller="Onboarding" asp-action="Index">+ Add client</a>
@@ -29,46 +36,58 @@
 
     @if (clients.Count == 0 && query.Length > 0)
     {
-        <div class=”empty-state”>
-            <p class=”title”>No client matches “@query”</p>
-            <p class=”hint text-muted”>Try a different name or domain.</p>
+        <div class="empty-state">
+            <p class="title">No client matches &ldquo;@query&rdquo;</p>
+            <p class="hint text-muted">Try a different name or domain.</p>
         </div>
     }
     else if (clients.Count == 0)
     {
-        <div class=”empty-state”>
-            <p class=”title”>No clients yet</p>
-            <p class=”hint text-muted”>Add your first client to start tracking its delivery.</p>
+        <div class="empty-state">
+            <p class="title">No clients yet</p>
+            <p class="hint text-muted">Add your first client to start tracking its delivery.</p>
         </div>
     }
     else
     {
-        <table class="ruled">
+        <div style="overflow-x:auto">
+        <table class="ruled" style="min-width:52rem">
             <thead>
             <tr>
                 <th>Client</th>
                 <th>Customer domain</th>
                 <th>Admin domain</th>
+                <th>Stage</th>
                 <th>Status</th>
                 <th style="text-align:right">Open tickets</th>
+                <th><span class="sr-only">Actions</span></th>
             </tr>
             </thead>
             <tbody>
             @foreach (var client in clients)
             {
                 var openTickets = DemoWorkspaceStore.TicketsOf(client.Id).Count(t => t.IsOpen);
-                <tr>
+                <tr class="@(client.IsActive ? "" : "is-suspended")">
                     <td class="text-primary">
                         <a asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">@client.Name</a>
+                        <span class="text-muted tabular" style="display:block;font-size:0.75rem;margin-top:2px">@client.Code</span>
                     </td>
                     <td class="text-body">@client.Domain</td>
                     <td class="text-body">@client.ResolvedAdminDomain</td>
                     <td><span class="label-caps stage-@client.Stage.ToString().ToLowerInvariant()">@Code(client.Stage)</span></td>
+                    <td><span class="state-chip @(client.IsActive ? "is-active" : "is-suspended")">@(client.IsActive ? "Active" : "Suspended")</span></td>
                     <td class="tabular text-body" style="text-align:right">@openTickets</td>
+                    <td>
+                        <span class="row-actions">
+                            <a class="btn btn-secondary btn-sm" asp-area="Platform" asp-controller="Clients" asp-action="Details" asp-route-id="@client.Id">Manage</a>
+                            <a class="btn btn-ghost btn-sm" asp-area="Platform" asp-controller="Clients" asp-action="Edit" asp-route-id="@client.Id">Edit</a>
+                        </span>
+                    </td>
                 </tr>
             }
             </tbody>
         </table>
+        </div>
         <p class="text-muted" style="font-size:0.875rem;margin-top:16px">Showing @clients.Count client@(clients.Count == 1 ? "" : "s")</p>
     }
 </div>
