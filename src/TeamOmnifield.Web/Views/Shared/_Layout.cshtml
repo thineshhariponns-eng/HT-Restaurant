@@ -153,7 +153,7 @@
             </ul>
         </div>
     </div>
-    <div class="bottom"><div class="container">&copy; @DateTime.Now.Year HT Restaurant @city.Name &middot; Powered by TeamOmnifield</div></div>
+    <div class="bottom"><div class="container">&copy; @DateTime.Now.Year HT Restaurant @city.Name &middot; Powered by TeamOmnifield &middot; <span class="tabular">@TeamOmnifield.Web.Services.AppVersionInfo.Display</span></div></div>
 </footer>
 @await RenderSectionAsync("Scripts", required: false)
 <script src="~/js/site.js" asp-append-version="true"></script>

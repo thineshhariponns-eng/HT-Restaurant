@@ -30,6 +30,7 @@
             </nav>
             <div class="admin-footnote">
                 <p style="margin:0 0 10px">Signed in as @(User.Identity!.Name ?? "consultant").</p>
+                <p class="text-muted tabular" style="margin:0 0 10px;font-size:0.75rem">Omnifield @TeamOmnifield.Web.Services.AppVersionInfo.Display</p>
                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
                     <button type="submit" class="btn btn-secondary btn-sm btn-block">Logout</button>
                 </form>
@@ -70,6 +71,7 @@
             <a href="/Platform/Deployments" class="admin-nav-link @(IsActive("Deployments") ? "active" : "")">Deployments</a>
         </nav>
         <div class="admin-footnote">
+            <p class="text-muted tabular" style="margin:0 0 10px;font-size:0.75rem">Omnifield @TeamOmnifield.Web.Services.AppVersionInfo.Display</p>
             <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
                 <button type="submit" class="btn btn-secondary btn-sm btn-block">Logout</button>
             </form>
